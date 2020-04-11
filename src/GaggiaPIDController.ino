@@ -21,7 +21,7 @@
 // Target steam temperature in celsius
 #define TARGET_STEAM_TEMP 146
 // Enable serial comms for debugging
-#define ENABLE_DEBUG_SERIAL 0
+#define ENABLE_DEBUG_SERIAL 1
 // PID gain parameters
 #define P_GAIN 2
 #define I_GAIN 5
@@ -43,6 +43,12 @@ MODE machine_mode(WATER_MODE);
 
 void setup()
 {
+    // Initialise serial comm
+    if (ENABLE_DEBUG_SERIAL)
+    {
+        Serial.begin(9600);
+    }
+
     // Setup the pin modes
     pinMode(WATER_TEMP_PIN, INPUT);
     pinMode(STEAM_TEMP_PIN, INPUT);
@@ -55,12 +61,6 @@ void setup()
 
     // Initialse display
     // TODO
-
-    // Initialise serial comm
-    if (ENABLE_DEBUG_SERIAL)
-    {
-        Serial.begin(9600);
-    }
 }
 
 void loop()
@@ -92,10 +92,16 @@ void loop()
     uint8_t relay_request = pid->compute(&current_temp, &target_temp);
 
     // Set boiler SSR On or Off
-    pinMode(BOILER_SSR_PIN, relay_request);
+    set_boiler_status(relay_request);
 
     // Update display
     // TODO
+
+    // Debug serial prints
+    message("Operation mode: " + String(machine_mode));
+    message("Current temp: " + String(current_temp));
+    message("Target temp: " + String(target_temp));
+    message("SSR status: " + String(relay_request));
 }
 
 /* Return the current working mode of the machine */
@@ -103,6 +109,11 @@ MODE get_machine_mode()
 {
     int value = digitalRead(STEAM_SWITCH_PIN);
     return value ? MODE::STEAM_MODE : MODE::WATER_MODE;
+}
+
+void set_boiler_status(const uint8_t &value)
+{
+    pinMode(BOILER_SSR_PIN, value);
 }
 
 void message(const String &msg)
