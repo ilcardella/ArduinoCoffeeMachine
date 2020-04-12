@@ -6,29 +6,42 @@ RelayPIDController::RelayPIDController(const uint16_t &kp, const uint16_t &ki,
       pid_setpoint(0.0), pid_window_size(5000), pid_window_start(millis())
 {
     pid = new PID(&pid_input, &pid_output, &pid_setpoint, kp, ki, kd, DIRECT);
+    // the PID output will represents a time window capped at pid_window_size
     pid->SetOutputLimits(0, pid_window_size);
     pid->SetMode(AUTOMATIC);
 }
 
 bool RelayPIDController::compute(double *input, double *setpoint)
 {
-    // Update the pid wrapper status
+    auto now = millis();
+
+    // How much time it has passed in the current window frame
+    long window_progress = now - pid_window_start;
+
+    // Restart the window then millis() rolls over
+    if (window_progress < 0)
+    {
+        pid_window_start = 0;
+        window_progress = now - pid_window_start;
+    }
+
+    // Update the pid input and setpoint with those requested
     pid_input = *input;
     pid_setpoint = *setpoint;
 
-    // Process the pid feedback loop
+    // Process the pid output
     pid->Compute();
 
     // Check if the window needs to be shifted
-    if (millis() - pid_window_start > pid_window_size)
+    if (window_progress > pid_window_size)
     {
         pid_window_start += pid_window_size;
     }
 
-    // Return a digitail status based on the pid output
-    if (pid_output < millis() - pid_window_start)
+    // Return a digital status based on the pid output
+    if (pid_output < window_progress)
     {
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }

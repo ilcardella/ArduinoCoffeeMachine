@@ -17,9 +17,9 @@
 // Input pin to detect steam mode
 #define STEAM_SWITCH_PIN 7
 // Target water temperature in celsius
-#define TARGET_WATER_TEMP 93
+#define TARGET_WATER_TEMP 93.5
 // Target steam temperature in celsius
-#define TARGET_STEAM_TEMP 146
+#define TARGET_STEAM_TEMP 146.0
 // Enable serial comms for debugging
 #define ENABLE_DEBUG_SERIAL 1
 // PID gain parameters
@@ -36,10 +36,17 @@ enum MODE
     STEAM_MODE = 1
 };
 
+struct ControlStatus
+{
+    MODE machine_mode;
+    double current_temperature;
+    double target_temperature;
+};
+
 TemperatureSensor *water_sensor;
 TemperatureSensor *steam_sensor;
 RelayPIDController *pid;
-MODE machine_mode(WATER_MODE);
+ControlStatus machine_status;
 
 void setup()
 {
@@ -58,6 +65,9 @@ void setup()
     water_sensor = new TemperatureSensor(WATER_TEMP_PIN, "water_sensor");
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
+    machine_status.current_temperature = 0.0;
+    machine_status.target_temperature = TARGET_WATER_TEMP;
+    machine_status.machine_mode = MODE::WATER_MODE;
 
     // Initialse display
     // TODO
@@ -65,31 +75,15 @@ void setup()
 
 void loop()
 {
-    // Read operation mode
-    MODE new_mode = get_machine_mode();
-    if (new_mode != machine_mode)
+    if (!update_machine_status(&machine_status))
     {
-        // TODO perform actions required at mode switch
-        machine_mode = new_mode;
-    }
-    // Select correct sensor and target temperature for current operation mode
-    TemperatureSensor *sensor =
-        (machine_mode == WATER_MODE) ? water_sensor : steam_sensor;
-    double target_temp =
-        (machine_mode == WATER_MODE) ? TARGET_WATER_TEMP : TARGET_STEAM_TEMP;
-
-    // Get the current temp from the temperature sensor
-    float sensor_value;
-    if (!sensor->get_temperature_celsius(&sensor_value))
-    {
-        message("Unable to read temperature from sensor: " + sensor->get_name());
         // TODO signal error on display
         return;
     }
 
     // Compute PID controller step with current data
-    double current_temp = sensor_value;
-    uint8_t relay_request = pid->compute(&current_temp, &target_temp);
+    uint8_t relay_request = pid->compute(&machine_status.current_temperature,
+                                         &machine_status.target_temperature);
 
     // Set boiler SSR On or Off
     set_boiler_status(relay_request);
@@ -98,10 +92,34 @@ void loop()
     // TODO
 
     // Debug serial prints
-    message("Operation mode: " + String(machine_mode));
-    message("Current temp: " + String(current_temp));
-    message("Target temp: " + String(target_temp));
+    message("Operation mode: " + String(machine_status.machine_mode));
+    message("Current temp: " + String(machine_status.current_temperature));
+    message("Target temp: " + String(machine_status.target_temperature));
     message("SSR status: " + String(relay_request));
+}
+
+bool update_machine_status(ControlStatus *status)
+{
+    // Read operation mode
+    status->machine_mode = get_machine_mode();
+    // Set target temperature based on machine mode
+    status->target_temperature =
+        (status->machine_mode == WATER_MODE) ? TARGET_WATER_TEMP : TARGET_STEAM_TEMP;
+
+    // Select correct sensor for current operation mode
+    TemperatureSensor *sensor =
+        (status->machine_mode == WATER_MODE) ? water_sensor : steam_sensor;
+
+    // Get the current temp from the temperature sensor
+    float sensor_value;
+    if (!sensor->get_temperature_celsius(&sensor_value))
+    {
+        // TODO add a String message in ControlStatus
+        message("Unable to read temperature from sensor: " + sensor->get_name());
+        return false;
+    }
+    status->current_temperature = static_cast<double>(sensor_value);
+    return true;
 }
 
 /* Return the current working mode of the machine */
