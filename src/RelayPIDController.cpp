@@ -30,10 +30,7 @@ bool RelayPIDController::compute(double *input, double *setpoint, bool *relay_on
     pid_setpoint = *setpoint;
 
     // Process the pid output
-    if (!pid->Compute())
-    {
-        return false;
-    }
+    pid->Compute();
 
     // Check if the window needs to be shifted
     if (window_progress > pid_window_size)

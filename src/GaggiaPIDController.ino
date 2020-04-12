@@ -20,12 +20,10 @@
 #define TARGET_WATER_TEMP 93.5
 // Target steam temperature in celsius
 #define TARGET_STEAM_TEMP 146.0
-// Enable serial comms for debugging
-#define ENABLE_DEBUG_SERIAL 1
 // PID gain parameters
-#define P_GAIN 2
-#define I_GAIN 5
-#define D_GAIN 1
+#define P_GAIN 100
+#define I_GAIN 50
+#define D_GAIN 20
 
 /************************************************/
 
@@ -38,26 +36,25 @@ enum MODE
 
 struct ControlStatus
 {
-    MODE machine_mode;
-    double current_temperature;
-    double target_temperature;
-    bool water_heater_on;
-    String status_message;
+    MODE machine_mode = MODE::WATER_MODE;
+    double current_temperature = 0.0;
+    double target_temperature = TARGET_WATER_TEMP;
+    bool water_heater_on = false;
+    String status_message = "Loading...";
+};
 
-    ControlStatus()
-    {
-        current_temperature = 0.0;
-        target_temperature = TARGET_WATER_TEMP;
-        machine_mode = MODE::WATER_MODE;
-        water_heater_on = false;
-        status_message = "Loading...";
-    }
+struct SerialComms
+{
+    bool debug_mode = true;
+    unsigned long last_sent = 0;
+    uint16_t print_timeout = 1000;
 };
 
 TemperatureSensor *water_sensor;
 TemperatureSensor *steam_sensor;
 RelayPIDController *pid;
 ControlStatus machine_status;
+SerialComms serial_comms;
 
 void setup()
 {
@@ -72,29 +69,20 @@ void setup()
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
 
-    initialiase_serial();
+    Serial.begin(9600);
 
     initialise_display();
 }
 
 void loop()
 {
-    if (not update_machine_status(&machine_status))
-    {
-        // TODO signal error on display
-        return;
-    }
+    read_serial();
 
-    // Compute PID controller step with current data
-    if (not pid->compute(&machine_status.current_temperature,
-                         &machine_status.target_temperature,
-                         &machine_status.water_heater_on))
-    {
-        // TODO signal error on display
-        return;
-    }
+    update_machine_status(&machine_status);
 
-    // Set heater SSR On or Off
+    pid->compute(&machine_status.current_temperature, &machine_status.target_temperature,
+                 &machine_status.water_heater_on);
+
     set_heater_status(machine_status.water_heater_on);
 
     update_display();
@@ -104,11 +92,16 @@ void loop()
 
 bool update_machine_status(ControlStatus *status)
 {
+    status->status_message = "";
     // Read operation mode
     status->machine_mode = get_machine_mode();
     // Set target temperature based on machine mode
     status->target_temperature =
         (status->machine_mode == WATER_MODE) ? TARGET_WATER_TEMP : TARGET_STEAM_TEMP;
+
+    // When debug mode is enabled do not read sensors
+    if (serial_comms.debug_mode)
+        return true;
 
     // Select correct sensor for current operation mode
     TemperatureSensor *sensor =
@@ -122,10 +115,6 @@ bool update_machine_status(ControlStatus *status)
         status->status_message =
             "Unable to read temperature from sensor: " + sensor->get_name();
         return false;
-    }
-    else
-    {
-        status->status_message = "";
     }
 
     status->current_temperature = static_cast<double>(sensor_value);
@@ -166,18 +155,36 @@ void update_display()
 //# Serial
 //##########################
 
-void initialiase_serial()
+void read_serial()
 {
-    if (ENABLE_DEBUG_SERIAL)
+    // Read input data and enable or disable the debug mode
+    // If debug mode is enabled, accept temperature input
+    // to overwrite sensor readings
+    if (Serial.available())
     {
-        Serial.begin(9600);
+        auto input = Serial.readStringUntil('\n');
+        if (input.startsWith("debug on"))
+        {
+            serial_comms.debug_mode = true;
+        }
+        else if (input.startsWith("debug off"))
+        {
+            serial_comms.debug_mode = false;
+        }
+        else if (serial_comms.debug_mode)
+        {
+            machine_status.current_temperature = input.toDouble();
+        }
     }
 }
 
 void print_status_on_serial()
 {
-    if (ENABLE_DEBUG_SERIAL)
+    auto now = millis();
+    if (serial_comms.debug_mode &&
+        now - serial_comms.last_sent > serial_comms.print_timeout)
     {
+        serial_comms.last_sent = now;
         Serial.println("Operation mode: " + String(machine_status.machine_mode));
         Serial.println("Current temp: " + String(machine_status.current_temperature));
         Serial.println("Target temp: " + String(machine_status.target_temperature));
