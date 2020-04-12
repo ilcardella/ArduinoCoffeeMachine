@@ -13,7 +13,7 @@
 // Input pin of the steam temperature sensor
 #define STEAM_TEMP_PIN 5
 // Output PWM pin to control the boiler
-#define BOILER_SSR_PIN 6
+#define HEATER_SSR_PIN 6
 // Input pin to detect steam mode
 #define STEAM_SWITCH_PIN 7
 // Target water temperature in celsius
@@ -41,6 +41,15 @@ struct ControlStatus
     MODE machine_mode;
     double current_temperature;
     double target_temperature;
+    bool water_heater_on;
+
+    ControlStatus()
+    {
+        current_temperature = 0.0;
+        target_temperature = TARGET_WATER_TEMP;
+        machine_mode = MODE::WATER_MODE;
+        water_heater_on = false;
+    }
 };
 
 TemperatureSensor *water_sensor;
@@ -59,15 +68,13 @@ void setup()
     // Setup the pin modes
     pinMode(WATER_TEMP_PIN, INPUT);
     pinMode(STEAM_TEMP_PIN, INPUT);
-    pinMode(BOILER_SSR_PIN, OUTPUT);
+    pinMode(HEATER_SSR_PIN, OUTPUT);
     pinMode(STEAM_SWITCH_PIN, INPUT);
+
     // Initialise sensors and other members
     water_sensor = new TemperatureSensor(WATER_TEMP_PIN, "water_sensor");
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
-    machine_status.current_temperature = 0.0;
-    machine_status.target_temperature = TARGET_WATER_TEMP;
-    machine_status.machine_mode = MODE::WATER_MODE;
 
     // Initialse display
     // TODO
@@ -75,18 +82,23 @@ void setup()
 
 void loop()
 {
-    if (!update_machine_status(&machine_status))
+    if (not update_machine_status(&machine_status))
     {
         // TODO signal error on display
         return;
     }
 
     // Compute PID controller step with current data
-    uint8_t relay_request = pid->compute(&machine_status.current_temperature,
-                                         &machine_status.target_temperature);
+    if (not pid->compute(&machine_status.current_temperature,
+                         &machine_status.target_temperature,
+                         &machine_status.water_heater_on))
+    {
+        // TODO signal error on display
+        return;
+    }
 
-    // Set boiler SSR On or Off
-    set_boiler_status(relay_request);
+    // Set heater SSR On or Off
+    set_heater_status(machine_status.water_heater_on);
 
     // Update display
     // TODO
@@ -95,7 +107,7 @@ void loop()
     message("Operation mode: " + String(machine_status.machine_mode));
     message("Current temp: " + String(machine_status.current_temperature));
     message("Target temp: " + String(machine_status.target_temperature));
-    message("SSR status: " + String(relay_request));
+    message("SSR status: " + String(machine_status.water_heater_on));
 }
 
 bool update_machine_status(ControlStatus *status)
@@ -129,9 +141,9 @@ MODE get_machine_mode()
     return value ? MODE::STEAM_MODE : MODE::WATER_MODE;
 }
 
-void set_boiler_status(const uint8_t &value)
+void set_heater_status(const uint8_t &value)
 {
-    pinMode(BOILER_SSR_PIN, value);
+    pinMode(HEATER_SSR_PIN, value);
 }
 
 void message(const String &msg)
