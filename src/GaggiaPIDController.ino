@@ -42,6 +42,7 @@ struct ControlStatus
     double current_temperature;
     double target_temperature;
     bool water_heater_on;
+    String status_message;
 
     ControlStatus()
     {
@@ -49,6 +50,7 @@ struct ControlStatus
         target_temperature = TARGET_WATER_TEMP;
         machine_mode = MODE::WATER_MODE;
         water_heater_on = false;
+        status_message = "Loading...";
     }
 };
 
@@ -59,25 +61,20 @@ ControlStatus machine_status;
 
 void setup()
 {
-    // Initialise serial comm
-    if (ENABLE_DEBUG_SERIAL)
-    {
-        Serial.begin(9600);
-    }
-
     // Setup the pin modes
     pinMode(WATER_TEMP_PIN, INPUT);
     pinMode(STEAM_TEMP_PIN, INPUT);
     pinMode(HEATER_SSR_PIN, OUTPUT);
     pinMode(STEAM_SWITCH_PIN, INPUT);
 
-    // Initialise sensors and other members
+    // Initialise sensors and actuators
     water_sensor = new TemperatureSensor(WATER_TEMP_PIN, "water_sensor");
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
 
-    // Initialse display
-    // TODO
+    initialiase_serial();
+
+    initialise_display();
 }
 
 void loop()
@@ -100,14 +97,9 @@ void loop()
     // Set heater SSR On or Off
     set_heater_status(machine_status.water_heater_on);
 
-    // Update display
-    // TODO
+    update_display();
 
-    // Debug serial prints
-    message("Operation mode: " + String(machine_status.machine_mode));
-    message("Current temp: " + String(machine_status.current_temperature));
-    message("Target temp: " + String(machine_status.target_temperature));
-    message("SSR status: " + String(machine_status.water_heater_on));
+    print_status_on_serial();
 }
 
 bool update_machine_status(ControlStatus *status)
@@ -127,10 +119,17 @@ bool update_machine_status(ControlStatus *status)
     if (!sensor->get_temperature_celsius(&sensor_value))
     {
         // TODO add a String message in ControlStatus
-        message("Unable to read temperature from sensor: " + sensor->get_name());
+        status->status_message =
+            "Unable to read temperature from sensor: " + sensor->get_name();
         return false;
     }
+    else
+    {
+        status->status_message = "";
+    }
+
     status->current_temperature = static_cast<double>(sensor_value);
+
     return true;
 }
 
@@ -141,15 +140,48 @@ MODE get_machine_mode()
     return value ? MODE::STEAM_MODE : MODE::WATER_MODE;
 }
 
-void set_heater_status(const uint8_t &value)
+void set_heater_status(const bool &heater_on)
 {
-    pinMode(HEATER_SSR_PIN, value);
+    uint8_t pin_level = heater_on ? HIGH : LOW;
+    pinMode(HEATER_SSR_PIN, pin_level);
 }
 
-void message(const String &msg)
+//##########################
+//# Display
+//##########################
+
+void initialise_display()
+{
+    // TODO
+    ;
+}
+
+void update_display()
+{
+    // TODO
+    ;
+}
+
+//##########################
+//# Serial
+//##########################
+
+void initialiase_serial()
 {
     if (ENABLE_DEBUG_SERIAL)
     {
-        Serial.println(msg);
+        Serial.begin(9600);
+    }
+}
+
+void print_status_on_serial()
+{
+    if (ENABLE_DEBUG_SERIAL)
+    {
+        Serial.println("Operation mode: " + String(machine_status.machine_mode));
+        Serial.println("Current temp: " + String(machine_status.current_temperature));
+        Serial.println("Target temp: " + String(machine_status.target_temperature));
+        Serial.println("SSR status: " + String(machine_status.water_heater_on));
+        Serial.println("Message: " + machine_status.status_message);
     }
 }
