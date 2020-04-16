@@ -1,6 +1,7 @@
 /* GaggiaPIDController
  */
 
+#include "Display.h"
 #include "RelayPIDController.h"
 #include "SerialInterface.h"
 #include "TemperatureSensor.h"
@@ -36,6 +37,7 @@ TemperatureSensor *steam_sensor;
 RelayPIDController *pid;
 Gaggia::ControlStatus machine_status;
 SerialInterface *serial;
+Display *display;
 
 void setup()
 {
@@ -50,8 +52,7 @@ void setup()
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
     serial = new SerialInterface(SERIAL_BAUDRATE);
-
-    initialise_display();
+    display = new Display();
 }
 
 void loop()
@@ -67,7 +68,7 @@ void loop()
 
     serial->print_status(&machine_status);
 
-    update_display(&machine_status);
+    display->update(&machine_status);
 }
 
 bool update_machine_status(Gaggia::ControlStatus *status)
@@ -117,20 +118,4 @@ void set_heater_status(const bool *heater_on)
 {
     uint8_t pin_level = *heater_on ? HIGH : LOW;
     pinMode(HEATER_SSR_PIN, pin_level);
-}
-
-//##########################
-//# Display
-//##########################
-
-void initialise_display()
-{
-    // TODO
-    ;
-}
-
-void update_display(Gaggia::ControlStatus *status)
-{
-    // TODO
-    ;
 }
