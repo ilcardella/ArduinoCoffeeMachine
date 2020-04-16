@@ -2,7 +2,9 @@
  */
 
 #include "RelayPIDController.h"
+#include "SerialInterface.h"
 #include "TemperatureSensor.h"
+#include "libraries/Common.h"
 
 /************************************************/
 // USER SETTINGS
@@ -24,38 +26,16 @@
 #define P_GAIN 100
 #define I_GAIN 50
 #define D_GAIN 20
+#define SERIAL_BAUDRATE 9600
 
 /************************************************/
 
 // Global variables and structs
-enum MODE
-{
-    WATER_MODE = 0,
-    STEAM_MODE = 1
-};
-
-struct ControlStatus
-{
-    MODE machine_mode = MODE::WATER_MODE;
-    double current_temperature = 0.0;
-    double target_temperature = TARGET_WATER_TEMP;
-    bool water_heater_on = false;
-    String status_message = "Loading...";
-};
-
-struct SerialComms
-{
-    const uint16_t PRINT_TIMEOUT = 1000;
-    unsigned long time_last_print = 0;
-    bool debug_mode = true;
-    double mock_temperature = 0.0;
-};
-
 TemperatureSensor *water_sensor;
 TemperatureSensor *steam_sensor;
 RelayPIDController *pid;
-ControlStatus machine_status;
-SerialComms serial_comms;
+Gaggia::ControlStatus machine_status;
+SerialInterface *serial;
 
 void setup()
 {
@@ -69,13 +49,14 @@ void setup()
     water_sensor = new TemperatureSensor(WATER_TEMP_PIN, "water_sensor");
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
+    serial = new SerialInterface(SERIAL_BAUDRATE);
 
     initialise_display();
 }
 
 void loop()
 {
-    read_serial();
+    serial->read_input();
 
     update_machine_status(&machine_status);
 
@@ -84,30 +65,31 @@ void loop()
 
     set_heater_status(&machine_status.water_heater_on);
 
-    print_status_on_serial();
+    serial->print_status(&machine_status);
 
     update_display(&machine_status);
 }
 
-bool update_machine_status(ControlStatus *status)
+bool update_machine_status(Gaggia::ControlStatus *status)
 {
     status->status_message = "";
     // Read operation mode
     status->machine_mode = get_machine_mode();
     // Set target temperature based on machine mode
-    status->target_temperature =
-        (status->machine_mode == WATER_MODE) ? TARGET_WATER_TEMP : TARGET_STEAM_TEMP;
+    status->target_temperature = (status->machine_mode == Gaggia::WATER_MODE)
+                                     ? TARGET_WATER_TEMP
+                                     : TARGET_STEAM_TEMP;
 
     // When debug mode is enabled do not read sensors
-    if (serial_comms.debug_mode)
+    if (serial->is_debug_active())
     {
-        status->current_temperature = serial_comms.mock_temperature;
+        status->current_temperature = serial->get_mock_temperature();
         return true;
     }
 
     // Select correct sensor for current operation mode
     TemperatureSensor *sensor =
-        (status->machine_mode == WATER_MODE) ? water_sensor : steam_sensor;
+        (status->machine_mode == Gaggia::WATER_MODE) ? water_sensor : steam_sensor;
 
     // Get the current temp from the temperature sensor
     float sensor_value;
@@ -125,10 +107,10 @@ bool update_machine_status(ControlStatus *status)
 }
 
 /* Return the current working mode of the machine */
-MODE get_machine_mode()
+Gaggia::MODE get_machine_mode()
 {
     int value = digitalRead(STEAM_SWITCH_PIN);
-    return value ? MODE::STEAM_MODE : MODE::WATER_MODE;
+    return value ? Gaggia::STEAM_MODE : Gaggia::WATER_MODE;
 }
 
 void set_heater_status(const bool *heater_on)
@@ -144,53 +126,11 @@ void set_heater_status(const bool *heater_on)
 void initialise_display()
 {
     // TODO
-    Serial.begin(9600);
-}
-
-void update_display(ControlStatus *status)
-{
-    // TODO
     ;
 }
 
-//##########################
-//# Serial
-//##########################
-
-void read_serial()
+void update_display(Gaggia::ControlStatus *status)
 {
-    // Read input data and enable or disable the debug mode
-    // If debug mode is enabled, accept temperature input
-    // to overwrite sensor readings
-    if (Serial.available())
-    {
-        auto input = Serial.readStringUntil('\n');
-        if (input.startsWith("debug on"))
-        {
-            serial_comms.debug_mode = true;
-        }
-        else if (input.startsWith("debug off"))
-        {
-            serial_comms.debug_mode = false;
-        }
-        else if (serial_comms.debug_mode)
-        {
-            serial_comms.mock_temperature = input.toDouble();
-        }
-    }
-}
-
-void print_status_on_serial()
-{
-    auto now = millis();
-    if (serial_comms.debug_mode &&
-        now - serial_comms.time_last_print > serial_comms.PRINT_TIMEOUT)
-    {
-        serial_comms.time_last_print = now;
-        Serial.println("Operation mode: " + String(machine_status.machine_mode));
-        Serial.println("Current temp: " + String(machine_status.current_temperature));
-        Serial.println("Target temp: " + String(machine_status.target_temperature));
-        Serial.println("SSR status: " + String(machine_status.water_heater_on));
-        Serial.println("Message: " + machine_status.status_message);
-    }
+    // TODO
+    ;
 }
