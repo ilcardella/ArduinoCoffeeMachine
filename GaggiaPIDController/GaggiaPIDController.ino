@@ -96,7 +96,6 @@ bool update_machine_status(Gaggia::ControlStatus *status)
     float sensor_value;
     if (!sensor->get_temperature_celsius(&sensor_value))
     {
-        // TODO add a String message in ControlStatus
         status->status_message =
             "Unable to read temperature from sensor: " + sensor->get_name();
         return false;
