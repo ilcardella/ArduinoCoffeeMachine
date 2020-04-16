@@ -9,7 +9,17 @@ A big thank you goes to these two other projects that helped me a lot in the und
 - [RaspberryPI based](http://int03.co.uk/blog/project-coffee-espiresso-machine/)
 - [Arduino based](http://www.cyberelectronics.org/?p=458)
 
-## Components
+## Software
+
+### Arduino libraries
+
+This project depends on the following Arduino libraries:
+- PID
+- TSIC
+
+## Hardware
+
+### Components
 
 This is the list of components required for this project:
 - 1x Arduino (any board type will do)
@@ -18,7 +28,7 @@ This is the list of components required for this project:
 - 1x I2C LCD or OLED
 - Wires and other utilities
 
-# Schematics
+### Schematics
 
 The following is the original schematic of the coffee machine:
 
