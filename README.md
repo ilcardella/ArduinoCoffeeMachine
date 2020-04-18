@@ -57,9 +57,11 @@ The following is the original schematic of the coffee machine:
 
 ![gaggia_classic_circuit](docs/schematics/gaggia_classic_circuit.png "Gaggia Classic circuit")
 
-This in how it looks with the Arduino controller and the sensors:
+This in how it looks with the Arduino controller and the SSR:
 
-TBD
+![gaggia_classic_circuit_modified](docs/schematics/gaggia_classic_circuit_arduino.png "Gaggia Classic circuit modified")
+
+The 2 stock thermostats are being replaced by 2 TSic306 digital sensors.
 
 ## Credits
 
