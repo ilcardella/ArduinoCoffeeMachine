@@ -1,7 +1,7 @@
 #include "SerialInterface.h"
 
 SerialInterface::SerialInterface(const uint16_t &baudrate)
-    : time_last_print(0), debug_mode(false), mock_temperature(0.0), enable_output(true)
+    : time_last_print(0), debug_mode(false), mock_temperature(0.0), enable_output(false)
 {
     Serial.begin(baudrate);
 }

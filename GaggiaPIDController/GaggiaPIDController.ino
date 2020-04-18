@@ -66,14 +66,14 @@ void loop()
 
     set_heater_status(&machine_status.water_heater_on);
 
-    serial->print_status(&machine_status);
-
     display->update(&machine_status);
+
+    serial->print_status(&machine_status);
 }
 
 bool update_machine_status(Gaggia::ControlStatus *status)
 {
-    status->status_message = "";
+    status->status_message = "Ready";
     // Read operation mode
     status->machine_mode = get_machine_mode();
     // Set target temperature based on machine mode
@@ -94,7 +94,7 @@ bool update_machine_status(Gaggia::ControlStatus *status)
 
     // Get the current temp from the temperature sensor
     float sensor_value;
-    if (!sensor->get_temperature_celsius(&sensor_value))
+    if (not sensor->get_temperature_celsius(&sensor_value))
     {
         status->status_message =
             "Unable to read temperature from sensor: " + sensor->get_name();
