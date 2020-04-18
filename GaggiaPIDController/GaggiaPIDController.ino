@@ -12,21 +12,21 @@
 /************************************************/
 
 // Input pin of the water temperature sensor
-#define WATER_TEMP_PIN 2
+#define WATER_TEMP_PIN 4
 // Input pin of the steam temperature sensor
-#define STEAM_TEMP_PIN 3
+#define STEAM_TEMP_PIN 5
 // Output PWM pin to control the boiler
-#define HEATER_SSR_PIN 4
+#define HEATER_SSR_PIN 6
 // Input pin to detect steam mode
-#define STEAM_SWITCH_PIN 5
+#define STEAM_SWITCH_PIN 7
 // Target water temperature in celsius
 #define TARGET_WATER_TEMP 93.5
 // Target steam temperature in celsius
 #define TARGET_STEAM_TEMP 146.0
 // PID gain parameters
-#define P_GAIN 100
-#define I_GAIN 50
-#define D_GAIN 20
+#define P_GAIN 1
+#define I_GAIN 1
+#define D_GAIN 1
 #define SERIAL_BAUDRATE 9600
 
 /************************************************/
@@ -116,5 +116,5 @@ Gaggia::MODE get_machine_mode()
 void set_heater_status(const bool *heater_on)
 {
     uint8_t pin_level = *heater_on ? HIGH : LOW;
-    pinMode(HEATER_SSR_PIN, pin_level);
+    digitalWrite(HEATER_SSR_PIN, pin_level);
 }

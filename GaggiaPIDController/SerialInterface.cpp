@@ -1,7 +1,7 @@
 #include "SerialInterface.h"
 
 SerialInterface::SerialInterface(const uint16_t &baudrate)
-    : time_last_print(0), debug_mode(false), mock_temperature(0.0)
+    : time_last_print(0), debug_mode(false), mock_temperature(0.0), enable_output(true)
 {
     Serial.begin(baudrate);
 }
@@ -22,6 +22,14 @@ void SerialInterface::read_input()
         {
             debug_mode = false;
         }
+        else if (input.startsWith("output on"))
+        {
+            enable_output = true;
+        }
+        else if(input.startsWith("output off"))
+        {
+            enable_output = false;
+        }
         else if (is_debug_active())
         {
             mock_temperature = input.toDouble();
@@ -32,7 +40,7 @@ void SerialInterface::read_input()
 void SerialInterface::print_status(Gaggia::ControlStatus *status)
 {
     auto now = millis();
-    if (is_debug_active() && now - time_last_print > PRINT_TIMEOUT)
+    if (is_output_enabled() && now - time_last_print > PRINT_TIMEOUT)
     {
         time_last_print = now;
         Serial.println("Operation mode: " + String(status->machine_mode));
@@ -43,10 +51,16 @@ void SerialInterface::print_status(Gaggia::ControlStatus *status)
     }
 }
 
+bool SerialInterface::is_output_enabled()
+{
+    return enable_output;
+}
+
 bool SerialInterface::is_debug_active()
 {
     return debug_mode;
 }
+
 double SerialInterface::get_mock_temperature()
 {
     return mock_temperature;

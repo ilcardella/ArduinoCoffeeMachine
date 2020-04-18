@@ -22,5 +22,5 @@ class TemperatureSensor
     String name;
     float last_read;
     unsigned long time_last_read;
-    static constexpr int MIN_READ_PERIOD = 100;
+    static constexpr int MIN_READ_PERIOD = 300;
 };
