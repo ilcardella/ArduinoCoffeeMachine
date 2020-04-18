@@ -1,0 +1,8 @@
+version: '3'
+services:
+  arduino-builder:
+    build: .
+    image: arduino-builder
+    command: scripts/build-project.sh $CORE $BOARD
+    volumes:
+        - "../:/build"

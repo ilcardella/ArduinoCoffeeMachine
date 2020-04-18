@@ -19,28 +19,26 @@ You can build the code using the Arduino IDE or with VSCode with the [Arduino ex
 
 #### Build with Docker
 
-The code can be built inside a Docker container using a Docker image generated from the `Dockerfile` provided in the `docker` directory.
-First build the Docker image:
+The code can be built inside a Docker container using docker-compose. The `docker-compose.yml` and the `Dockerfile` are in the `docker` directory. The `docker-compose.yml` depends on 2 environment variables that must be defined before starting the build:
+- CORE: the Arduino core
+- BOARD: the Arduino board to use
+Refers to the [arduino-cli](https://arduino.github.io/arduino-cli/) documentation to see the list of available values.
+The following is an example that builds the code for an Arduino Nano board:
 
 ```
 $ cd /path/to/repo
-$ docker build --rm -f docker/Dockerfile -t arduino-build .
+$ CORE=avr BOARD=nano docker-compose -f docker/docker-compose.yml up
 ```
 
-The previous command will create a Docker image called `arduino-build` that can be used to build the code.
-The following command generate the `.hex` for an Arduino Nano board:
+The generated build files will be in the `GaggiaPIDController` directory.
+
+After building the Docker image the first time, you can then use the `arduino-cli` installed in the Docker image directly with:
 
 ```
-$ docker run --rm -it -v /path/to/repo:/build arduino-build scripts/build-project.sh avr nano
-```
-
-You can use the `arduino-cli` installed in the Docker image directly with:
-
-```
-$ docker run --rm -it -v $PWD:/build arduino-build arduino-cli version
+$ cd /path/to/repo
+$ docker run --rm -it -v $PWD:/build arduino-builder arduino-cli version
 arduino-cli Version: 0.10.0 Commit: ec5c3ed
 ```
-
 
 ## Hardware
 
