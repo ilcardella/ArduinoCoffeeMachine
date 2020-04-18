@@ -34,6 +34,14 @@ The following command generate the `.hex` for an Arduino Nano board:
 $ docker run --rm -it -v /path/to/repo:/build arduino-build scripts/build-project.sh avr nano
 ```
 
+You can use the `arduino-cli` installed in the Docker image directly with:
+
+```
+$ docker run --rm -it -v $PWD:/build arduino-build arduino-cli version
+arduino-cli Version: 0.10.0 Commit: ec5c3ed
+```
+
+
 ## Hardware
 
 ### Components
