@@ -1,7 +1,6 @@
 #include "SerialInterface.h"
 
-SerialInterface::SerialInterface(const uint16_t &baudrate)
-    : time_last_print(0), debug_mode(false), mock_temperature(0.0), enable_output(false)
+SerialInterface::SerialInterface(const uint16_t &baudrate) : time_last_print(0), inputs()
 {
     Serial.begin(baudrate);
 }
@@ -13,28 +12,101 @@ void SerialInterface::read_input()
     // to overwrite sensor readings
     if (Serial.available())
     {
-        auto input = Serial.readStringUntil('\n');
-        if (input.startsWith("debug on"))
+        auto data = Serial.readStringUntil('\n');
+        if (data.startsWith("help"))
         {
-            debug_mode = true;
+            print_help();
         }
-        else if (input.startsWith("debug off"))
+        else if (data.startsWith("debug on"))
         {
-            debug_mode = false;
+            inputs.debug_mode = true;
+            Serial.println("Setting debug mode ON");
         }
-        else if (input.startsWith("output on"))
+        else if (data.startsWith("debug off"))
         {
-            enable_output = true;
+            inputs.debug_mode = false;
+            Serial.println("Setting debug mode OFF");
         }
-        else if(input.startsWith("output off"))
+        else if (data.startsWith("output on"))
         {
-            enable_output = false;
+            inputs.enable_output = true;
+            Serial.println("Setting output ON");
         }
-        else if (is_debug_active())
+        else if (data.startsWith("output off"))
         {
-            mock_temperature = input.toDouble();
+            inputs.enable_output = false;
+            Serial.println("Setting output OFF");
+        }
+        else if (data.startsWith("temp ") && is_debug_active())
+        {
+            data.replace("temp ", "");
+            inputs.mock_temperature = data.toDouble();
+            Serial.println("Setting mock temperature to; " + data);
+        }
+        else if (data.startsWith("kp "))
+        {
+            data.replace("kp ", "");
+            inputs.kp = data.toInt();
+            Serial.println("Setting PID kp to: " + data);
+        }
+        else if (data.startsWith("ki "))
+        {
+            data.replace("ki ", "");
+            inputs.ki = data.toInt();
+            Serial.println("Setting PID ki to: " + data);
+        }
+        else if (data.startsWith("kd "))
+        {
+            data.replace("kd ", "");
+            inputs.kd = data.toInt();
+            Serial.println("Setting PID kd to: " + data);
         }
     }
+}
+
+bool SerialInterface::is_output_enabled()
+{
+    return inputs.enable_output;
+}
+
+bool SerialInterface::is_debug_active()
+{
+    return inputs.debug_mode;
+}
+
+double SerialInterface::get_mock_temperature()
+{
+    return inputs.mock_temperature;
+}
+
+bool SerialInterface::get_new_kp(uint16_t *kp)
+{
+    if (inputs.kp > 0)
+    {
+        *kp = inputs.kp;
+        return true;
+    }
+    return false;
+}
+
+bool SerialInterface::get_new_ki(uint16_t *ki)
+{
+    if (inputs.ki > 0)
+    {
+        *ki = inputs.ki;
+        return true;
+    }
+    return false;
+}
+
+bool SerialInterface::get_new_kd(uint16_t *kd)
+{
+    if (inputs.kd > 0)
+    {
+        *kd = inputs.kd;
+        return true;
+    }
+    return false;
 }
 
 void SerialInterface::print_status(Gaggia::ControlStatus *status)
@@ -51,17 +123,16 @@ void SerialInterface::print_status(Gaggia::ControlStatus *status)
     }
 }
 
-bool SerialInterface::is_output_enabled()
+void SerialInterface::print_help()
 {
-    return enable_output;
-}
-
-bool SerialInterface::is_debug_active()
-{
-    return debug_mode;
-}
-
-double SerialInterface::get_mock_temperature()
-{
-    return mock_temperature;
+    Serial.println("**** GaggiaPIDController serial interface ****");
+    Serial.println("Commands:");
+    Serial.println("- help: show this message");
+    Serial.println("- debug [on/off]: enable/disable debug mode");
+    Serial.println("- output [on/off]: enable/disable serial output");
+    Serial.println("- temp [value]: Set the mock temperature. Used only in debug mode");
+    Serial.println("- kp [value]: Set the P gain of the PID controller");
+    Serial.println("- ki [value]: Set the I gain of the PID controller");
+    Serial.println("- kd [value]: Set the D gain of the PID controller");
+    Serial.println("**** END ****");
 }

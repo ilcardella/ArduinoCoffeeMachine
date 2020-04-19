@@ -1,7 +1,7 @@
 /* GaggiaPIDController
  */
 
-#include "Display.h"
+//#include "Display.h"
 #include "RelayPIDController.h"
 #include "SerialInterface.h"
 #include "TemperatureSensor.h"
@@ -24,9 +24,9 @@
 // Target steam temperature in celsius
 #define TARGET_STEAM_TEMP 146.0
 // PID gain parameters
-#define P_GAIN 1
-#define I_GAIN 1
-#define D_GAIN 1
+#define P_GAIN 200
+#define I_GAIN 100
+#define D_GAIN 100
 #define SERIAL_BAUDRATE 9600
 
 /************************************************/
@@ -35,9 +35,8 @@
 TemperatureSensor *water_sensor;
 TemperatureSensor *steam_sensor;
 RelayPIDController *pid;
-Gaggia::ControlStatus machine_status;
 SerialInterface *serial;
-Display *display;
+//Display *display;
 
 void setup()
 {
@@ -52,21 +51,22 @@ void setup()
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
     serial = new SerialInterface(SERIAL_BAUDRATE);
-    display = new Display();
+    //display = new Display();
 }
 
 void loop()
 {
+    Gaggia::ControlStatus machine_status;
+
     serial->read_input();
 
     update_machine_status(&machine_status);
 
-    pid->compute(&machine_status.current_temperature, &machine_status.target_temperature,
-                 &machine_status.water_heater_on);
+    update_pid(&machine_status);
 
     set_heater_status(&machine_status.water_heater_on);
 
-    display->update(&machine_status);
+    //display->update(&machine_status);
 
     serial->print_status(&machine_status);
 }
@@ -111,6 +111,27 @@ Gaggia::MODE get_machine_mode()
 {
     int value = digitalRead(STEAM_SWITCH_PIN);
     return value ? Gaggia::STEAM_MODE : Gaggia::WATER_MODE;
+}
+
+void update_pid(Gaggia::ControlStatus *status)
+{
+    // Check if new PID gains have been requested and update our controller
+    uint16_t gain;
+    if (serial->get_new_kp(&gain))
+    {
+        pid->set_kp(&gain);
+    }
+    if (serial->get_new_ki(&gain))
+    {
+        pid->set_ki(&gain);
+    }
+    if (serial->get_new_kd(&gain))
+    {
+        pid->set_kd(&gain);
+    }
+
+    pid->compute(&(status->current_temperature), &(status->target_temperature),
+                 &(status->water_heater_on));
 }
 
 void set_heater_status(const bool *heater_on)

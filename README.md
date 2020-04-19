@@ -22,7 +22,8 @@ You can build the code using the Arduino IDE or with VSCode with the [Arduino ex
 The code can be built inside a Docker container using docker-compose. The `docker-compose.yml` and the `Dockerfile` are in the `docker` directory. The `docker-compose.yml` depends on 2 environment variables that must be defined before starting the build:
 - CORE: the Arduino core
 - BOARD: the Arduino board to use
-Refers to the [arduino-cli](https://arduino.github.io/arduino-cli/) documentation to see the list of available values.
+
+Refer to the [arduino-cli](https://arduino.github.io/arduino-cli/) documentation for the list of available cores and boards.
 The following is an example that builds the code for an Arduino Nano board:
 
 ```
