@@ -1,7 +1,7 @@
 /* GaggiaPIDController
  */
 
-//#include "Display.h"
+#include "Display.h"
 #include "RelayPIDController.h"
 #include "SerialInterface.h"
 #include "TemperatureSensor.h"
@@ -36,7 +36,7 @@ TemperatureSensor *water_sensor;
 TemperatureSensor *steam_sensor;
 RelayPIDController *pid;
 SerialInterface *serial;
-//Display *display;
+Display *display;
 
 void setup()
 {
@@ -51,7 +51,7 @@ void setup()
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
     serial = new SerialInterface(SERIAL_BAUDRATE);
-    //display = new Display();
+    display = new Display();
 }
 
 void loop()
@@ -66,14 +66,14 @@ void loop()
 
     set_heater_status(&machine_status.water_heater_on);
 
-    //display->update(&machine_status);
+    display->update(&machine_status);
 
     serial->print_status(&machine_status);
 }
 
 bool update_machine_status(Gaggia::ControlStatus *status)
 {
-    status->status_message = "Ready";
+    status->status_message = "OK";
     // Read operation mode
     status->machine_mode = get_machine_mode();
     // Set target temperature based on machine mode

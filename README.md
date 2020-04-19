@@ -10,8 +10,7 @@ This Arduino based controller improves the stability of the water temperature of
 This project depends on the following Arduino libraries:
 - [PID](https://github.com/br3ttb/Arduino-PID-Library)
 - [TSIC](https://github.com/Schm1tz1/arduino-tsic)
-- [Adafruit_SDD1306](https://github.com/adafruit/Adafruit_SSD1306)
-- [Adafruit_GFX](https://github.com/adafruit/Adafruit-GFX-Library)
+- [SDD1306Ascii](https://github.com/greiman/SSD1306Ascii)
 
 ### Build
 

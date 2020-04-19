@@ -3,15 +3,11 @@
 #include "libraries/Common.h"
 #include <Arduino.h>
 
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <SPI.h>
 #include <Wire.h>
+#include "SSD1306Ascii.h"
+#include "SSD1306AsciiWire.h"
 
-// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-#define OLED_RESET -1    // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_I2C_ADDR 0x3C
 
 class Display
 {
@@ -27,7 +23,7 @@ class Display
 
     static constexpr uint16_t REFRESH_PERIOD = 200;
 
-    Adafruit_SSD1306 display;
+    SSD1306AsciiWire display;
     unsigned long time_last_update;
     bool disable_display;
 };

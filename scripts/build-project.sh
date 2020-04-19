@@ -16,6 +16,5 @@ arduino-cli core list
 # install libraries
 arduino-cli lib install "PID"
 arduino-cli lib install "TSIC"
-arduino-cli lib install "Adafruit GFX Library"
-arduino-cli lib install "Adafruit SSD1306"
+arduino-cli lib install "SSD1306Ascii"
 arduino-cli compile --fqbn arduino:$CORE:$BOARD GaggiaPIDController/GaggiaPIDController.ino
