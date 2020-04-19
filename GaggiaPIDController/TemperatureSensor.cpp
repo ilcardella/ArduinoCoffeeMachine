@@ -26,8 +26,14 @@ bool TemperatureSensor::get_temperature_celsius(float *value)
         {
             return false;
         }
-        // TODO Occasionally the raw value spikes to 60k, ignore these reads
-        last_read = sensor.calc_Celsius(&raw);
+        // FIXME Occasionally the raw value spikes to 60k+ or other times
+        // it drops to ~ 0. For this project it should be safe to constraint
+        // the raw reads between safety margins to ignore these errors.
+        // At 23C ambient temp the raw value is around 730
+        if (raw > 500 || raw < 1000)
+        {
+            last_read = sensor.calc_Celsius(&raw);
+        }
         time_last_read = now;
     }
 
