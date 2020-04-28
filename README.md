@@ -30,7 +30,7 @@ $ cd /path/to/repo
 $ CORE=avr BOARD=nano docker-compose -f docker/docker-compose.yml up
 ```
 
-The generated build files will be in the `GaggiaPIDController` directory.
+The generated build files will be in the `build` directory.
 
 After building the Docker image the first time, you can then use the `arduino-cli` installed in the Docker image directly with:
 

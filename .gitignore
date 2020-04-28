@@ -10,3 +10,4 @@ debug.txt
 .vscode
 *.hex
 *.elf
+build/

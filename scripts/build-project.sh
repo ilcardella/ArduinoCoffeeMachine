@@ -18,3 +18,7 @@ arduino-cli lib install "PID"
 arduino-cli lib install "TSIC"
 arduino-cli lib install "SSD1306Ascii"
 arduino-cli compile --fqbn arduino:$CORE:$BOARD GaggiaPIDController/GaggiaPIDController.ino
+
+mkdir -p build
+mv GaggiaPIDController/*.hex build
+mv GaggiaPIDController/*.elf build
