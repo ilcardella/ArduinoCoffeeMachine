@@ -109,8 +109,7 @@ bool update_machine_status(Gaggia::ControlStatus *status)
 /* Return the current working mode of the machine */
 Gaggia::MODE get_machine_mode()
 {
-    int value = digitalRead(STEAM_SWITCH_PIN);
-    return value ? Gaggia::STEAM_MODE : Gaggia::WATER_MODE;
+    return digitalRead(STEAM_SWITCH_PIN) ? Gaggia::STEAM_MODE : Gaggia::WATER_MODE;
 }
 
 void update_pid(Gaggia::ControlStatus *status)
@@ -136,6 +135,5 @@ void update_pid(Gaggia::ControlStatus *status)
 
 void set_heater_status(const bool *heater_on)
 {
-    uint8_t pin_level = *heater_on ? HIGH : LOW;
-    digitalWrite(HEATER_SSR_PIN, pin_level);
+    digitalWrite(HEATER_SSR_PIN, (*heater_on) ? HIGH : LOW);
 }
