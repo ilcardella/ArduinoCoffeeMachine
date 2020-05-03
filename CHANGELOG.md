@@ -1,5 +1,9 @@
 # Gaggia PID Controller Changelog
 
-## [] -
+## [1.0.0] - 2020-05-03
 ### Added
-- Created project
+- First release:
+  - Support for TSic306 digital temperature sensor
+  - SSR control with PID loop
+  - Support for SSD1306 OLED 128x64 display
+  - Serial interface to show debug information
