@@ -84,6 +84,7 @@ bool SerialInterface::get_new_kp(uint16_t *kp)
     if (inputs.kp > 0)
     {
         *kp = inputs.kp;
+        inputs.kp = 0; // reset input
         return true;
     }
     return false;
@@ -94,6 +95,7 @@ bool SerialInterface::get_new_ki(uint16_t *ki)
     if (inputs.ki > 0)
     {
         *ki = inputs.ki;
+        inputs.ki = 0; // reset input
         return true;
     }
     return false;
@@ -104,6 +106,7 @@ bool SerialInterface::get_new_kd(uint16_t *kd)
     if (inputs.kd > 0)
     {
         *kd = inputs.kd;
+        inputs.kd = 0; // reset input
         return true;
     }
     return false;
