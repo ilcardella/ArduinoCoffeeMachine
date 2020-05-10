@@ -55,7 +55,7 @@ This is the list of components required for this project:
 
 Detailed documentation is available at: https://gaggiapidcontroller.readthedocs.io
 
-The `docs` folder contains the Sphinx documentation that can be build using a Docker
+The `docs` folder contains the Sphinx documentation that can be built using a Docker
 container:
 
 ```
