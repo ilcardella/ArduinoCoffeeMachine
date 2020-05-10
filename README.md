@@ -1,4 +1,4 @@
-# Gaggia PID Controller
+# Gaggia PID Controller [![Documentation Status](https://readthedocs.org/projects/gaggiapidcontroller/badge/?version=latest)](https://gaggiapidcontroller.readthedocs.io/en/latest/?badge=latest)
 
 This project is a PID controller for a `Gaggia Paros` (or Gaggia Classic) coffee machine using Arduino and a few other components.
 This Arduino based controller improves the stability of the water temperature of the coffee machine by controlling the boiler with a PID control loop feedback.
@@ -48,20 +48,20 @@ This is the list of components required for this project:
 - 1x Arduino (any board type will do)
 - 1x Solid State Relay 40A
 - 2x Digital temperature sensor TSic306
-- 1x I2C OLED
+- 1x I2C 128x64 OLED
 - Wires and other utilities
 
-### Schematics
+## Documentation
 
-The following is the original schematic of the coffee machine:
+Detailed documentation is available at: https://gaggiapidcontroller.readthedocs.io
 
-![gaggia_classic_circuit](docs/schematics/gaggia_classic_circuit.png "Gaggia Classic circuit")
+The `docs` folder contains the Sphinx documentation that can be build using a Docker
+container:
 
-This in how it looks with the Arduino controller and the SSR:
-
-![gaggia_classic_circuit_modified](docs/schematics/gaggia_classic_circuit_arduino.png "Gaggia Classic circuit modified")
-
-The 2 stock thermostats are being replaced by 2 TSic306 digital sensors.
+```
+$ cd /path/to/repo
+$ docker-compose -f docker/docker-compose.yml up docs-builder
+```
 
 ## Credits
 

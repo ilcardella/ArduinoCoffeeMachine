@@ -1,4 +1,6 @@
-FROM ubuntu:latest
+# Image used to build the source code
+
+FROM ubuntu:latest AS arduino-builder
 
 RUN apt-get update \
     && apt-get install -y curl \
@@ -12,3 +14,11 @@ RUN mkdir -p $BINDIR \
 WORKDIR /build
 
 CMD [ "arduino-cli" "version" ]
+
+### Image used to build the sphinx documentation
+
+FROM sphinxdoc/sphinx AS docs-builder
+
+WORKDIR /build
+ADD requirements.txt /build
+RUN pip3 install -r requirements.txt

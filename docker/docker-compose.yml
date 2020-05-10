@@ -1,8 +1,18 @@
-version: '3'
+version: '3.7'
 services:
   arduino-builder:
-    build: .
+    build:
+      context: .
+      target: arduino-builder
     image: arduino-builder
     command: scripts/build-project.sh $CORE $BOARD
+    volumes:
+        - "../:/build"
+  docs-builder:
+    build:
+      context: .
+      target: docs-builder
+    image: docs-builder
+    command: scripts/build-docs.sh
     volumes:
         - "../:/build"

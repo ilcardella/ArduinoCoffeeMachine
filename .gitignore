@@ -2,7 +2,6 @@
 bin/*/
 *~
 build-tmp/
-Makefile
 doc/
 debug.txt
 .ycm_extra_conf.pyc
@@ -11,3 +10,4 @@ debug.txt
 *.hex
 *.elf
 build/
+_build/
