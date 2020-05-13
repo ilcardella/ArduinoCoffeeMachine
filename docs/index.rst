@@ -47,6 +47,19 @@ The second modification required to allow to target the correct temperature is t
 connect Arduino to the left pins of the "double switch" ``13``. This will allow the MCU
 to know if the Steam button has been pressed.
 
+This is the list of materials I used for this project. The purpose here is to just give
+an idea of what I used and you can change anything as you might prefer:
+* TSic 306 digital temperature sensor (x2)
+* 128x64 OLED with SSD1306 controller
+* Arduino Nano
+* Arduino Nano expansion connection shield
+* Fotek clone SSR 40A
+* Wires 22AWG (low voltage) and 18AWG (AC line)
+* Heat shrinking sleeves
+* T-tap (scotch) connectors
+* Thermal paste
+* M4 brass hexagonal standoff
+
 Arduino
 *******
 
@@ -97,7 +110,7 @@ these clones usually contain underrated triac, so to stay on the safe side I bou
 This type of SSR can be controlled with a signal in the range 3-32 VDC and they update
 the output when the AC signal crosses its zero level.
 
-The SSR can be placed inside the coffee machine and the control signal are going to be
+The SSR can be placed inside the coffee machine and the control signals are going to be
 wired outside to be connected to the Arduino board.
 
 Power supply
@@ -150,8 +163,12 @@ is a gap.
 Assembly
 ********
 
-For initial testing I wired everything on a breadboard to verify that everything was
-working as expected.
+In this section I'll recap the steps I took from the beginning, until the final
+assembly with the PID controller integrated in the coffee machine.
+
+Once gathered all the materials, which took several weeks due to the lockdown, for
+initial testing I wired everything on a breadboard to verify that the code was working
+as expected:
 
 .. figure:: images/testbench01.jpg
     :align: center
@@ -159,10 +176,56 @@ working as expected.
 
     Testbench assembly
 
-This is how the Paros looks like after the modification
+This also helped me to find a good starting point for the PID gains, at least better than
+leaving them set to ``1``. They have been tuned once everything was connected to the
+machine heater.
+
+* Assemble the temperature sensor, fitting them into the hexagonal brass spacers with the
+  thermal paste and soldering the 22AWG wires
+* Solder some wires to the display pins, to allow the connection to the arduino expansion
+  shield
+* Prepare two pieces of 18AWG cable soldering a male spade connector on one end of each
+  wire piece. The other ends are going to be connected to the SSR AC ports
+* Solder two female spade connectors to two pieces of 22AWG wire. These are going to be
+  used to detect the position of the steam switch
+* Assemple the external enclosure fitting the display and the Arduino Nano plugged in
+  the expansion shield
+
+Now it's time to move things in the coffee machine. After opening the enclosure you'll
+need to:
+* Disconnect two female spade connectors from the switch 13. Make sure to disconnect
+  those two connected with the ``brown`` wire
+* Plug the two 22AWG wire to the now free male switch pins. The other ends needs to be
+  connected to the Arduino expansion shield, one to the 5V and the other to the pin
+  allocated to the switch state detection
+* Unscrew the two thermostats from the heater and unplug the spade connectors. From each
+  thermostat, keep the connectors with the ``brown`` and ``white`` wires aside
+* Connect the SSR wires to the two connectors kept aside in the previous step and the
+  other ends to the SSR AC ports. Place the SSR inside the coffee machine
+* Connect the SSR control ports with two wires going to the Arduino expansion shield
+* Screw the temperature sensor in the heater where the thermostats were and connect
+  the wires to the Arduino expansion shield
+* Apply the T-Tap connectors to the coffee machine input AC line and connect the AC/DC
+  converter to the T-Tap female connectors. Place the power supply inside the machine, far
+  from anything else and connect the 5V line wires to the Arduino expansion shield ``Vin``
+
+After that you can close the coffee machine making sure that all the "Arduino connections"
+are wired out to the external enclosure. To recap you should have the following wires:
+* 2 wires from the power supply (5V + Ground)
+* 3 wires from the water temperature sensor (5V + Ground + Signal)
+* 3 wires from the steam temperature sensor (5V + Ground + Signal)
+* 2 wires from the SSR (Signal + Ground)
+* 2 wires from the steam switch (5V + Signal)
+
+Connect all the wires to the appropriate port in the Arduino expansion shield and mount
+the external enclosure on the coffee machine.
+
+This is how the Paros looks like after the modification:
 
 .. figure:: images/final_mod.png
     :align: center
     :alt: Final assembly
 
     Final assembly
+
+Enjoy the coffee!
