@@ -49,6 +49,7 @@ to know if the Steam button has been pressed.
 
 This is the list of materials I used for this project. The purpose here is to just give
 an idea of what I used and you can change anything as you might prefer:
+
 * TSic 306 digital temperature sensor (x2)
 * 128x64 OLED with SSD1306 controller
 * Arduino Nano
@@ -193,24 +194,26 @@ machine heater.
 
 Now it's time to move things in the coffee machine. After opening the enclosure you'll
 need to:
+
 * Disconnect two female spade connectors from the switch 13. Make sure to disconnect
-those two connected with the ``brown`` wire
+  those two connected with the ``brown`` wire
 * Plug the two 22AWG wire to the now free male switch pins. The other ends needs to be
-connected to the Arduino expansion shield, one to the 5V and the other to the pin
-allocated to the switch state detection
+  connected to the Arduino expansion shield, one to the 5V and the other to the pin
+  allocated to the switch state detection
 * Unscrew the two thermostats from the heater and unplug the spade connectors. From each
-thermostat, keep the connectors with the ``brown`` and ``white`` wires aside
+  thermostat, keep the connectors with the ``brown`` and ``white`` wires aside
 * Connect the SSR wires to the two connectors kept aside in the previous step and the
-other ends to the SSR AC ports. Place the SSR inside the coffee machine
+  other ends to the SSR AC ports. Place the SSR inside the coffee machine
 * Connect the SSR control ports with two wires going to the Arduino expansion shield
 * Screw the temperature sensor in the heater where the thermostats were and connect
-the wires to the Arduino expansion shield
+  the wires to the Arduino expansion shield
 * Apply the T-Tap connectors to the coffee machine input AC line and connect the AC/DC
-converter to the T-Tap female connectors. Place the power supply inside the machine, far
-from anything else and connect the 5V line wires to the Arduino expansion shield ``Vin``
+  converter to the T-Tap female connectors. Place the power supply inside the machine, far
+  from anything else and connect the 5V line wires to the Arduino expansion shield ``Vin``
 
 After that you can close the coffee machine making sure that all the "Arduino connections"
 are wired out to the external enclosure. To recap you should have the following wires:
+
 * 2 wires from the power supply (5V + Ground)
 * 3 wires from the water temperature sensor (5V + Ground + Signal)
 * 3 wires from the steam temperature sensor (5V + Ground + Signal)
