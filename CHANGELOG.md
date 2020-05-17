@@ -4,6 +4,9 @@
 ### Added
 - Added python script to plot machine temperatures reported through serial interface 
 
+### Changed
+- Display shows status of the machine indicating if it's heating, cooling or ready for brew
+
 ## [1.0.0] - 2020-05-03
 ### Added
 - First release:

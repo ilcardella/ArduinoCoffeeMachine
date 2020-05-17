@@ -30,7 +30,7 @@ bool TemperatureSensor::get_temperature_celsius(float *value)
         // it drops to ~ 0. For this project it should be safe to constraint
         // the raw reads between safety margins to ignore these errors.
         // At 23C ambient temp the raw value is around 730
-        if (raw > 500 || raw < 1000)
+        if (raw > 600 || raw < 900)
         {
             last_read = sensor.calc_Celsius(&raw);
         }

@@ -60,7 +60,11 @@ void loop()
 
     serial->read_input();
 
-    update_machine_status(&machine_status);
+    if (not update_machine_status(&machine_status))
+    {
+        set_heater_status(new bool(false));
+        return;
+    }
 
     update_pid(&machine_status);
 
@@ -73,7 +77,6 @@ void loop()
 
 bool update_machine_status(Gaggia::ControlStatus *status)
 {
-    status->status_message = "OK";
     // Read operation mode
     status->machine_mode = get_machine_mode();
     // Set target temperature based on machine mode
@@ -85,6 +88,7 @@ bool update_machine_status(Gaggia::ControlStatus *status)
     if (serial->is_debug_active())
     {
         status->current_temperature = serial->get_mock_temperature();
+        status->status_message = "Debug mode";
         return true;
     }
 
@@ -102,6 +106,21 @@ bool update_machine_status(Gaggia::ControlStatus *status)
     }
 
     status->current_temperature = static_cast<double>(sensor_value);
+
+    // Use a tolerance of +/- 1Deg for the message
+    double diff = status->target_temperature - status->current_temperature;
+    if (diff < -1.0)
+    {
+        status->status_message = "Cooling...";
+    }
+    else if (diff > 1.0)
+    {
+        status->status_message = "Heating...";
+    }
+    else
+    {
+        status->status_message = "Ready";
+    }
 
     return true;
 }
