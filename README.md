@@ -1,4 +1,4 @@
-# Gaggia PID Controller [![Documentation Status](https://readthedocs.org/projects/gaggiapidcontroller/badge/?version=latest)](https://gaggiapidcontroller.readthedocs.io/en/latest/?badge=latest)
+# Gaggia PID Controller [![Documentation Status](https://readthedocs.org/projects/gaggiapidcontroller/badge/?version=latest)](https://gaggiapidcontroller.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://travis-ci.com/ilcardella/GaggiaPIDController.svg?branch=master)](https://travis-ci.com/ilcardella/GaggiaPIDController)
 
 This project is a PID controller for a `Gaggia Paros` (or Gaggia Classic) coffee machine using Arduino and a few other components.
 This Arduino based controller improves the stability of the water temperature of the coffee machine by controlling the boiler with a PID control loop feedback.
