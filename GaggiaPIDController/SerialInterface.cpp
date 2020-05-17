@@ -118,11 +118,16 @@ void SerialInterface::print_status(Gaggia::ControlStatus *status)
     if (is_output_enabled() && now - time_last_print > PRINT_TIMEOUT)
     {
         time_last_print = now;
-        Serial.println("Operation mode: " + String(status->machine_mode));
-        Serial.println("Current temp: " + String(status->current_temperature));
-        Serial.println("Target temp: " + String(status->target_temperature));
-        Serial.println("SSR status: " + String(status->water_heater_on));
-        Serial.println("Message: " + status->status_message);
+        // Serial.println("Operation mode: " + String(status->machine_mode));
+        // Serial.println("Current temp: " + String(status->current_temperature));
+        // Serial.println("Target temp: " + String(status->target_temperature));
+        // Serial.println("SSR status: " + String(status->water_heater_on));
+        // Serial.println("Message: " + status->status_message);
+        String output = String(status->machine_mode) + "," +
+                        String(status->current_temperature) + "," +
+                        String(status->target_temperature) + "," +
+                        String(status->water_heater_on) + "," + status->status_message;
+        Serial.println(output);
     }
 }
 
