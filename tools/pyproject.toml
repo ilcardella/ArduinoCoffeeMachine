@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "temp_plotter"
+version = "0.1.0"
+description = "Temperature plotter"
+authors = ["Alberto Cardellini"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pyserial = "^3.4"
+flake8 = "^3.8.1"
+black = {version = "^19.10b0", allow-prereleases = true}
+matplotlib = "^3.2.1"
+
+[tool.poetry.dev-dependencies]
