@@ -6,6 +6,7 @@ Display::Display() : display(), time_last_update(0), disable_display(false)
     Wire.setClock(400000L);
     display.begin(&Adafruit128x64, SCREEN_I2C_ADDR);
     display.setFont(Adafruit5x7);
+    //display.set2X();
     display.clear();
 }
 
@@ -35,8 +36,8 @@ bool Display::update(Gaggia::ControlStatus *status)
 void Display::write_machine_mode(const Gaggia::MODE &mode)
 {
     display.setCursor(30, 1);
-    display.print("Heating ");
     display.print((mode == Gaggia::WATER_MODE) ? "Water" : "Steam");
+    display.print(" mode");
     display.clearToEOL();
     display.println();
 }
