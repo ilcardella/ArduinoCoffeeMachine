@@ -2,6 +2,7 @@
  */
 
 #include "Display.h"
+#include "ModeDetector.h"
 #include "RelayPIDController.h"
 #include "SerialInterface.h"
 #include "TemperatureSensor.h"
@@ -24,8 +25,8 @@
 // Target steam temperature in celsius
 #define TARGET_STEAM_TEMP 146.0
 // PID gain parameters
-#define P_GAIN 200
-#define I_GAIN 100
+#define P_GAIN 150
+#define I_GAIN 75
 #define D_GAIN 100
 #define SERIAL_BAUDRATE 9600
 
@@ -37,6 +38,7 @@ TemperatureSensor *steam_sensor;
 RelayPIDController *pid;
 SerialInterface *serial;
 Display *display;
+ModeDetector *mode_detector;
 
 void setup()
 {
@@ -44,7 +46,7 @@ void setup()
     pinMode(WATER_TEMP_PIN, INPUT);
     pinMode(STEAM_TEMP_PIN, INPUT);
     pinMode(HEATER_SSR_PIN, OUTPUT);
-    pinMode(STEAM_SWITCH_PIN, INPUT);
+    pinMode(STEAM_SWITCH_PIN, INPUT_PULLUP);
 
     // Initialise sensors and actuators
     water_sensor = new TemperatureSensor(WATER_TEMP_PIN, "water_sensor");
@@ -52,6 +54,7 @@ void setup()
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
     serial = new SerialInterface(SERIAL_BAUDRATE);
     display = new Display();
+    mode_detector = new ModeDetector(STEAM_SWITCH_PIN);
 }
 
 void loop()
@@ -60,13 +63,10 @@ void loop()
 
     serial->read_input();
 
-    if (not update_machine_status(&machine_status))
+    if (update_machine_status(&machine_status))
     {
-        set_heater_status(new bool(false));
-        return;
+        update_pid(&machine_status);
     }
-
-    update_pid(&machine_status);
 
     set_heater_status(&machine_status.water_heater_on);
 
@@ -77,8 +77,10 @@ void loop()
 
 bool update_machine_status(Gaggia::ControlStatus *status)
 {
+    // Set SSR off by default and let the PID decide whether to turn it on
+    status->water_heater_on = false;
     // Read operation mode
-    status->machine_mode = get_machine_mode();
+    status->machine_mode = mode_detector->get_mode();
     // Set target temperature based on machine mode
     status->target_temperature = (status->machine_mode == Gaggia::WATER_MODE)
                                      ? TARGET_WATER_TEMP
@@ -123,12 +125,6 @@ bool update_machine_status(Gaggia::ControlStatus *status)
     }
 
     return true;
-}
-
-/* Return the current working mode of the machine */
-Gaggia::MODE get_machine_mode()
-{
-    return digitalRead(STEAM_SWITCH_PIN) ? Gaggia::STEAM_MODE : Gaggia::WATER_MODE;
 }
 
 void update_pid(Gaggia::ControlStatus *status)
