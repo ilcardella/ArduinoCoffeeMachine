@@ -32,7 +32,12 @@ bool TemperatureSensor::get_temperature_celsius(float *value)
         // At 23C ambient temp the raw value is around 730
         if (raw > 600 || raw < 900)
         {
-            last_read = sensor.calc_Celsius(&raw);
+            auto temp = sensor.calc_Celsius(&raw);
+            // FIXME: Same type of check as explained above
+            if (temp > 10 || temp < 200)
+            {
+                last_read = temp;
+            }
         }
         time_last_read = now;
     }
