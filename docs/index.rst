@@ -95,7 +95,7 @@ have drilled the M4 female thread but I do not have a drill at hand :(
 I filled the female thread with thermal paste and then I inserted the sensors in the
 paste. Eventually I covered everything with a heat shrinking sleeve.
 
-.. figure:: images/temp_sensor_assembled.png
+.. figure:: images/temp_sensor_assembled.jpg
     :align: center
     :alt: Temperature sensor assembled
 
