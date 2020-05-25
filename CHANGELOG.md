@@ -7,6 +7,7 @@
 ### Changed
 - Display shows status of the machine indicating if it's heating, cooling or ready for brew
 - Performed PID tuning to reduce oscillation of temperature
+- Updated steam switch mode to use internal pullup resistor
 
 ## [1.0.0] - 2020-05-03
 ### Added
