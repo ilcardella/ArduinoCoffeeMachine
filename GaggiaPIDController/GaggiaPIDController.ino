@@ -21,13 +21,13 @@
 // Input pin to detect steam mode
 #define STEAM_SWITCH_PIN 7
 // Target water temperature in celsius
-#define TARGET_WATER_TEMP 93.0
+#define TARGET_WATER_TEMP 95.0
 // Target steam temperature in celsius
 #define TARGET_STEAM_TEMP 145.0
 // PID gain parameters
-#define P_GAIN 10
-#define I_GAIN 5
-#define D_GAIN 2
+#define P_GAIN 250
+#define I_GAIN 1.5
+#define D_GAIN 0.75
 #define SERIAL_BAUDRATE 9600
 
 /************************************************/
