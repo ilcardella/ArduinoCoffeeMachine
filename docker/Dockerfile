@@ -17,7 +17,7 @@ CMD [ "arduino-cli" "version" ]
 
 ### Image used to build the sphinx documentation
 
-FROM sphinxdoc/sphinx AS docs-builder
+FROM sphinxdoc/sphinx:latest AS docs-builder
 
 WORKDIR /build
 ADD requirements.txt /build
