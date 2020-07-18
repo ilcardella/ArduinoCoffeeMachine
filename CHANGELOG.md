@@ -3,6 +3,7 @@
 ## []
 ### Added
 - Added python script to plot machine temperatures reported through serial interface
+- Configurable safety timeouts to turn the heater off after a set period of time
 
 ### Changed
 - Display shows status of the machine indicating if it's heating, cooling or ready for brew

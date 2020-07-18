@@ -23,12 +23,15 @@
 // Target water temperature in celsius
 #define TARGET_WATER_TEMP 95.0
 // Target steam temperature in celsius
-#define TARGET_STEAM_TEMP 145.0
+#define TARGET_STEAM_TEMP 140.0
 // PID gain parameters
 #define P_GAIN 250
 #define I_GAIN 1.5
 #define D_GAIN 0.75
 #define SERIAL_BAUDRATE 9600
+// Safety timeouts in minutes to turn off the heater. (disabled if < 1)
+#define SAFETY_TIMEOUT 40
+#define STEAM_TIMEOUT 5
 
 /************************************************/
 
@@ -39,6 +42,7 @@ RelayPIDController *pid;
 SerialInterface *serial;
 Display *display;
 ModeDetector *mode_detector;
+Gaggia::ControlStatus machine_status;
 
 void setup()
 {
@@ -48,19 +52,18 @@ void setup()
     pinMode(HEATER_SSR_PIN, OUTPUT);
     pinMode(STEAM_SWITCH_PIN, INPUT_PULLUP);
 
-    // Initialise sensors and actuators
+    // Initialise sensors and controllers
     water_sensor = new TemperatureSensor(WATER_TEMP_PIN, "water_sensor");
     steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
     serial = new SerialInterface(SERIAL_BAUDRATE);
     display = new Display();
     mode_detector = new ModeDetector(STEAM_SWITCH_PIN);
+    machine_status.time_since_start = millis();
 }
 
 void loop()
 {
-    Gaggia::ControlStatus machine_status;
-
     serial->read_input();
 
     if (update_machine_status(&machine_status))
@@ -77,10 +80,19 @@ void loop()
 
 bool update_machine_status(Gaggia::ControlStatus *status)
 {
+    unsigned long now = millis();
+
     // Set SSR off by default and let the PID decide whether to turn it on
     status->water_heater_on = false;
     // Read operation mode
     status->machine_mode = mode_detector->get_mode();
+
+    // Reset steam mode timeout counter when not in steam mode
+    if (status->machine_mode != Gaggia::STEAM_MODE)
+    {
+        status->time_since_steam_mode = now;
+    }
+
     // Set target temperature based on machine mode
     status->target_temperature = (status->machine_mode == Gaggia::WATER_MODE)
                                      ? TARGET_WATER_TEMP
@@ -122,6 +134,20 @@ bool update_machine_status(Gaggia::ControlStatus *status)
     else
     {
         status->status_message = "Ready";
+    }
+
+    // If the machine has been on for more than the safety limit, then report a problem
+    // so the heater will be turned off
+    if (SAFETY_TIMEOUT > 0 && (now - status->time_since_start) > SAFETY_TIMEOUT)
+    {
+        status->status_message = "Safety timeout expired";
+        return false;
+    }
+    // Check steam mode timeout to avoid keeping the machine at high temps for long
+    if (STEAM_TIMEOUT > 0 && (now - status->time_since_steam_mode) > STEAM_TIMEOUT)
+    {
+        status->status_message = "Steam mode timeout expired";
+        return false;
     }
 
     return true;
