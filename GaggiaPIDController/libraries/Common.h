@@ -17,5 +17,7 @@ struct ControlStatus
     double target_temperature = 0.0;
     bool water_heater_on = false;
     String status_message = "Loading...";
+    unsigned long time_since_start = 0;
+    unsigned long time_since_steam_mode = 0;
 };
 } // namespace Gaggia
