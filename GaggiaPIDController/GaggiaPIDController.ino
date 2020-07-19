@@ -29,9 +29,9 @@
 #define I_GAIN 1.5
 #define D_GAIN 0.75
 #define SERIAL_BAUDRATE 9600
-// Safety timeouts in minutes to turn off the heater. (disabled if < 1)
-#define SAFETY_TIMEOUT 40
-#define STEAM_TIMEOUT 5
+// Safety timeouts in milliseconds to turn off the heater. (disabled if < 1)
+#define SAFETY_TIMEOUT 40 * 60 * 1000 // 40 minutes
+#define STEAM_TIMEOUT 5 * 60 * 1000   // 5 minutes
 
 /************************************************/
 
