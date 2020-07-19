@@ -27,10 +27,10 @@ The following is an example that builds the code for an Arduino Nano board:
 
 ```
 $ cd /path/to/repo
-$ CORE=avr BOARD=nano docker-compose -f docker/docker-compose.yml up
+$ CORE=avr BOARD=nano make build
 ```
 
-The generated build files will be in the `build` directory.
+The generated build files will be in the `GaggiaPIDController/build` directory.
 
 After building the Docker image the first time, you can then use the `arduino-cli` installed in the Docker image directly with:
 
@@ -59,7 +59,19 @@ Or build it locally with:
 
 ```
 $ cd /path/to/repo
-$ docker-compose -f docker/docker-compose.yml up docs-builder
+$ make docs
+```
+
+## Tools
+
+The `tools` directory contains a Python script that can be used to read the Arduino
+Serial messages and to plot the current water temperature on a graph. The goal
+is to help the PID tuning process showing the realtime results.
+
+```
+$ cd tools
+$ poetry install --no-dev
+$ poetry run python temp_plotter.py
 ```
 
 ## Acknowledgement

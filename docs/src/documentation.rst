@@ -223,6 +223,27 @@ This is how the ``Gaggia Paros`` looks like after the modification:
 The display is going to have a small 3D printed support leveraging the screw at the top
 of the black plastic cover, for now it's just hanging there :)
 
+PID Tuning
+**********
+
+The last step was improving the PID controller by tuning the gains in order to achieve
+the best possible control of the heater.
+There are several guides online that explain what each gain does and how to resolve
+specific issues, I am not expert so I won't cover this part. My suggestion is to get a
+basic understanding of how a PID controller works and then just try changing the gain
+values to see the effect.
+
+The code is configured by default to send the current machine status to the Serial
+interface.
+I provided a Python script in the ``tools`` directory of the repository that connects to
+the Serial interface of the Arduino, reading these messages and plotting the water
+temperature on a graph. This of course requires to connect a laptop to the Arduino
+through a USB cable.
+
+Having a real-time plot of the water temperature will help massively the PID tuning
+process, because you will clearly see the oscillations or the overshooting and it will
+be easier to correct them.
+
 Improvements
 ************
 
