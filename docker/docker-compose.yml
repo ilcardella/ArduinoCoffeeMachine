@@ -4,15 +4,17 @@ services:
     build:
       context: .
       target: arduino-builder
-    image: arduino-builder
+    image: gaggiapidcontroller/arduino-builder
     command: scripts/build-project.sh $CORE $BOARD
+    user: $UID:$GID
     volumes:
         - "../:/build"
   docs-builder:
     build:
       context: .
       target: docs-builder
-    image: docs-builder
+    image: gaggiapidcontroller/docs-builder
     command: make -C docs html
+    user: $UID:$GID
     volumes:
         - "../:/build"

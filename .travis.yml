@@ -1,6 +1,8 @@
+os: linux
+dist: bionic
+
 services:
   - docker
 
 script:
-    - docker-compose -f docker/docker-compose.yml up --exit-code-from docs-builder docs-builder
-    - CORE=avr BOARD=nano docker-compose -f docker/docker-compose.yml up --exit-code-from arduino-builder arduino-builder
+    - make ci
