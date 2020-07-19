@@ -24,7 +24,7 @@ bool RelayPIDController::compute(double *input, double *setpoint, bool *relay_on
     pid->Compute();
 
     // Set the relay status based on the pid output
-    *relay_on = (pid_output >= window_progress) ? true : false;
+    *relay_on = (pid_output >= window_progress);
 
     return true;
 }

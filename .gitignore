@@ -11,3 +11,5 @@ debug.txt
 *.elf
 build/
 _build/
+
+*.egg-info

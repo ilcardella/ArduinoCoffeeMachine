@@ -27,10 +27,10 @@ The following is an example that builds the code for an Arduino Nano board:
 
 ```
 $ cd /path/to/repo
-$ CORE=avr BOARD=nano docker-compose -f docker/docker-compose.yml up
+$ CORE=avr BOARD=nano make build
 ```
 
-The generated build files will be in the `build` directory.
+The generated build files will be in the `GaggiaPIDController/build` directory.
 
 After building the Docker image the first time, you can then use the `arduino-cli` installed in the Docker image directly with:
 
@@ -44,8 +44,8 @@ arduino-cli Version: 0.10.0 Commit: ec5c3ed
 
 ### Components
 
-This is the list of components required for this project:
-- 1x Arduino (any board type will do)
+This is the list of components I used for the project:
+- 1x Arduino Nano (any board type will do)
 - 1x Solid State Relay 40A
 - 2x Digital temperature sensor TSic306
 - 1x I2C 128x64 OLED
@@ -53,18 +53,29 @@ This is the list of components required for this project:
 
 ## Documentation
 
-Detailed documentation is available at: https://gaggiapidcontroller.readthedocs.io
+Read the project documentation at: https://gaggiapidcontroller.readthedocs.io
 
-The `docs` folder contains the Sphinx documentation that can be built using a Docker
-container:
+Or build it locally with:
 
 ```
 $ cd /path/to/repo
-$ docker-compose -f docker/docker-compose.yml up docs-builder
+$ make docs
 ```
 
-## Credits
+## Tools
 
-A big thank you goes to these two other projects that helped me a lot in the understanding of the electric schematics of the coffee machine and the components to use:
+The `tools` directory contains a Python script that can be used to read the Arduino
+Serial messages and to plot the current water temperature on a graph. The goal
+is to help the PID tuning process showing the realtime results.
+
+```
+$ cd tools
+$ poetry install --no-dev
+$ poetry run python temp_plotter.py
+```
+
+## Acknowledgement
+
+A big thanks goes to these two other projects that helped me a lot in the understanding of the electric schematics of the coffee machine and the components to use:
 - [RaspberryPI based](http://int03.co.uk/blog/project-coffee-espiresso-machine/)
 - [Arduino based](http://www.cyberelectronics.org/?p=458)
