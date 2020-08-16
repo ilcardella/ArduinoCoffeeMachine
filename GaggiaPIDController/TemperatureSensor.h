@@ -1,26 +1,38 @@
 #pragma once
 
 #include <Arduino.h>
-#include <TSIC.h>
+
+namespace sensors
+{
+namespace temperature
+{
+enum class type
+{
+    TSIC = 0, // TSic sensor family
+    KTYPE_SPI = 1 // K-type thermocouple with SPI interface
+};
 
 class TemperatureSensor
 {
   public:
-    TemperatureSensor(const uint32_t &pin, const String &name);
+    TemperatureSensor(const String &name) : name(name)
+    {
+    }
 
-    String get_name();
+    /** Return the name identifier of the sensor.
+     */
+    virtual String get_name()
+    {
+        return name;
+    }
 
     /* Read the sensor and store the current temperature in
-     * celsius degrees tnto 'value'.
-     * Return 'true' if the operation succeed, 'false' otherwise */
-    bool get_temperature_celsius(float *value);
+     * celsius degrees into 'value'.
+     * Return 'true' if the operation succeeds, 'false' otherwise */
+    virtual bool get_temperature_celsius(float *value);
 
   private:
-    bool read_sensor(uint16_t *value);
-
-    TSIC sensor;
     String name;
-    float last_read;
-    unsigned long time_last_read;
-    static constexpr int MIN_READ_PERIOD = 300;
 };
+} // namespace temperature
+} // namespace sensors
