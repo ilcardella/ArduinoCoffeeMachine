@@ -8,7 +8,7 @@ namespace temperature
 {
 enum class type
 {
-    TSIC = 0, // TSic sensor family
+    TSIC = 0,     // TSic sensor family
     KTYPE_SPI = 1 // K-type thermocouple with SPI interface
 };
 
@@ -21,7 +21,7 @@ class TemperatureSensor
 
     /** Return the name identifier of the sensor.
      */
-    virtual String get_name()
+    String get_name()
     {
         return name;
     }
@@ -29,9 +29,9 @@ class TemperatureSensor
     /* Read the sensor and store the current temperature in
      * celsius degrees into 'value'.
      * Return 'true' if the operation succeeds, 'false' otherwise */
-    virtual bool get_temperature_celsius(float *value);
+    virtual bool get_temperature_celsius(float *value) = 0;
 
-  private:
+  protected:
     String name;
 };
 } // namespace temperature

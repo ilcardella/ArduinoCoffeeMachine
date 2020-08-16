@@ -2,6 +2,7 @@
  */
 
 #include "Display.h"
+#include "KTypeThermocouple.h"
 #include "ModeDetector.h"
 #include "RelayPIDController.h"
 #include "SerialInterface.h"
@@ -69,32 +70,10 @@ void setup()
     pinMode(HEATER_SSR_PIN, OUTPUT);
 
     // Initialise the temperature sensors based on configuration
-    switch (WATER_TEMP_SENSOR_TYPE)
-    {
-    case type::TSIC:
-        water_sensor = new TSICTempSensor(WATER_TEMP_PIN, "water_sensor");
-        break;
-    case type::KTYPE_SPI:
-        // TODO
-        break;
-    default:
-        // Ideally we would raise an exception here
-        water_sensor = new TSICTempSensor(WATER_TEMP_PIN, "water_sensor");
-        break;
-    }
-    switch (STEAM_TEMP_SENSOR_TYPE)
-    {
-    case type::TSIC:
-        steam_sensor = new TSICTempSensor(WATER_TEMP_PIN, "steam_sensor");
-        break;
-    case type::KTYPE_SPI:
-        // TODO
-        break;
-    default:
-        // Ideally we would raise an exception here
-        steam_sensor = new TSICTempSensor(WATER_TEMP_PIN, "steam_sensor");
-        break;
-    }
+    water_sensor =
+        make_temp_sensor(WATER_TEMP_SENSOR_TYPE, "water_sensor", WATER_TEMP_PIN);
+    steam_sensor =
+        make_temp_sensor(STEAM_TEMP_SENSOR_TYPE, "steam_sensor", STEAM_TEMP_PIN);
 
     // Initialise other components
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
@@ -102,6 +81,9 @@ void setup()
     display = new Display();
     mode_detector = new ModeDetector(STEAM_SWITCH_PIN);
     machine_status.time_since_start = millis();
+
+    // Allow sensors to initialise
+    delay(500);
 }
 
 void loop()
@@ -154,7 +136,7 @@ bool update_machine_status(Gaggia::ControlStatus *status)
 
     // Get the current temp from the temperature sensor
     float sensor_value;
-    if (not sensor->get_temperature_celsius(&sensor_value))
+    if (not sensor || not sensor->get_temperature_celsius(&sensor_value))
     {
         status->status_message =
             "Unable to read temperature from sensor: " + sensor->get_name();
@@ -219,4 +201,22 @@ void update_pid(Gaggia::ControlStatus *status)
 void set_heater_status(const bool *heater_on)
 {
     digitalWrite(HEATER_SSR_PIN, (*heater_on) ? HIGH : LOW);
+}
+
+TemperatureSensor *make_temp_sensor(const type &sensor_type, const String &name,
+                                    const uint8_t &sensor_pin)
+{
+    switch (sensor_type)
+    {
+    case type::TSIC:
+        return new TSICTempSensor(sensor_pin, name);
+        break;
+    case type::KTYPE_SPI:
+        return new KTypeThermocouple(name, SPI_CLK_PIN, SPI_DO_PIN, sensor_pin);
+        break;
+    default:
+        // Ideally we would raise an exception here
+        return nullptr;
+        break;
+    }
 }
