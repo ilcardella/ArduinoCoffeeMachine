@@ -3,6 +3,7 @@
 #include "TemperatureSensor.h"
 #include "max6675.h"
 #include <Arduino.h>
+#include "libraries/Common.h"
 
 class KTypeThermocouple : public sensors::temperature::TemperatureSensor
 {
@@ -14,7 +15,7 @@ class KTypeThermocouple : public sensors::temperature::TemperatureSensor
 
   private:
     MAX6675 sensor;
-    float last_read_value;
     unsigned long time_last_read;
     static constexpr int READ_PERIOD = 300;
+    MovingAverage<float> m_avg;
 };

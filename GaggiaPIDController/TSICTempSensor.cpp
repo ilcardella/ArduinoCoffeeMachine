@@ -3,8 +3,8 @@
 using namespace sensors::temperature;
 
 TSICTempSensor::TSICTempSensor(const uint32_t &pin, const String &name)
-    : TemperatureSensor(name), sensor(pin, NO_VCC_PIN, TSIC_30x), last_read(0.0f),
-      time_last_read(0)
+    : TemperatureSensor(name), sensor(pin, NO_VCC_PIN, TSIC_30x),
+      time_last_read(millis()), m_avg(10)
 {
     pinMode(pin, INPUT);
 }
@@ -20,6 +20,7 @@ bool TSICTempSensor::get_temperature_celsius(float *value)
     unsigned long now = millis();
     if (now - time_last_read > MIN_READ_PERIOD)
     {
+        time_last_read = now;
         uint16_t raw;
         if (not read_sensor(&raw))
         {
@@ -35,13 +36,11 @@ bool TSICTempSensor::get_temperature_celsius(float *value)
             // FIXME: Same type of check as explained above
             if (temp > 10 || temp < 200)
             {
-                last_read = temp;
+                m_avg.add(temp);
             }
         }
-        time_last_read = now;
     }
 
-    // TODO use a moving average to smooth
-    *value = last_read;
+    *value = m_avg.get();
     return true;
 }

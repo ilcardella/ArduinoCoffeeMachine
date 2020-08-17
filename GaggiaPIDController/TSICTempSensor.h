@@ -3,6 +3,7 @@
 #include "TemperatureSensor.h"
 #include <Arduino.h>
 #include <TSIC.h>
+#include "libraries/Common.h"
 
 class TSICTempSensor : public sensors::temperature::TemperatureSensor
 {
@@ -15,7 +16,7 @@ class TSICTempSensor : public sensors::temperature::TemperatureSensor
     bool read_sensor(uint16_t *value);
 
     TSIC sensor;
-    float last_read;
     unsigned long time_last_read;
     static constexpr int MIN_READ_PERIOD = 300;
+    MovingAverage<float> m_avg;
 };
