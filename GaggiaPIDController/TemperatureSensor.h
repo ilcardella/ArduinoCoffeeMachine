@@ -17,7 +17,7 @@ class TemperatureSensor
 {
   public:
     TemperatureSensor(const String &name)
-        : name(name), m_avg(10), time_last_read(millis())
+        : name(name), m_avg(10), time_last_read(millis()), healthy(true)
     {
     }
 
@@ -40,14 +40,16 @@ class TemperatureSensor
             float reading;
             if (not read_sensor(&reading))
             {
+                healthy = false;
                 return false;
             }
 
+            healthy = true;
             m_avg.add(reading);
         }
 
         *value = m_avg.get();
-        return true;
+        return healthy;
     }
 
   protected:
@@ -57,6 +59,7 @@ class TemperatureSensor
     unsigned long time_last_read;
     static constexpr int READ_PERIOD = 300;
     MovingAverage<float> m_avg;
+    bool healthy;
 };
 } // namespace temperature
 } // namespace sensors
