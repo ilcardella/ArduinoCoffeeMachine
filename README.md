@@ -11,6 +11,7 @@ This project depends on the following Arduino libraries:
 - [PID](https://github.com/br3ttb/Arduino-PID-Library)
 - [TSIC](https://github.com/Schm1tz1/arduino-tsic)
 - [SDD1306Ascii](https://github.com/greiman/SSD1306Ascii)
+- [MAX6675](https://github.com/adafruit/MAX6675-library)
 
 ### Build
 
@@ -47,9 +48,9 @@ arduino-cli Version: 0.10.0 Commit: ec5c3ed
 This is the list of components I used for the project:
 - 1x Arduino Nano (any board type will do)
 - 1x Solid State Relay 40A
-- 2x Digital temperature sensor TSic306
+- 2x Digital temperature sensors (e.g. TSic306)
 - 1x I2C 128x64 OLED
-- Wires and other utilities
+- Wires and other supplies
 
 ## Documentation
 

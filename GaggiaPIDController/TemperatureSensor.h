@@ -1,26 +1,65 @@
 #pragma once
 
+#include "libraries/Common.h"
 #include <Arduino.h>
-#include <TSIC.h>
+
+namespace sensors
+{
+namespace temperature
+{
+enum class type
+{
+    TSIC = 0,     // TSic sensor family
+    KTYPE_SPI = 1 // K-type thermocouple with SPI interface
+};
 
 class TemperatureSensor
 {
   public:
-    TemperatureSensor(const uint32_t &pin, const String &name);
+    TemperatureSensor(const String &name)
+        : name(name), m_avg(10), time_last_read(millis()), healthy(true)
+    {
+    }
 
-    String get_name();
+    /** Return the name identifier of the sensor.
+     */
+    String get_name()
+    {
+        return name;
+    }
 
     /* Read the sensor and store the current temperature in
-     * celsius degrees tnto 'value'.
-     * Return 'true' if the operation succeed, 'false' otherwise */
-    bool get_temperature_celsius(float *value);
+     * celsius degrees into 'value'.
+     * Return 'true' if the operation succeeds, 'false' otherwise */
+    virtual bool get_temperature_celsius(float *value)
+    {
+        unsigned long now = millis();
+        if (now - time_last_read > READ_PERIOD)
+        {
+            time_last_read = now;
+            float reading;
+            if (not read_sensor(&reading))
+            {
+                healthy = false;
+                return false;
+            }
 
-  private:
-    bool read_sensor(uint16_t *value);
+            healthy = true;
+            m_avg.add(reading);
+        }
 
-    TSIC sensor;
+        *value = m_avg.get();
+        return healthy;
+    }
+
+  protected:
+    virtual bool read_sensor(float *value) = 0;
+
     String name;
-    float last_read;
     unsigned long time_last_read;
-    static constexpr int MIN_READ_PERIOD = 300;
+    static constexpr int READ_PERIOD = 300;
+    MovingAverage<float> m_avg;
+    bool healthy;
 };
+} // namespace temperature
+} // namespace sensors

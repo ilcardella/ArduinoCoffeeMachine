@@ -2,9 +2,11 @@
  */
 
 #include "Display.h"
+#include "KTypeThermocouple.h"
 #include "ModeDetector.h"
 #include "RelayPIDController.h"
 #include "SerialInterface.h"
+#include "TSICTempSensor.h"
 #include "TemperatureSensor.h"
 #include "libraries/Common.h"
 
@@ -12,28 +14,46 @@
 // USER SETTINGS
 /************************************************/
 
+// Define the sensor type to use for the water temperature
+#define WATER_TEMP_SENSOR_TYPE sensors::temperature::type::KTYPE_SPI
+// Define the sensor type to use for the steam temperature
+#define STEAM_TEMP_SENSOR_TYPE sensors::temperature::type::KTYPE_SPI
+
 // Input pin of the water temperature sensor
 #define WATER_TEMP_PIN 4
 // Input pin of the steam temperature sensor
 #define STEAM_TEMP_PIN 5
+
 // Output PWM pin to control the boiler
 #define HEATER_SSR_PIN 6
+
 // Input pin to detect steam mode
 #define STEAM_SWITCH_PIN 7
+
 // Target water temperature in celsius
 #define TARGET_WATER_TEMP 95.0
 // Target steam temperature in celsius
 #define TARGET_STEAM_TEMP 140.0
+
 // PID gain parameters
 #define P_GAIN 250
 #define I_GAIN 1.5
 #define D_GAIN 0.75
+
+// SPI interface common pins
+#define SPI_CLK_PIN 8
+#define SPI_DO_PIN 9
+
+// Serial interface
 #define SERIAL_BAUDRATE 9600
+
 // Safety timeouts in milliseconds to turn off the heater. (disabled if < 1)
 #define SAFETY_TIMEOUT 40 * 60 * 1000 // 40 minutes
 #define STEAM_TIMEOUT 5 * 60 * 1000   // 5 minutes
 
 /************************************************/
+
+using namespace sensors::temperature;
 
 // Global variables and structs
 TemperatureSensor *water_sensor;
@@ -46,20 +66,24 @@ Gaggia::ControlStatus machine_status;
 
 void setup()
 {
-    // Setup the pin modes
-    pinMode(WATER_TEMP_PIN, INPUT);
-    pinMode(STEAM_TEMP_PIN, INPUT);
+    // Setup the pin modes. Other pins are initialised within classes
     pinMode(HEATER_SSR_PIN, OUTPUT);
-    pinMode(STEAM_SWITCH_PIN, INPUT_PULLUP);
 
-    // Initialise sensors and controllers
-    water_sensor = new TemperatureSensor(WATER_TEMP_PIN, "water_sensor");
-    steam_sensor = new TemperatureSensor(STEAM_TEMP_PIN, "steam_sensor");
+    // Initialise the temperature sensors based on configuration
+    water_sensor =
+        make_temp_sensor(WATER_TEMP_SENSOR_TYPE, "water_sensor", WATER_TEMP_PIN);
+    steam_sensor =
+        make_temp_sensor(STEAM_TEMP_SENSOR_TYPE, "steam_sensor", STEAM_TEMP_PIN);
+
+    // Initialise other components
     pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
     serial = new SerialInterface(SERIAL_BAUDRATE);
     display = new Display();
     mode_detector = new ModeDetector(STEAM_SWITCH_PIN);
     machine_status.time_since_start = millis();
+
+    // Allow sensors to initialise
+    delay(500);
 }
 
 void loop()
@@ -112,7 +136,7 @@ bool update_machine_status(Gaggia::ControlStatus *status)
 
     // Get the current temp from the temperature sensor
     float sensor_value;
-    if (not sensor->get_temperature_celsius(&sensor_value))
+    if (not sensor || not sensor->get_temperature_celsius(&sensor_value))
     {
         status->status_message =
             "Unable to read temperature from sensor: " + sensor->get_name();
@@ -177,4 +201,22 @@ void update_pid(Gaggia::ControlStatus *status)
 void set_heater_status(const bool *heater_on)
 {
     digitalWrite(HEATER_SSR_PIN, (*heater_on) ? HIGH : LOW);
+}
+
+TemperatureSensor *make_temp_sensor(const type &sensor_type, const String &name,
+                                    const uint8_t &sensor_pin)
+{
+    switch (sensor_type)
+    {
+    case type::TSIC:
+        return new TSICTempSensor(sensor_pin, name);
+        break;
+    case type::KTYPE_SPI:
+        return new KTypeThermocouple(name, SPI_CLK_PIN, SPI_DO_PIN, sensor_pin);
+        break;
+    default:
+        // Ideally we would raise an exception here
+        return nullptr;
+        break;
+    }
 }

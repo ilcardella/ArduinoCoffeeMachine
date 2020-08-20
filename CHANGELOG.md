@@ -4,6 +4,7 @@
 ### Added
 - Added python script to plot machine temperatures reported through serial interface
 - Configurable safety timeouts to turn the heater off after a set period of time
+- Added support for K-type thermocouple sensors with MAX6675 and SPI interface
 
 ### Changed
 - Display shows status of the machine indicating if it's heating, cooling or ready for brew

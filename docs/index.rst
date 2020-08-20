@@ -17,8 +17,9 @@ combined with a coffee grinder.
 To add a PID controller to the coffee machine we'll need to replace the existing
 thermostats that control the heater. There are 2 thermostats to allow the operation
 of the machine heating water to brew temperature and also steam temperature.
-Unfortunately these thermostat do not allow fine control of the water temperature,
-meaning that they don't keep the water/steam temperature stable enough to allow
+Unfortunately these thermostats do not allow a fine control of the water temperature,
+being a simple on/off switch without any logic behind.
+The result is that they don't keep the water/steam temperature stable enough to allow
 consistency of the brewed coffee.
 
 .. toctree::

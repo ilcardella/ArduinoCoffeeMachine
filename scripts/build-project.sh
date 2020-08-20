@@ -17,4 +17,5 @@ arduino-cli core list
 arduino-cli lib install "PID"
 arduino-cli lib install "TSIC"
 arduino-cli lib install "SSD1306Ascii"
+arduino-cli lib install "MAX6675 library"
 arduino-cli compile --fqbn arduino:$CORE:$BOARD GaggiaPIDController/GaggiaPIDController.ino
