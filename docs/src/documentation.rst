@@ -53,8 +53,12 @@ Temperature sensors
 *******************
 
 I have tested this whole setup with two different types of sensors:
+
 * TSic306
 * K-type thermocouple
+
+TSic306
+=======
 
 At first I decided to use the TSic 306 digital temperature sensors. As suggested
 in similar projects there are several benefits: it's digital so no need for ADC or
@@ -85,6 +89,9 @@ The problem with this solution was that the two sensors were not really stable
 in the brass standoff and it was easy to knock them off by touching them or pulling the
 wires.
 
+K-type thermocouple
+===================
+
 I then decided to try out two K-type thermocouples. I bought two of those that
 come already assembled on an M4 nut (designed for 3D printers) which is handy as this was
 the weak point of the previous solution.
@@ -95,15 +102,21 @@ Fortunately both of these can be sourced in a single package, the MAX6675 module
 The Arduino can "speak" with the MAX6675 with the SPI protocol requiring 2 more pins
 compared to the digital sensor solution. Not a big deal as there are plenty available.
 
+.. figure:: images/ktype_thermocouple.jpg
+    :align: center
+    :alt: K-type thermocouples assembled on the heater
+
+    K-type thermocouples assembled on the heater
+
+.. figure:: images/max6675_module.jpg
+    :align: center
+    :alt: MAX6675 module
+
+    MAX6675 module
+
 Another possible drawback with thermocouple is the error they might be subject to:
 again I was not really worried about this because even if there is a ~2deg C error, as
 long as it's stable (basically just an offset) it would not impact the PID performances.
-
-.. figure:: images/ktype_thermocouple.jpg
-    :align: center
-    :alt: K-type thermocouples with the MAX6675 module
-
-    K-type thermocouples with the MAX6675 module
 
 Solid State Relay
 *****************
@@ -153,7 +166,7 @@ an AC-DC switch converter (cheap from Ebay).
     TTap connector on AC power line
 
 Using the T-Tap connectors allowed me to not having to cut or solder almost anything, and
-everything can still be removed turning the machine back to it's original state.
+everything can still be removed reverting the machine back to it's original state.
 
 Eventually I enclosed the whole circuit board in 3D printed plastic case leaving it inside
 the coffee machine, as far as possible from any other components. The 5V lines has been
@@ -164,6 +177,15 @@ wired to reach the Arduino board and the temperature sensors.
     :alt: Power supply enclosure
 
     Power supply enclosure
+
+I also used two clamp wire connectors for the ``5V`` and ``GND`` bus, again this makes
+it easier and faster to assemble everything and swap components if required.
+
+.. figure:: images/clamp_wire_connecttors.jpg
+    :align: center
+    :alt: Clamp wire connectors for 5V and GND
+
+    Clamp wire connectors for 5V and GND
 
 Display
 *******
@@ -239,13 +261,22 @@ from the power supply, I placed everything at the front of the machine.
 Eventually I checked I connected all the wires to the appropriate port in the Arduino
 expansion shield and then I placed the external enclosure on the coffee machine back.
 
-This is how the ``Gaggia Paros`` looks like after the modification:
+This is how the ``Gaggia Paros`` looks like after the modification.
+The inside:
+
+.. figure:: images/final_mod_inside.jpg
+    :align: center
+    :alt: Final internal assembly of the Gaggia Paros
+
+    Final internal assembly of the Gaggia Paros
+
+And the outside:
 
 .. figure:: images/final_mod.jpg
     :align: center
-    :alt: Final assembly of the Gaggia Paros
+    :alt: Final external assembly of the Gaggia Paros
 
-    Final assembly of the Gaggia Paros
+    Final external assembly of the Gaggia Paros
 
 The display is going to have a small 3D printed support leveraging the screw at the top
 of the black plastic cover, for now it's just hanging there :)
@@ -260,16 +291,21 @@ specific issues, I am not expert so I won't cover this part. My suggestion is to
 basic understanding of how a PID controller works and then just try changing the gain
 values to see the effect.
 
-The code is configured by default to send the current machine status to the Serial
-interface.
-I provided a Python script in the ``tools`` directory of the repository that connects to
-the Serial interface of the Arduino, reading these messages and plotting the water
-temperature on a graph. This of course requires to connect a laptop to the Arduino
-through a USB cable.
+The Arduino code is configured by default to send the current machine status to the Serial
+Interface in a comma separated string format.
+In the repository ``tools`` directory there is a Python script that connects to
+the machine serial port ``/dev/ttyUSB0`` (a different port can be specified), reading
+these messages coming from the Arduino and plotting the water temperature on a graph.
 
 Having a real-time plot of the water temperature will help massively the PID tuning
 process, because you will clearly see the oscillations or the overshooting and it will
 be easier to correct them.
+
+.. figure:: images/pid_tuning_screenshot.png
+    :align: center
+    :alt: PID tuning temperature plot
+
+    PID tuning temperature plot
 
 Improvements
 ************
@@ -282,9 +318,9 @@ There are still a few things that I'd like to improve:
 
 - Create the display support frame
 - Improve the internal wiring, I did not do a good job on that front
-- Try out K-type thermocouples instead of the digital sensors (done)
 - Replace the Arduino Nano with a ESP8266 based board to have WiFi connectivity
 
 I hope these notes are useful to anybody attempting a similar modification and please
 submit Issues or PR on the GitHub repository.
+
 Enjoy the coffee!
