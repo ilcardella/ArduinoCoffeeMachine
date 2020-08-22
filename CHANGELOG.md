@@ -1,6 +1,6 @@
 # Gaggia PID Controller Changelog
 
-## []
+## [1.1.0] - 2020-08-22
 ### Added
 - Added python script to plot machine temperatures reported through serial interface
 - Configurable safety timeouts to turn the heater off after a set period of time
