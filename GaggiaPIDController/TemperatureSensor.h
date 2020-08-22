@@ -16,8 +16,9 @@ enum class type
 class TemperatureSensor
 {
   public:
-    TemperatureSensor(const String &name, const uint32_t read_period)
-        : name(name), m_avg(10), time_last_read(millis()), healthy(true),
+    TemperatureSensor(const String &name, const uint32_t read_period,
+                      const uint32_t &moving_avg_size = 1)
+        : name(name), m_avg(moving_avg_size), time_last_read(millis()), healthy(true),
           read_period(read_period)
     {
     }

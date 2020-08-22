@@ -1,7 +1,7 @@
 #include "RelayPIDController.h"
 
-RelayPIDController::RelayPIDController(const uint16_t &kp, const uint16_t &ki,
-                                       const uint16_t &kd)
+RelayPIDController::RelayPIDController(const double &kp, const double &ki,
+                                       const double &kd)
     : pid_input(0.0), pid_output(0.0), pid_setpoint(0.0), pid_window_size(5000),
       p_gain(kp), i_gain(ki), d_gain(kd)
 {
@@ -29,19 +29,19 @@ bool RelayPIDController::compute(double *input, double *setpoint, bool *relay_on
     return true;
 }
 
-void RelayPIDController::set_kp(uint16_t *kp)
+void RelayPIDController::set_kp(double *kp)
 {
     p_gain = *kp;
     pid->SetTunings(p_gain, i_gain, d_gain);
 }
 
-void RelayPIDController::set_ki(uint16_t *ki)
+void RelayPIDController::set_ki(double *ki)
 {
     i_gain = *ki;
     pid->SetTunings(p_gain, i_gain, d_gain);
 }
 
-void RelayPIDController::set_kd(uint16_t *kd)
+void RelayPIDController::set_kd(double *kd)
 {
     d_gain = *kd;
     pid->SetTunings(p_gain, i_gain, d_gain);

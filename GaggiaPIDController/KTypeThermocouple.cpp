@@ -2,7 +2,7 @@
 
 KTypeThermocouple::KTypeThermocouple(const String &name, const uint8_t &clk_pin,
                                      const uint8_t &do_pin, const uint8_t &cs_pin)
-    : TemperatureSensor(name, 300), sensor(clk_pin, cs_pin, do_pin)
+    : TemperatureSensor(name, 300, 10), sensor(clk_pin, cs_pin, do_pin)
 {
 }
 

@@ -31,13 +31,13 @@
 #define STEAM_SWITCH_PIN 7
 
 // Target water temperature in celsius
-#define TARGET_WATER_TEMP 95.0
+#define TARGET_WATER_TEMP 98.0
 // Target steam temperature in celsius
 #define TARGET_STEAM_TEMP 140.0
 
 // PID gain parameters
-#define P_GAIN 250
-#define I_GAIN 1.5
+#define P_GAIN 125
+#define I_GAIN 0.8
 #define D_GAIN 0.75
 
 // SPI interface common pins
@@ -180,7 +180,7 @@ bool update_machine_status(Gaggia::ControlStatus *status)
 void update_pid(Gaggia::ControlStatus *status)
 {
     // Check if new PID gains have been requested and update our controller
-    uint16_t gain;
+    double gain;
     if (serial->get_new_kp(&gain))
     {
         pid->set_kp(&gain);

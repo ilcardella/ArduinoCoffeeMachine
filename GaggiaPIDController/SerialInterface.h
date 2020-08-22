@@ -8,9 +8,9 @@ struct SerialInput
     bool debug_mode = false;
     bool enable_output = true;
     double mock_temperature = 0.0;
-    uint16_t kp = 0;
-    uint16_t ki = 0;
-    uint16_t kd = 0;
+    double kp = 0.0;
+    double ki = 0.0;
+    double kd = 0.0;
 };
 
 class SerialInterface
@@ -26,9 +26,9 @@ class SerialInterface
     bool is_debug_active();
     double get_mock_temperature();
     bool is_output_enabled();
-    bool get_new_kp(uint16_t *kp);
-    bool get_new_ki(uint16_t *ki);
-    bool get_new_kd(uint16_t *kd);
+    bool get_new_kp(double *kp);
+    bool get_new_ki(double *ki);
+    bool get_new_kd(double *kd);
 
   private:
     static constexpr uint16_t PRINT_TIMEOUT = 200;

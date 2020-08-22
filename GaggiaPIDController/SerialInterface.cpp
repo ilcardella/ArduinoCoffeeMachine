@@ -46,19 +46,19 @@ void SerialInterface::read_input()
         else if (data.startsWith("kp "))
         {
             data.replace("kp ", "");
-            inputs.kp = data.toInt();
+            inputs.kp = data.toDouble();
             Serial.println("Setting PID kp to: " + data);
         }
         else if (data.startsWith("ki "))
         {
             data.replace("ki ", "");
-            inputs.ki = data.toInt();
+            inputs.ki = data.toDouble();
             Serial.println("Setting PID ki to: " + data);
         }
         else if (data.startsWith("kd "))
         {
             data.replace("kd ", "");
-            inputs.kd = data.toInt();
+            inputs.kd = data.toDouble();
             Serial.println("Setting PID kd to: " + data);
         }
     }
@@ -79,34 +79,34 @@ double SerialInterface::get_mock_temperature()
     return inputs.mock_temperature;
 }
 
-bool SerialInterface::get_new_kp(uint16_t *kp)
+bool SerialInterface::get_new_kp(double *kp)
 {
-    if (inputs.kp > 0)
+    if (inputs.kp > 0.0)
     {
         *kp = inputs.kp;
-        inputs.kp = 0; // reset input
+        inputs.kp = 0.0; // reset input
         return true;
     }
     return false;
 }
 
-bool SerialInterface::get_new_ki(uint16_t *ki)
+bool SerialInterface::get_new_ki(double *ki)
 {
-    if (inputs.ki > 0)
+    if (inputs.ki > 0.0)
     {
         *ki = inputs.ki;
-        inputs.ki = 0; // reset input
+        inputs.ki = 0.0; // reset input
         return true;
     }
     return false;
 }
 
-bool SerialInterface::get_new_kd(uint16_t *kd)
+bool SerialInterface::get_new_kd(double *kd)
 {
-    if (inputs.kd > 0)
+    if (inputs.kd > 0.0)
     {
         *kd = inputs.kd;
-        inputs.kd = 0; // reset input
+        inputs.kd = 0.0; // reset input
         return true;
     }
     return false;
