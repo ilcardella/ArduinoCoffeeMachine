@@ -25,7 +25,8 @@ struct ControlStatus
 template <typename T> class MovingAverage
 {
   public:
-    MovingAverage(const uint32_t &window_size) : window_size(window_size)
+    MovingAverage(const uint32_t &window_size)
+        : window_size(window_size), index(0), sum(0)
     {
         readings = new T[window_size];
         reset();

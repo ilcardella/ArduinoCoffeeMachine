@@ -2,8 +2,8 @@
 
 using namespace sensors::temperature;
 
-TSICTempSensor::TSICTempSensor(const uint32_t &pin, const String &name)
-    : TemperatureSensor(name), sensor(pin, NO_VCC_PIN, TSIC_30x)
+TSICTempSensor::TSICTempSensor(const String &name, const uint32_t &pin)
+    : TemperatureSensor(name, 300), sensor(pin, NO_VCC_PIN, TSIC_30x)
 {
     pinMode(pin, INPUT);
 }

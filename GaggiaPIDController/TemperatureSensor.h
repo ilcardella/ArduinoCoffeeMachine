@@ -16,8 +16,9 @@ enum class type
 class TemperatureSensor
 {
   public:
-    TemperatureSensor(const String &name)
-        : name(name), m_avg(10), time_last_read(millis()), healthy(true)
+    TemperatureSensor(const String &name, const uint32_t read_period)
+        : name(name), m_avg(10), time_last_read(millis()), healthy(true),
+          read_period(read_period)
     {
     }
 
@@ -31,10 +32,10 @@ class TemperatureSensor
     /* Read the sensor and store the current temperature in
      * celsius degrees into 'value'.
      * Return 'true' if the operation succeeds, 'false' otherwise */
-    virtual bool get_temperature_celsius(float *value)
+    bool get_temperature_celsius(float *value)
     {
         unsigned long now = millis();
-        if (now - time_last_read > READ_PERIOD)
+        if (now - time_last_read > read_period)
         {
             time_last_read = now;
             float reading;
@@ -57,7 +58,7 @@ class TemperatureSensor
 
     String name;
     unsigned long time_last_read;
-    static constexpr int READ_PERIOD = 300;
+    uint32_t read_period;
     MovingAverage<float> m_avg;
     bool healthy;
 };

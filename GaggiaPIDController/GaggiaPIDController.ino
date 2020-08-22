@@ -209,7 +209,7 @@ TemperatureSensor *make_temp_sensor(const type &sensor_type, const String &name,
     switch (sensor_type)
     {
     case type::TSIC:
-        return new TSICTempSensor(sensor_pin, name);
+        return new TSICTempSensor(name, sensor_pin);
         break;
     case type::KTYPE_SPI:
         return new KTypeThermocouple(name, SPI_CLK_PIN, SPI_DO_PIN, sensor_pin);
