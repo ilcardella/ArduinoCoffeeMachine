@@ -31,9 +31,9 @@
 #define STEAM_SWITCH_PIN 7
 
 // Target water temperature in celsius
-#define TARGET_WATER_TEMP 98.0
+#define TARGET_WATER_TEMP 95.0
 // Target steam temperature in celsius
-#define TARGET_STEAM_TEMP 140.0
+#define TARGET_STEAM_TEMP 150.0
 
 // PID gain parameters
 #define P_GAIN 125

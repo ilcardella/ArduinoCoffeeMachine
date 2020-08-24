@@ -1,5 +1,9 @@
 # Gaggia PID Controller Changelog
 
+## []
+### Added
+- Thermocouple sensor support a temperature offset to account for static error
+
 ## [1.1.0] - 2020-08-22
 ### Added
 - Added python script to plot machine temperatures reported through serial interface
