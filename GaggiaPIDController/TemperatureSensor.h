@@ -17,9 +17,9 @@ class TemperatureSensor
 {
   public:
     TemperatureSensor(const String &name, const uint32_t read_period,
-                      const uint32_t &moving_avg_size = 1)
+                      const uint32_t &moving_avg_size = 1, const float &temp_offset = 0)
         : name(name), m_avg(moving_avg_size), time_last_read(millis()), healthy(true),
-          read_period(read_period)
+          read_period(read_period), temp_offset(temp_offset)
     {
     }
 
@@ -45,11 +45,11 @@ class TemperatureSensor
                 healthy = false;
                 return false;
             }
+            reading += temp_offset;
 
             healthy = true;
             m_avg.add(reading);
         }
-
         *value = m_avg.get();
         return healthy;
     }
@@ -62,6 +62,7 @@ class TemperatureSensor
     uint32_t read_period;
     MovingAverage<float> m_avg;
     bool healthy;
+    float temp_offset;
 };
 } // namespace temperature
 } // namespace sensors
