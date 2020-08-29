@@ -58,10 +58,10 @@ using namespace sensors::temperature;
 // Global variables and structs
 TemperatureSensor *water_sensor;
 TemperatureSensor *steam_sensor;
-RelayPIDController *pid;
-SerialInterface *serial;
-Display *display;
-ModeDetector *mode_detector;
+RelayPIDController pid(P_GAIN, I_GAIN, D_GAIN);
+SerialInterface serial(SERIAL_BAUDRATE);
+Display display;
+ModeDetector mode_detector(STEAM_SWITCH_PIN);
 Gaggia::ControlStatus machine_status;
 
 void setup()
@@ -75,11 +75,7 @@ void setup()
     steam_sensor =
         make_temp_sensor(STEAM_TEMP_SENSOR_TYPE, "steam_sensor", STEAM_TEMP_PIN);
 
-    // Initialise other components
-    pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
-    serial = new SerialInterface(SERIAL_BAUDRATE);
-    display = new Display();
-    mode_detector = new ModeDetector(STEAM_SWITCH_PIN);
+    // Mark machine start time
     machine_status.time_since_start = millis();
 
     // Allow sensors to initialise
@@ -88,7 +84,7 @@ void setup()
 
 void loop()
 {
-    serial->read_input();
+    serial.read_input();
 
     if (update_machine_status(machine_status))
     {
@@ -97,9 +93,9 @@ void loop()
 
     set_heater_status(machine_status.water_heater_on);
 
-    display->update(machine_status);
+    display.update(machine_status);
 
-    serial->print_status(machine_status);
+    serial.print_status(machine_status);
 }
 
 bool update_machine_status(Gaggia::ControlStatus &status)
@@ -109,7 +105,7 @@ bool update_machine_status(Gaggia::ControlStatus &status)
     // Set SSR off by default and let the PID decide whether to turn it on
     status.water_heater_on = false;
     // Read operation mode
-    status.machine_mode = mode_detector->get_mode();
+    status.machine_mode = mode_detector.get_mode();
 
     // Reset steam mode timeout counter when not in steam mode
     if (status.machine_mode != Gaggia::STEAM_MODE)
@@ -123,9 +119,9 @@ bool update_machine_status(Gaggia::ControlStatus &status)
                                     : TARGET_STEAM_TEMP;
 
     // When debug mode is enabled do not read sensors
-    if (serial->is_debug_active())
+    if (serial.is_debug_active())
     {
-        status.current_temperature = serial->get_mock_temperature();
+        status.current_temperature = serial.get_mock_temperature();
         status.status_message = "Debug mode";
         return true;
     }
@@ -181,21 +177,21 @@ void update_pid(Gaggia::ControlStatus &status)
 {
     // Check if new PID gains have been requested and update our controller
     double gain;
-    if (serial->get_new_kp(&gain))
+    if (serial.get_new_kp(&gain))
     {
-        pid->set_kp(gain);
+        pid.set_kp(gain);
     }
-    if (serial->get_new_ki(&gain))
+    if (serial.get_new_ki(&gain))
     {
-        pid->set_ki(gain);
+        pid.set_ki(gain);
     }
-    if (serial->get_new_kd(&gain))
+    if (serial.get_new_kd(&gain))
     {
-        pid->set_kd(gain);
+        pid.set_kd(gain);
     }
 
-    pid->compute(status.current_temperature, status.target_temperature,
-                 &(status.water_heater_on));
+    pid.compute(status.current_temperature, status.target_temperature,
+                &(status.water_heater_on));
 }
 
 void set_heater_status(const bool &heater_on)
