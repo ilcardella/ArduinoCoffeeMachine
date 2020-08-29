@@ -11,14 +11,15 @@ RelayPIDController::RelayPIDController(const double &kp, const double &ki,
     pid->SetMode(AUTOMATIC);
 }
 
-bool RelayPIDController::compute(double *input, double *setpoint, bool *relay_on)
+bool RelayPIDController::compute(const double &input, const double &setpoint,
+                                 bool *relay_on)
 {
     // How much time it has passed in the current window frame
     uint16_t window_progress = millis() % pid_window_size;
 
     // Update the pid input and setpoint with those requested
-    pid_input = *input;
-    pid_setpoint = *setpoint;
+    pid_input = input;
+    pid_setpoint = setpoint;
 
     // Process the pid output
     pid->Compute();
@@ -29,20 +30,20 @@ bool RelayPIDController::compute(double *input, double *setpoint, bool *relay_on
     return true;
 }
 
-void RelayPIDController::set_kp(double *kp)
+void RelayPIDController::set_kp(const double &kp)
 {
-    p_gain = *kp;
+    p_gain = kp;
     pid->SetTunings(p_gain, i_gain, d_gain);
 }
 
-void RelayPIDController::set_ki(double *ki)
+void RelayPIDController::set_ki(const double &ki)
 {
-    i_gain = *ki;
+    i_gain = ki;
     pid->SetTunings(p_gain, i_gain, d_gain);
 }
 
-void RelayPIDController::set_kd(double *kd)
+void RelayPIDController::set_kd(const double &kd)
 {
-    d_gain = *kd;
+    d_gain = kd;
     pid->SetTunings(p_gain, i_gain, d_gain);
 }
