@@ -4,7 +4,7 @@
 
 namespace Gaggia
 {
-enum MODE
+enum class Mode
 {
     WATER_MODE = 0,
     STEAM_MODE = 1
@@ -12,7 +12,7 @@ enum MODE
 
 struct ControlStatus
 {
-    MODE machine_mode = MODE::WATER_MODE;
+    Mode machine_mode = Mode::WATER_MODE;
     double current_temperature = 0.0;
     double target_temperature = 0.0;
     bool water_heater_on = false;

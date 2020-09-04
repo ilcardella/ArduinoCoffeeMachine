@@ -16,7 +16,7 @@ class Display
     bool update(const Gaggia::ControlStatus &status);
 
   private:
-    void write_machine_mode(const Gaggia::MODE &mode);
+    void write_machine_mode(const Gaggia::Mode &mode);
     void write_current_temp(const double &temp);
     void write_target_temp(const double &temp);
     void write_status_message(const String &message);

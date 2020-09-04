@@ -26,10 +26,10 @@ bool Display::update(const Gaggia::ControlStatus &status)
     return true;
 }
 
-void Display::write_machine_mode(const Gaggia::MODE &mode)
+void Display::write_machine_mode(const Gaggia::Mode &mode)
 {
     display.setCursor(30, 1);
-    display.print((mode == Gaggia::WATER_MODE) ? "Water" : "Steam");
+    display.print((mode == Gaggia::Mode::WATER_MODE) ? "Water" : "Steam");
     display.print(" mode");
     display.clearToEOL();
     display.println();

@@ -118,7 +118,7 @@ void SerialInterface::print_status(const Gaggia::ControlStatus &status)
     if (is_output_enabled() && now - time_last_print > PRINT_TIMEOUT)
     {
         time_last_print = now;
-        String output = String(status.machine_mode) + "," +
+        String output = String(static_cast<int>(status.machine_mode)) + "," +
                         String(status.current_temperature) + "," +
                         String(status.target_temperature) + "," +
                         String(status.water_heater_on) + "," + status.status_message;

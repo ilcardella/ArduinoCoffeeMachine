@@ -108,13 +108,13 @@ bool update_machine_status(Gaggia::ControlStatus &status)
     status.machine_mode = mode_detector.get_mode();
 
     // Reset steam mode timeout counter when not in steam mode
-    if (status.machine_mode != Gaggia::STEAM_MODE)
+    if (status.machine_mode != Gaggia::Mode::STEAM_MODE)
     {
         status.time_since_steam_mode = now;
     }
 
     // Set target temperature based on machine mode
-    status.target_temperature = (status.machine_mode == Gaggia::WATER_MODE)
+    status.target_temperature = (status.machine_mode == Gaggia::Mode::WATER_MODE)
                                     ? TARGET_WATER_TEMP
                                     : TARGET_STEAM_TEMP;
 
@@ -128,7 +128,7 @@ bool update_machine_status(Gaggia::ControlStatus &status)
 
     // Select correct sensor for current operation mode
     TemperatureSensor *sensor =
-        (status.machine_mode == Gaggia::WATER_MODE) ? water_sensor : steam_sensor;
+        (status.machine_mode == Gaggia::Mode::WATER_MODE) ? water_sensor : steam_sensor;
 
     // Get the current temp from the temperature sensor
     float sensor_value;

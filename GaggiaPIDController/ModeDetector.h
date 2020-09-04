@@ -11,10 +11,10 @@ class ModeDetector
         pinMode(pin, INPUT_PULLUP);
     }
 
-    Gaggia::MODE get_mode()
+    Gaggia::Mode get_mode()
     {
-        return (digitalRead(steam_switch_pin) == HIGH) ? Gaggia::WATER_MODE
-                                                       : Gaggia::STEAM_MODE;
+        return (digitalRead(steam_switch_pin) == HIGH) ? Gaggia::Mode::WATER_MODE
+                                                       : Gaggia::Mode::STEAM_MODE;
     }
 
   private:
