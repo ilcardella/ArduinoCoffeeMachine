@@ -8,7 +8,7 @@
 #include "SerialInterface.h"
 #include "TSICTempSensor.h"
 #include "TemperatureSensor.h"
-#include "libraries/Common.h"
+#include "Common.h"
 
 /************************************************/
 // USER SETTINGS

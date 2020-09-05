@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libraries/Common.h"
+#include "Common.h"
 #include <Arduino.h>
 
 namespace sensors
