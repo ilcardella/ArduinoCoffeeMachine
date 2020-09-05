@@ -1,42 +1,35 @@
 #include "Display.h"
 
-Display::Display() : display(), time_last_update(0), disable_display(false)
+Display::Display() : display(), time_last_update(0)
 {
     Wire.begin();
     Wire.setClock(400000L);
     display.begin(&Adafruit128x64, SCREEN_I2C_ADDR);
     display.setFont(Adafruit5x7);
-    //display.set2X();
+    // display.set2X();
     display.clear();
 }
 
-bool Display::update(Gaggia::ControlStatus *status)
+bool Display::update(const Gaggia::ControlStatus &status)
 {
-    // Do nothing if display was not initialised
-    if (disable_display)
-    {
-        status->status_message = "Display not initialised";
-        return false;
-    }
-
     // Refresh the display with a reasonable rate
     auto now = millis();
     if (now - time_last_update > REFRESH_PERIOD)
     {
-        write_machine_mode(status->machine_mode);
-        write_current_temp(status->current_temperature);
-        write_target_temp(status->target_temperature);
-        write_status_message(status->status_message);
+        write_machine_mode(status.machine_mode);
+        write_current_temp(status.current_temperature);
+        write_target_temp(status.target_temperature);
+        write_status_message(status.status_message);
         time_last_update = now;
     }
 
     return true;
 }
 
-void Display::write_machine_mode(const Gaggia::MODE &mode)
+void Display::write_machine_mode(const Gaggia::Mode &mode)
 {
     display.setCursor(30, 1);
-    display.print((mode == Gaggia::WATER_MODE) ? "Water" : "Steam");
+    display.print((mode == Gaggia::Mode::WATER_MODE) ? "Water" : "Steam");
     display.print(" mode");
     display.clearToEOL();
     display.println();

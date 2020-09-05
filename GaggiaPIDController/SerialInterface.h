@@ -20,7 +20,7 @@ class SerialInterface
 
     void read_input();
 
-    void print_status(Gaggia::ControlStatus *status);
+    void print_status(const Gaggia::ControlStatus &status);
     void print_help();
 
     bool is_debug_active();

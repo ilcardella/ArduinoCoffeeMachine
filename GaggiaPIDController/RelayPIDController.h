@@ -8,11 +8,11 @@ class RelayPIDController
   public:
     RelayPIDController(const double &kp, const double &ki, const double &kd);
 
-    bool compute(double *input, double *setpoint, bool *relay_on);
+    bool compute(const double &input, const double &setpoint, bool *relay_on);
 
-    void set_kp(double *kp);
-    void set_ki(double *ki);
-    void set_kd(double *kd);
+    void set_kp(const double &kp);
+    void set_ki(const double &ki);
+    void set_kd(const double &kd);
 
   private:
     PID *pid;

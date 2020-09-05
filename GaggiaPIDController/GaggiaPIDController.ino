@@ -58,10 +58,10 @@ using namespace sensors::temperature;
 // Global variables and structs
 TemperatureSensor *water_sensor;
 TemperatureSensor *steam_sensor;
-RelayPIDController *pid;
-SerialInterface *serial;
-Display *display;
-ModeDetector *mode_detector;
+RelayPIDController pid(P_GAIN, I_GAIN, D_GAIN);
+SerialInterface serial(SERIAL_BAUDRATE);
+Display display;
+ModeDetector mode_detector(STEAM_SWITCH_PIN);
 Gaggia::ControlStatus machine_status;
 
 void setup()
@@ -75,11 +75,7 @@ void setup()
     steam_sensor =
         make_temp_sensor(STEAM_TEMP_SENSOR_TYPE, "steam_sensor", STEAM_TEMP_PIN);
 
-    // Initialise other components
-    pid = new RelayPIDController(P_GAIN, I_GAIN, D_GAIN);
-    serial = new SerialInterface(SERIAL_BAUDRATE);
-    display = new Display();
-    mode_detector = new ModeDetector(STEAM_SWITCH_PIN);
+    // Mark machine start time
     machine_status.time_since_start = millis();
 
     // Allow sensors to initialise
@@ -88,119 +84,119 @@ void setup()
 
 void loop()
 {
-    serial->read_input();
+    serial.read_input();
 
-    if (update_machine_status(&machine_status))
+    if (update_machine_status(machine_status))
     {
-        update_pid(&machine_status);
+        update_pid(machine_status);
     }
 
-    set_heater_status(&machine_status.water_heater_on);
+    set_heater_status(machine_status.water_heater_on);
 
-    display->update(&machine_status);
+    display.update(machine_status);
 
-    serial->print_status(&machine_status);
+    serial.print_status(machine_status);
 }
 
-bool update_machine_status(Gaggia::ControlStatus *status)
+bool update_machine_status(Gaggia::ControlStatus &status)
 {
     unsigned long now = millis();
 
     // Set SSR off by default and let the PID decide whether to turn it on
-    status->water_heater_on = false;
+    status.water_heater_on = false;
     // Read operation mode
-    status->machine_mode = mode_detector->get_mode();
+    status.machine_mode = mode_detector.get_mode();
 
     // Reset steam mode timeout counter when not in steam mode
-    if (status->machine_mode != Gaggia::STEAM_MODE)
+    if (status.machine_mode != Gaggia::Mode::STEAM_MODE)
     {
-        status->time_since_steam_mode = now;
+        status.time_since_steam_mode = now;
     }
 
     // Set target temperature based on machine mode
-    status->target_temperature = (status->machine_mode == Gaggia::WATER_MODE)
-                                     ? TARGET_WATER_TEMP
-                                     : TARGET_STEAM_TEMP;
+    status.target_temperature = (status.machine_mode == Gaggia::Mode::WATER_MODE)
+                                    ? TARGET_WATER_TEMP
+                                    : TARGET_STEAM_TEMP;
 
     // When debug mode is enabled do not read sensors
-    if (serial->is_debug_active())
+    if (serial.is_debug_active())
     {
-        status->current_temperature = serial->get_mock_temperature();
-        status->status_message = "Debug mode";
+        status.current_temperature = serial.get_mock_temperature();
+        status.status_message = "Debug mode";
         return true;
     }
 
     // Select correct sensor for current operation mode
     TemperatureSensor *sensor =
-        (status->machine_mode == Gaggia::WATER_MODE) ? water_sensor : steam_sensor;
+        (status.machine_mode == Gaggia::Mode::WATER_MODE) ? water_sensor : steam_sensor;
 
     // Get the current temp from the temperature sensor
     float sensor_value;
     if (not sensor || not sensor->get_temperature_celsius(&sensor_value))
     {
-        status->status_message =
+        status.status_message =
             "Unable to read temperature from sensor: " + sensor->get_name();
         return false;
     }
 
-    status->current_temperature = static_cast<double>(sensor_value);
+    status.current_temperature = static_cast<double>(sensor_value);
 
     // Use a tolerance of +/- 1Deg for the message
-    double diff = status->target_temperature - status->current_temperature;
+    double diff = status.target_temperature - status.current_temperature;
     if (diff < -1.0)
     {
-        status->status_message = "Cooling...";
+        status.status_message = "Cooling...";
     }
     else if (diff > 1.0)
     {
-        status->status_message = "Heating...";
+        status.status_message = "Heating...";
     }
     else
     {
-        status->status_message = "Ready";
+        status.status_message = "Ready";
     }
 
     // If the machine has been on for more than the safety limit, then report a problem
     // so the heater will be turned off
-    if (SAFETY_TIMEOUT > 0 && (now - status->time_since_start) > SAFETY_TIMEOUT)
+    if (SAFETY_TIMEOUT > 0 && (now - status.time_since_start) > SAFETY_TIMEOUT)
     {
-        status->status_message = "Safety timeout expired";
+        status.status_message = "Safety timeout expired";
         return false;
     }
     // Check steam mode timeout to avoid keeping the machine at high temps for long
-    if (STEAM_TIMEOUT > 0 && (now - status->time_since_steam_mode) > STEAM_TIMEOUT)
+    if (STEAM_TIMEOUT > 0 && (now - status.time_since_steam_mode) > STEAM_TIMEOUT)
     {
-        status->status_message = "Steam mode timeout expired";
+        status.status_message = "Steam mode timeout expired";
         return false;
     }
 
     return true;
 }
 
-void update_pid(Gaggia::ControlStatus *status)
+void update_pid(Gaggia::ControlStatus &status)
 {
     // Check if new PID gains have been requested and update our controller
     double gain;
-    if (serial->get_new_kp(&gain))
+    if (serial.get_new_kp(&gain))
     {
-        pid->set_kp(&gain);
+        pid.set_kp(gain);
     }
-    if (serial->get_new_ki(&gain))
+    if (serial.get_new_ki(&gain))
     {
-        pid->set_ki(&gain);
+        pid.set_ki(gain);
     }
-    if (serial->get_new_kd(&gain))
+    if (serial.get_new_kd(&gain))
     {
-        pid->set_kd(&gain);
+        pid.set_kd(gain);
     }
 
-    pid->compute(&(status->current_temperature), &(status->target_temperature),
-                 &(status->water_heater_on));
+    pid.compute(status.current_temperature, status.target_temperature,
+                &(status.water_heater_on));
 }
 
-void set_heater_status(const bool *heater_on)
+void set_heater_status(const bool &heater_on)
 {
-    digitalWrite(HEATER_SSR_PIN, (*heater_on) ? HIGH : LOW);
+    digitalWrite(HEATER_SSR_PIN, heater_on ? HIGH : LOW);
 }
 
 TemperatureSensor *make_temp_sensor(const type &sensor_type, const String &name,

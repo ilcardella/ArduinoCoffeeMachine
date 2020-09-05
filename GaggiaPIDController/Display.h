@@ -3,9 +3,9 @@
 #include "libraries/Common.h"
 #include <Arduino.h>
 
-#include <Wire.h>
 #include "SSD1306Ascii.h"
 #include "SSD1306AsciiWire.h"
+#include <Wire.h>
 
 #define SCREEN_I2C_ADDR 0x3C
 
@@ -13,10 +13,10 @@ class Display
 {
   public:
     Display();
-    bool update(Gaggia::ControlStatus *status);
+    bool update(const Gaggia::ControlStatus &status);
 
   private:
-    void write_machine_mode(const Gaggia::MODE &mode);
+    void write_machine_mode(const Gaggia::Mode &mode);
     void write_current_temp(const double &temp);
     void write_target_temp(const double &temp);
     void write_status_message(const String &message);
@@ -25,5 +25,4 @@ class Display
 
     SSD1306AsciiWire display;
     unsigned long time_last_update;
-    bool disable_display;
 };
