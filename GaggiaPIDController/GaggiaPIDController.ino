@@ -1,79 +1,32 @@
-/* GaggiaPIDController
- */
-
+#include "Common.h"
+#include "Configuration.h"
 #include "Display.h"
-#include "KTypeThermocouple.h"
 #include "ModeDetector.h"
 #include "RelayPIDController.h"
+#include "Sensors.h"
 #include "SerialInterface.h"
-#include "TSICTempSensor.h"
 #include "TemperatureSensor.h"
-#include "Common.h"
-
-/************************************************/
-// USER SETTINGS
-/************************************************/
-
-// Define the sensor type to use for the water temperature
-#define WATER_TEMP_SENSOR_TYPE sensors::temperature::type::KTYPE_SPI
-// Define the sensor type to use for the steam temperature
-#define STEAM_TEMP_SENSOR_TYPE sensors::temperature::type::KTYPE_SPI
-
-// Input pin of the water temperature sensor
-#define WATER_TEMP_PIN 4
-// Input pin of the steam temperature sensor
-#define STEAM_TEMP_PIN 5
-
-// Output PWM pin to control the boiler
-#define HEATER_SSR_PIN 6
-
-// Input pin to detect steam mode
-#define STEAM_SWITCH_PIN 7
-
-// Target water temperature in celsius
-#define TARGET_WATER_TEMP 95.0
-// Target steam temperature in celsius
-#define TARGET_STEAM_TEMP 150.0
-
-// PID gain parameters
-#define P_GAIN 125
-#define I_GAIN 0.8
-#define D_GAIN 0.75
-
-// SPI interface common pins
-#define SPI_CLK_PIN 8
-#define SPI_DO_PIN 9
-
-// Serial interface
-#define SERIAL_BAUDRATE 9600
-
-// Safety timeouts in milliseconds to turn off the heater. (disabled if < 1)
-#define SAFETY_TIMEOUT 40 * 60 * 1000 // 40 minutes
-#define STEAM_TIMEOUT 5 * 60 * 1000   // 5 minutes
-
-/************************************************/
-
-using namespace sensors::temperature;
 
 // Global variables and structs
-TemperatureSensor *water_sensor;
-TemperatureSensor *steam_sensor;
-RelayPIDController pid(P_GAIN, I_GAIN, D_GAIN);
-SerialInterface serial(SERIAL_BAUDRATE);
+BaseTemperatureSensor *water_sensor;
+BaseTemperatureSensor *steam_sensor;
+RelayPIDController pid(Configuration::P_GAIN, Configuration::I_GAIN,
+                       Configuration::D_GAIN);
+SerialInterface serial(Configuration::SERIAL_BAUDRATE);
 Display display;
-ModeDetector mode_detector(STEAM_SWITCH_PIN);
+ModeDetector mode_detector(Configuration::STEAM_SWITCH_PIN);
 Gaggia::ControlStatus machine_status;
 
 void setup()
 {
     // Setup the pin modes. Other pins are initialised within classes
-    pinMode(HEATER_SSR_PIN, OUTPUT);
+    pinMode(Configuration::HEATER_SSR_PIN, OUTPUT);
 
     // Initialise the temperature sensors based on configuration
-    water_sensor =
-        make_temp_sensor(WATER_TEMP_SENSOR_TYPE, "water_sensor", WATER_TEMP_PIN);
-    steam_sensor =
-        make_temp_sensor(STEAM_TEMP_SENSOR_TYPE, "steam_sensor", STEAM_TEMP_PIN);
+    water_sensor = make_temp_sensor(Configuration::WATER_TEMP_SENSOR_TYPE, "water_sensor",
+                                    Configuration::WATER_TEMP_PIN);
+    steam_sensor = make_temp_sensor(Configuration::STEAM_TEMP_SENSOR_TYPE, "steam_sensor",
+                                    Configuration::STEAM_TEMP_PIN);
 
     // Mark machine start time
     machine_status.time_since_start = millis();
@@ -115,8 +68,8 @@ bool update_machine_status(Gaggia::ControlStatus &status)
 
     // Set target temperature based on machine mode
     status.target_temperature = (status.machine_mode == Gaggia::Mode::WATER_MODE)
-                                    ? TARGET_WATER_TEMP
-                                    : TARGET_STEAM_TEMP;
+                                    ? Configuration::TARGET_WATER_TEMP
+                                    : Configuration::TARGET_STEAM_TEMP;
 
     // When debug mode is enabled do not read sensors
     if (serial.is_debug_active())
@@ -127,7 +80,7 @@ bool update_machine_status(Gaggia::ControlStatus &status)
     }
 
     // Select correct sensor for current operation mode
-    TemperatureSensor *sensor =
+    BaseTemperatureSensor *sensor =
         (status.machine_mode == Gaggia::Mode::WATER_MODE) ? water_sensor : steam_sensor;
 
     // Get the current temp from the temperature sensor
@@ -158,13 +111,15 @@ bool update_machine_status(Gaggia::ControlStatus &status)
 
     // If the machine has been on for more than the safety limit, then report a problem
     // so the heater will be turned off
-    if (SAFETY_TIMEOUT > 0 && (now - status.time_since_start) > SAFETY_TIMEOUT)
+    if (Configuration::SAFETY_TIMEOUT > 0 &&
+        (now - status.time_since_start) > Configuration::SAFETY_TIMEOUT)
     {
         status.status_message = "Safety timeout expired";
         return false;
     }
     // Check steam mode timeout to avoid keeping the machine at high temps for long
-    if (STEAM_TIMEOUT > 0 && (now - status.time_since_steam_mode) > STEAM_TIMEOUT)
+    if (Configuration::STEAM_TIMEOUT > 0 &&
+        (now - status.time_since_steam_mode) > Configuration::STEAM_TIMEOUT)
     {
         status.status_message = "Steam mode timeout expired";
         return false;
@@ -196,19 +151,22 @@ void update_pid(Gaggia::ControlStatus &status)
 
 void set_heater_status(const bool &heater_on)
 {
-    digitalWrite(HEATER_SSR_PIN, heater_on ? HIGH : LOW);
+    digitalWrite(Configuration::HEATER_SSR_PIN, heater_on ? HIGH : LOW);
 }
 
-TemperatureSensor *make_temp_sensor(const type &sensor_type, const String &name,
-                                    const uint8_t &sensor_pin)
+BaseTemperatureSensor *make_temp_sensor(const SensorTypes &sensor_type,
+                                        const String &name, const uint8_t &sensor_pin)
 {
+    using namespace sensors;
+
     switch (sensor_type)
     {
-    case type::TSIC:
-        return new TSICTempSensor(name, sensor_pin);
+    case SensorTypes::TSIC:
+        return new TemperatureSensor<TSICTempSensor>(name, sensor_pin, 300, 10);
         break;
-    case type::KTYPE_SPI:
-        return new KTypeThermocouple(name, SPI_CLK_PIN, SPI_DO_PIN, sensor_pin);
+    case SensorTypes::KTYPE_SPI:
+        return new TemperatureSensor<KTypeThermocouple>(name, sensor_pin, 300, 10,
+                                                        -10.0f);
         break;
     default:
         // Ideally we would raise an exception here

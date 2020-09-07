@@ -3,36 +3,34 @@
 #include "Common.h"
 #include <Arduino.h>
 
-namespace sensors
-{
-namespace temperature
-{
-enum class type
-{
-    TSIC = 0,     // TSic sensor family
-    KTYPE_SPI = 1 // K-type thermocouple with SPI interface
-};
-
-class TemperatureSensor
+class BaseTemperatureSensor
 {
   public:
-    TemperatureSensor(const String &name, const uint32_t read_period,
+    /** Return the name identifier of the sensor.
+     */
+    virtual String get_name() = 0;
+
+    /* Read the sensor and store the current temperature in
+     * celsius degrees into 'value'.
+     * Return 'true' if the operation succeeds, 'false' otherwise */
+    virtual bool get_temperature_celsius(float *value) = 0;
+};
+
+template <class SensorType> class TemperatureSensor : public BaseTemperatureSensor
+{
+  public:
+    TemperatureSensor(const String &name, const uint8_t &pin, const uint32_t read_period,
                       const uint32_t &moving_avg_size = 1, const float &temp_offset = 0)
         : name(name), m_avg(moving_avg_size), time_last_read(millis()), healthy(true),
-          read_period(read_period), temp_offset(temp_offset)
+          read_period(read_period), temp_offset(temp_offset), sensor(pin)
     {
     }
 
-    /** Return the name identifier of the sensor.
-     */
     String get_name()
     {
         return name;
     }
 
-    /* Read the sensor and store the current temperature in
-     * celsius degrees into 'value'.
-     * Return 'true' if the operation succeeds, 'false' otherwise */
     bool get_temperature_celsius(float *value)
     {
         unsigned long now = millis();
@@ -40,7 +38,7 @@ class TemperatureSensor
         {
             time_last_read = now;
             float reading;
-            if (not read_sensor(&reading))
+            if (not sensor.read_sensor(&reading))
             {
                 healthy = false;
                 return false;
@@ -54,9 +52,8 @@ class TemperatureSensor
         return healthy;
     }
 
-  protected:
-    virtual bool read_sensor(float *value) = 0;
-
+  private:
+    SensorType sensor;
     String name;
     unsigned long time_last_read;
     uint32_t read_period;
@@ -64,5 +61,3 @@ class TemperatureSensor
     bool healthy;
     float temp_offset;
 };
-} // namespace temperature
-} // namespace sensors
