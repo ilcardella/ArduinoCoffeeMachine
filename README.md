@@ -13,6 +13,11 @@ This project depends on the following Arduino libraries:
 - [SDD1306Ascii](https://github.com/greiman/SSD1306Ascii)
 - [MAX6675](https://github.com/adafruit/MAX6675-library)
 
+### Configuration
+
+The code configuration is contained in a "static" `struct` in the file `Configuration.h`.
+To change the default configuration just edit the default value of the desired parameter.
+
 ### Build
 
 You can build the code using the Arduino IDE or with VSCode with the [Arduino extension](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino) opening the `GaggiaPIDController.ino` sketch.

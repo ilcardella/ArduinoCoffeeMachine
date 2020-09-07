@@ -4,6 +4,9 @@
 ### Added
 - Thermocouple sensor support a temperature offset to account for static error
 
+## Changed
+- Reformat of the `TemperatureSensor` class using template for sensor implementation
+
 ## [1.1.0] - 2020-08-22
 ### Added
 - Added python script to plot machine temperatures reported through serial interface
