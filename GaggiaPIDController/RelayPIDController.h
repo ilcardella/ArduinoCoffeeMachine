@@ -23,5 +23,5 @@ class RelayPIDController
     double pid_input;
     double pid_output;
     double pid_setpoint;
-    uint16_t pid_window_size;
+    unsigned short pid_window_size;
 };

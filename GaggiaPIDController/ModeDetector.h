@@ -1,20 +1,20 @@
 #pragma once
 
 #include "Common.h"
-#include <Arduino.h>
 
-class ModeDetector
+template <class Adapter> class ModeDetector
 {
   public:
     ModeDetector(const uint32_t &pin) : steam_switch_pin(pin)
     {
-        pinMode(pin, INPUT_PULLUP);
+        Adapter::pinMode(pin, INPUT_PULLUP);
     }
 
     Gaggia::Mode get_mode()
     {
-        return (digitalRead(steam_switch_pin) == HIGH) ? Gaggia::Mode::WATER_MODE
-                                                       : Gaggia::Mode::STEAM_MODE;
+        return (Adapter::digitalRead(steam_switch_pin) == HIGH)
+                   ? Gaggia::Mode::WATER_MODE
+                   : Gaggia::Mode::STEAM_MODE;
     }
 
   private:

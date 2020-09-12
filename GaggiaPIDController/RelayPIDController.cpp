@@ -15,7 +15,7 @@ bool RelayPIDController::compute(const double &input, const double &setpoint,
                                  bool *relay_on)
 {
     // How much time it has passed in the current window frame
-    uint16_t window_progress = millis() % pid_window_size;
+    unsigned short window_progress = millis() % pid_window_size;
 
     // Update the pid input and setpoint with those requested
     pid_input = input;

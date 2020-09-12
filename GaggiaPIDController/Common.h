@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
-
 namespace Gaggia
 {
 enum class Mode
@@ -10,13 +8,13 @@ enum class Mode
     STEAM_MODE = 1
 };
 
-struct ControlStatus
+template <class Adapter> struct ControlStatus
 {
     Mode machine_mode = Mode::WATER_MODE;
     double current_temperature = 0.0;
     double target_temperature = 0.0;
     bool water_heater_on = false;
-    String status_message = "Loading...";
+    typename Adapter::String status_message = "Loading...";
     unsigned long time_since_start = 0;
     unsigned long time_since_steam_mode = 0;
 };
@@ -25,7 +23,7 @@ struct ControlStatus
 template <typename T> class MovingAverage
 {
   public:
-    MovingAverage(const uint32_t &window_size)
+    MovingAverage(const unsigned int &window_size)
         : window_size(window_size), index(0), sum(0)
     {
         readings = new T[window_size];
@@ -62,8 +60,8 @@ template <typename T> class MovingAverage
     }
 
   private:
-    uint32_t window_size;
+    unsigned int window_size;
     T *readings;
-    uint32_t index;
+    unsigned int index;
     T sum;
 };

@@ -1,21 +1,24 @@
+#include "ArduinoAdapter.h"
 #include "Common.h"
 #include "Configuration.h"
 #include "Display.h"
+#include "Factories.h"
 #include "ModeDetector.h"
 #include "RelayPIDController.h"
-#include "Sensors.h"
 #include "SerialInterface.h"
 #include "TemperatureSensor.h"
 
+using Adapter = ArduinoAdapter;
+
 // Global variables and structs
-BaseTemperatureSensor *water_sensor;
-BaseTemperatureSensor *steam_sensor;
+BaseTemperatureSensor<Adapter> *water_sensor;
+BaseTemperatureSensor<Adapter> *steam_sensor;
 RelayPIDController pid(Configuration::P_GAIN, Configuration::I_GAIN,
                        Configuration::D_GAIN);
-SerialInterface serial(Configuration::SERIAL_BAUDRATE);
-Display display;
-ModeDetector mode_detector(Configuration::STEAM_SWITCH_PIN);
-Gaggia::ControlStatus machine_status;
+SerialInterface<Adapter> serial(Configuration::SERIAL_BAUDRATE);
+Display<Adapter> display;
+ModeDetector<Adapter> mode_detector(Configuration::STEAM_SWITCH_PIN);
+Gaggia::ControlStatus<Adapter> machine_status;
 
 void setup()
 {
@@ -23,13 +26,17 @@ void setup()
     pinMode(Configuration::HEATER_SSR_PIN, OUTPUT);
 
     // Initialise the temperature sensors based on configuration
-    water_sensor = make_temp_sensor(Configuration::WATER_TEMP_SENSOR_TYPE, "water_sensor",
-                                    Configuration::WATER_TEMP_PIN);
-    steam_sensor = make_temp_sensor(Configuration::STEAM_TEMP_SENSOR_TYPE, "steam_sensor",
-                                    Configuration::STEAM_TEMP_PIN);
+    water_sensor =
+        SensorFactory::make_temperature_sensor<Adapter,
+                                               Configuration::WATER_TEMP_SENSOR_TYPE>(
+            "water_sensor", Configuration::WATER_TEMP_PIN);
+    steam_sensor =
+        SensorFactory::make_temperature_sensor<Adapter,
+                                               Configuration::STEAM_TEMP_SENSOR_TYPE>(
+            "steam_sensor", Configuration::STEAM_TEMP_PIN);
 
     // Mark machine start time
-    machine_status.time_since_start = millis();
+    machine_status.time_since_start = Adapter::millis();
 
     // Allow sensors to initialise
     delay(500);
@@ -51,9 +58,9 @@ void loop()
     serial.print_status(machine_status);
 }
 
-bool update_machine_status(Gaggia::ControlStatus &status)
+bool update_machine_status(Gaggia::ControlStatus<Adapter> &status)
 {
-    unsigned long now = millis();
+    unsigned long now = Adapter::millis();
 
     // Set SSR off by default and let the PID decide whether to turn it on
     status.water_heater_on = false;
@@ -80,7 +87,7 @@ bool update_machine_status(Gaggia::ControlStatus &status)
     }
 
     // Select correct sensor for current operation mode
-    BaseTemperatureSensor *sensor =
+    BaseTemperatureSensor<Adapter> *sensor =
         (status.machine_mode == Gaggia::Mode::WATER_MODE) ? water_sensor : steam_sensor;
 
     // Get the current temp from the temperature sensor
@@ -128,7 +135,7 @@ bool update_machine_status(Gaggia::ControlStatus &status)
     return true;
 }
 
-void update_pid(Gaggia::ControlStatus &status)
+void update_pid(Gaggia::ControlStatus<Adapter> &status)
 {
     // Check if new PID gains have been requested and update our controller
     double gain;
@@ -152,25 +159,4 @@ void update_pid(Gaggia::ControlStatus &status)
 void set_heater_status(const bool &heater_on)
 {
     digitalWrite(Configuration::HEATER_SSR_PIN, heater_on ? HIGH : LOW);
-}
-
-BaseTemperatureSensor *make_temp_sensor(const SensorTypes &sensor_type,
-                                        const String &name, const uint8_t &sensor_pin)
-{
-    using namespace sensors;
-
-    switch (sensor_type)
-    {
-    case SensorTypes::TSIC:
-        return new TemperatureSensor<TSICTempSensor>(name, sensor_pin, 300, 10);
-        break;
-    case SensorTypes::KTYPE_SPI:
-        return new TemperatureSensor<KTypeThermocouple>(name, sensor_pin, 300, 10,
-                                                        -10.0f);
-        break;
-    default:
-        // Ideally we would raise an exception here
-        return nullptr;
-        break;
-    }
 }

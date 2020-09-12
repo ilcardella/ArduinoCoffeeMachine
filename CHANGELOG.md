@@ -3,6 +3,7 @@
 ## []
 ### Added
 - Thermocouple sensor support a temperature offset to account for static error
+- Wrapper for all Arduino.h functions and types
 
 ## Changed
 - Reformat of the `TemperatureSensor` class using template for sensor implementation
