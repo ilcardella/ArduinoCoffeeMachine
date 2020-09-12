@@ -18,6 +18,16 @@ class ArduinoAdapter
         return digitalRead(pin);
     }
 
+    static void digitalWrite(uint8_t pin, uint8_t val)
+    {
+        digitalWrite(pin, val);
+    }
+
+    static void delay(unsigned long ms)
+    {
+        delay(ms);
+    }
+
     static unsigned long millis()
     {
         return millis();
