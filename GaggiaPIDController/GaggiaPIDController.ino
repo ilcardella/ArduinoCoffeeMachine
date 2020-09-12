@@ -13,8 +13,8 @@ using Adapter = ArduinoAdapter;
 // Global variables and structs
 BaseTemperatureSensor<Adapter> *water_sensor;
 BaseTemperatureSensor<Adapter> *steam_sensor;
-RelayPIDController pid(Configuration::P_GAIN, Configuration::I_GAIN,
-                       Configuration::D_GAIN);
+RelayPIDController<Adapter> pid(Configuration::P_GAIN, Configuration::I_GAIN,
+                                Configuration::D_GAIN);
 SerialInterface<Adapter> serial(Configuration::SERIAL_BAUDRATE);
 Display<Adapter> display;
 ModeDetector<Adapter> mode_detector(Configuration::STEAM_SWITCH_PIN);

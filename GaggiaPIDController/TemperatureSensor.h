@@ -17,10 +17,9 @@ template <class Adapter, class SensorType>
 class TemperatureSensor : public BaseTemperatureSensor<Adapter>
 {
   public:
-    TemperatureSensor(const typename Adapter::String &name,
-                      const typename Adapter::uint8_t &pin,
-                      const typename Adapter::uint32_t read_period,
-                      const typename Adapter::uint32_t &moving_avg_size = 1,
+    TemperatureSensor(const typename Adapter::String &name, const unsigned char &pin,
+                      const unsigned long read_period,
+                      const unsigned int &moving_avg_size = 1,
                       const float &temp_offset = 0)
         : name(name), m_avg(moving_avg_size), time_last_read(Adapter::millis()),
           healthy(true), read_period(read_period), temp_offset(temp_offset), sensor(pin)
@@ -57,7 +56,7 @@ class TemperatureSensor : public BaseTemperatureSensor<Adapter>
     SensorType sensor;
     typename Adapter::String name;
     unsigned long time_last_read;
-    typename Adapter::uint32_t read_period;
+    unsigned long read_period;
     MovingAverage<float> m_avg;
     bool healthy;
     float temp_offset;

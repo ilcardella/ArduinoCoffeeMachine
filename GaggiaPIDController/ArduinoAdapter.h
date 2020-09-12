@@ -7,9 +7,6 @@ class ArduinoAdapter
   public:
     using String = String;
     using StringSumHelper = StringSumHelper;
-    using uint8_t = uint8_t;
-    using uint16_t = uint16_t;
-    using uint32_t = uint32_t;
 
     static void pinMode(uint8_t pin, uint8_t mode)
     {

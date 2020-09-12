@@ -10,7 +10,7 @@ namespace sensors
 class KTypeThermocouple
 {
   public:
-    KTypeThermocouple(const uint8_t &pin)
+    KTypeThermocouple(const unsigned char &pin)
         : sensor(Configuration::SPI_CLK_PIN, pin, Configuration::SPI_DO_PIN)
     {
     }
@@ -33,14 +33,14 @@ class KTypeThermocouple
 class TSICTempSensor
 {
   public:
-    TSICTempSensor(const uint32_t &pin) : sensor(pin, NO_VCC_PIN, TSIC_30x)
+    TSICTempSensor(const unsigned char &pin) : sensor(pin, NO_VCC_PIN, TSIC_30x)
     {
         pinMode(pin, INPUT);
     }
 
     bool read_sensor(float *value)
     {
-        uint16_t raw;
+        unsigned short raw;
         if (not sensor.getTemperature(&raw))
         {
             return false;

@@ -5,7 +5,7 @@
 template <class Adapter> class ModeDetector
 {
   public:
-    ModeDetector(const uint32_t &pin) : steam_switch_pin(pin)
+    ModeDetector(const unsigned char &pin) : steam_switch_pin(pin)
     {
         Adapter::pinMode(pin, INPUT_PULLUP);
     }
@@ -18,5 +18,5 @@ template <class Adapter> class ModeDetector
     }
 
   private:
-    uint32_t steam_switch_pin;
+    unsigned char steam_switch_pin;
 };

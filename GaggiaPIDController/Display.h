@@ -7,7 +7,7 @@
 template <class Adapter> class Display
 {
   public:
-    Display()
+    Display() : display(), time_last_update(0)
     {
         Wire.begin();
         Wire.setClock(400000L);
@@ -15,6 +15,7 @@ template <class Adapter> class Display
         display.setFont(Adafruit5x7);
         display.clear();
     }
+
     bool update(const Gaggia::ControlStatus<Adapter> &status)
     {
         // Refresh the display with a reasonable rate

@@ -15,7 +15,7 @@ struct SerialInput
 template <class Adapter> class SerialInterface
 {
   public:
-    SerialInterface(const unsigned short &baudrate)
+    SerialInterface(const unsigned short &baudrate) : time_last_print(0), inputs()
     {
         Adapter::SerialBegin(baudrate);
     }
