@@ -1,12 +1,12 @@
 #include "libraries/ArduinoAdapter.h"
-#include "libraries/BaseTypes.h"
-#include "libraries/CoffeeMachine.h"
 #include "libraries/Display.h"
 #include "libraries/Factories.h"
 #include "libraries/Heater.h"
 #include "libraries/ModeDetector.h"
 #include "libraries/RelayPIDController.h"
 #include "libraries/SerialInterface.h"
+#include "libraries/coffee_machine/BaseTypes.h"
+#include "libraries/coffee_machine/CoffeeMachine.h"
 
 using Adapter = ArduinoAdapter;
 

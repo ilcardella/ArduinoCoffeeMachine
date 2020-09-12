@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BaseTypes.h"
+#include "coffee_machine/BaseTypes.h"
 
 template <class Adapter, class SensorType>
 class TemperatureSensor : public BaseTemperatureSensor<Adapter>

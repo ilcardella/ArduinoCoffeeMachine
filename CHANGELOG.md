@@ -4,6 +4,8 @@
 ### Added
 - Thermocouple sensor support a temperature offset to account for static error
 - Wrapper for all Arduino.h functions and types
+- CMake configuration for non-Arduino dependant code
+- Automated test suite for non-Arduino dependant codebase
 
 ## Changed
 - Reformat of the `TemperatureSensor` class using template for sensor implementation
