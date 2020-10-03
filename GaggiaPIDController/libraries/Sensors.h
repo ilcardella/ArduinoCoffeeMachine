@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BaseTypes.h"
 #include "Configuration.h"
 
 #include "max6675.h"
@@ -7,7 +8,7 @@
 
 namespace sensors
 {
-class KTypeThermocouple
+class KTypeThermocouple : public BaseSensor
 {
   public:
     KTypeThermocouple(const unsigned char &pin)
@@ -15,7 +16,7 @@ class KTypeThermocouple
     {
     }
 
-    bool read_sensor(float *value)
+    bool read_sensor(float *value) override
     {
         float reading = sensor.readCelsius();
         if (reading == NAN)
@@ -30,7 +31,7 @@ class KTypeThermocouple
     MAX6675 sensor;
 };
 
-class TSICTempSensor
+class TSICTempSensor : public BaseSensor
 {
   public:
     TSICTempSensor(const unsigned char &pin) : sensor(pin, NO_VCC_PIN, TSIC_30x)
@@ -38,7 +39,7 @@ class TSICTempSensor
         pinMode(pin, INPUT);
     }
 
-    bool read_sensor(float *value)
+    bool read_sensor(float *value) override
     {
         unsigned short raw;
         if (not sensor.getTemperature(&raw))

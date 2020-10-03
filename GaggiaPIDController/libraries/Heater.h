@@ -1,6 +1,8 @@
 #pragma once
 
-template <class Adapter> class Heater
+#include "BaseTypes.h"
+
+template <class Adapter> class Heater : public BaseHeater
 {
   public:
     Heater(const unsigned char &pin) : pin(pin)
@@ -8,7 +10,7 @@ template <class Adapter> class Heater
         Adapter::pinMode(pin, OUTPUT);
     }
 
-    bool set(const bool &on)
+    bool set(const bool &on) override
     {
         Adapter::digitalWrite(pin, on ? HIGH : LOW);
     }

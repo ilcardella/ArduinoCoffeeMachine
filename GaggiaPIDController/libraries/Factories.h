@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BaseTypes.h"
 #include "Configuration.h"
 #include "Sensors.h"
 #include "TemperatureSensor.h"

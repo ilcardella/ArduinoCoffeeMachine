@@ -1,18 +1,9 @@
 #pragma once
 
+#include "BaseTypes.h"
 #include "Common.h"
 
-struct SerialInput
-{
-    bool debug_mode = false;
-    bool enable_output = true;
-    double mock_temperature = 0.0;
-    double kp = 0.0;
-    double ki = 0.0;
-    double kd = 0.0;
-};
-
-template <class Adapter> class SerialInterface
+template <class Adapter> class SerialInterface : public BaseSerialInterface<Adapter>
 {
   public:
     SerialInterface(const unsigned short &baudrate) : time_last_print(0), inputs()
@@ -20,7 +11,7 @@ template <class Adapter> class SerialInterface
         Adapter::SerialBegin(baudrate);
     }
 
-    void read_input()
+    void read_input() override
     {
         using string = typename Adapter::String;
 
@@ -81,7 +72,7 @@ template <class Adapter> class SerialInterface
         }
     }
 
-    void print_status(const Gaggia::ControlStatus<Adapter> &status)
+    void print_status(const Gaggia::ControlStatus<Adapter> &status) override
     {
         using string = typename Adapter::String;
         auto now = Adapter::millis();
@@ -96,6 +87,50 @@ template <class Adapter> class SerialInterface
         }
     }
 
+    bool is_debug_active() override
+    {
+        return inputs.debug_mode;
+    }
+
+    double get_mock_temperature() override
+    {
+        return inputs.mock_temperature;
+    }
+
+    bool get_new_kp(double *kp) override
+    {
+        if (inputs.kp > 0.0)
+        {
+            *kp = inputs.kp;
+            inputs.kp = 0.0; // reset input
+            return true;
+        }
+        return false;
+    }
+
+    bool get_new_ki(double *ki) override
+    {
+        if (inputs.ki > 0.0)
+        {
+            *ki = inputs.ki;
+            inputs.ki = 0.0; // reset input
+            return true;
+        }
+        return false;
+    }
+
+    bool get_new_kd(double *kd) override
+    {
+        if (inputs.kd > 0.0)
+        {
+            *kd = inputs.kd;
+            inputs.kd = 0.0; // reset input
+            return true;
+        }
+        return false;
+    }
+
+  private:
     void print_help()
     {
         Adapter::SerialPrintln("**** GaggiaPIDController serial interface ****");
@@ -111,56 +146,23 @@ template <class Adapter> class SerialInterface
         Adapter::SerialPrintln("**** END ****");
     }
 
-    bool is_debug_active()
-    {
-        return inputs.debug_mode;
-    }
-
-    double get_mock_temperature()
-    {
-        return inputs.mock_temperature;
-    }
-
     bool is_output_enabled()
     {
         return inputs.enable_output;
     }
 
-    bool get_new_kp(double *kp)
-    {
-        if (inputs.kp > 0.0)
-        {
-            *kp = inputs.kp;
-            inputs.kp = 0.0; // reset input
-            return true;
-        }
-        return false;
-    }
-
-    bool get_new_ki(double *ki)
-    {
-        if (inputs.ki > 0.0)
-        {
-            *ki = inputs.ki;
-            inputs.ki = 0.0; // reset input
-            return true;
-        }
-        return false;
-    }
-
-    bool get_new_kd(double *kd)
-    {
-        if (inputs.kd > 0.0)
-        {
-            *kd = inputs.kd;
-            inputs.kd = 0.0; // reset input
-            return true;
-        }
-        return false;
-    }
-
-  private:
     static constexpr unsigned short PRINT_TIMEOUT = 200;
     unsigned long time_last_print;
+
+    struct SerialInput
+    {
+        bool debug_mode = false;
+        bool enable_output = true;
+        double mock_temperature = 0.0;
+        double kp = 0.0;
+        double ki = 0.0;
+        double kd = 0.0;
+    };
+
     SerialInput inputs;
 };

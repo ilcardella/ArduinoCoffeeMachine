@@ -1,8 +1,9 @@
 #pragma once
 
+#include "BaseTypes.h"
 #include <PID_v1.h>
 
-template <class Adapter> class RelayPIDController
+template <class Adapter> class RelayPIDController : public BasePIDController
 {
   public:
     RelayPIDController(const double &kp, const double &ki, const double &kd)
@@ -16,7 +17,7 @@ template <class Adapter> class RelayPIDController
         pid->SetMode(AUTOMATIC);
     }
 
-    bool compute(const double &input, const double &setpoint, bool *relay_on)
+    bool compute(const double &input, const double &setpoint, bool *relay_on) override
     {
         // How much time it has passed in the current window frame
         unsigned short window_progress = Adapter::millis() % pid_window_size;
@@ -34,19 +35,19 @@ template <class Adapter> class RelayPIDController
         return true;
     }
 
-    void set_kp(const double &kp)
+    void set_kp(const double &kp) override
     {
         p_gain = kp;
         pid->SetTunings(p_gain, i_gain, d_gain);
     }
 
-    void set_ki(const double &ki)
+    void set_ki(const double &ki) override
     {
         i_gain = ki;
         pid->SetTunings(p_gain, i_gain, d_gain);
     }
 
-    void set_kd(const double &kd)
+    void set_kd(const double &kd) override
     {
         d_gain = kd;
         pid->SetTunings(p_gain, i_gain, d_gain);

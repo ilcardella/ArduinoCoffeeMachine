@@ -1,10 +1,11 @@
 #pragma once
 
+#include "BaseTypes.h"
 #include "Common.h"
 
 #include "SSD1306AsciiWire.h"
 
-template <class Adapter> class Display
+template <class Adapter> class Display : public BaseDisplay<Adapter>
 {
   public:
     Display() : display(), time_last_update(0)
@@ -16,7 +17,7 @@ template <class Adapter> class Display
         display.clear();
     }
 
-    bool update(const Gaggia::ControlStatus<Adapter> &status)
+    bool update(const Gaggia::ControlStatus<Adapter> &status) override
     {
         // Refresh the display with a reasonable rate
         auto now = Adapter::millis();

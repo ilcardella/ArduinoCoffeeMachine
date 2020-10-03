@@ -1,8 +1,9 @@
 #pragma once
 
+#include "BaseTypes.h"
 #include "Common.h"
 
-template <class Adapter> class ModeDetector
+template <class Adapter> class ModeDetector : public BaseModeDetector
 {
   public:
     ModeDetector(const unsigned char &pin) : steam_switch_pin(pin)
@@ -10,7 +11,7 @@ template <class Adapter> class ModeDetector
         Adapter::pinMode(pin, INPUT_PULLUP);
     }
 
-    Gaggia::Mode get_mode()
+    Gaggia::Mode get_mode() override
     {
         return (Adapter::digitalRead(steam_switch_pin) == HIGH)
                    ? Gaggia::Mode::WATER_MODE

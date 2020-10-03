@@ -1,52 +1,38 @@
 #pragma once
 
+#include "BaseTypes.h"
 #include "Common.h"
 #include "Configuration.h"
-#include "Display.h"
-#include "Factories.h"
-#include "Heater.h"
-#include "ModeDetector.h"
-#include "RelayPIDController.h"
-#include "SerialInterface.h"
-#include "TemperatureSensor.h"
 
 template <class Adapter> class CoffeeMachine
 {
   public:
-    CoffeeMachine()
-        : pid(Configuration::P_GAIN, Configuration::I_GAIN, Configuration::D_GAIN),
-          serial(Configuration::SERIAL_BAUDRATE),
-          mode_detector(Configuration::STEAM_SWITCH_PIN), machine_status(), display(),
-          heater(Configuration::HEATER_SSR_PIN)
+    CoffeeMachine(BasePIDController *pid, BaseSerialInterface<Adapter> *serial,
+                  BaseModeDetector *mode_detector, BaseDisplay<Adapter> *display,
+                  BaseHeater *heater, BaseTemperatureSensor<Adapter> *water_sensor,
+                  BaseTemperatureSensor<Adapter> *steam_sensor)
+        : pid(pid), serial(serial), mode_detector(mode_detector), display(display),
+          heater(heater), water_sensor(water_sensor), steam_sensor(steam_sensor),
+          machine_status()
     {
-        // Initialise the temperature sensors based on configuration
-        water_sensor =
-            SensorFactory::make_temperature_sensor<Adapter,
-                                                   Configuration::WATER_TEMP_SENSOR_TYPE>(
-                "water_sensor", Configuration::WATER_TEMP_PIN);
-        steam_sensor =
-            SensorFactory::make_temperature_sensor<Adapter,
-                                                   Configuration::STEAM_TEMP_SENSOR_TYPE>(
-                "steam_sensor", Configuration::STEAM_TEMP_PIN);
-
         // Mark machine start time
         machine_status.time_since_start = Adapter::millis();
     }
 
     bool spin()
     {
-        serial.read_input();
+        serial->read_input();
 
         if (update_machine_status(machine_status))
         {
             update_pid(machine_status);
         }
 
-        heater.set(machine_status.water_heater_on);
+        heater->set(machine_status.water_heater_on);
 
-        display.update(machine_status);
+        display->update(machine_status);
 
-        serial.print_status(machine_status);
+        serial->print_status(machine_status);
         return true;
     }
 
@@ -58,7 +44,7 @@ template <class Adapter> class CoffeeMachine
         // Set SSR off by default and let the PID decide whether to turn it on
         status.water_heater_on = false;
         // Read operation mode
-        status.machine_mode = mode_detector.get_mode();
+        status.machine_mode = mode_detector->get_mode();
 
         // Reset steam mode timeout counter when not in steam mode
         if (status.machine_mode != Gaggia::Mode::STEAM_MODE)
@@ -72,9 +58,9 @@ template <class Adapter> class CoffeeMachine
                                         : Configuration::TARGET_STEAM_TEMP;
 
         // When debug mode is enabled do not read sensors
-        if (serial.is_debug_active())
+        if (serial->is_debug_active())
         {
-            status.current_temperature = serial.get_mock_temperature();
+            status.current_temperature = serial->get_mock_temperature();
             status.status_message = "Debug mode";
             return true;
         }
@@ -133,31 +119,31 @@ template <class Adapter> class CoffeeMachine
     {
         // Check if new PID gains have been requested and update our controller
         double gain;
-        if (serial.get_new_kp(&gain))
+        if (serial->get_new_kp(&gain))
         {
-            pid.set_kp(gain);
+            pid->set_kp(gain);
         }
-        if (serial.get_new_ki(&gain))
+        if (serial->get_new_ki(&gain))
         {
-            pid.set_ki(gain);
+            pid->set_ki(gain);
         }
-        if (serial.get_new_kd(&gain))
+        if (serial->get_new_kd(&gain))
         {
-            pid.set_kd(gain);
+            pid->set_kd(gain);
         }
 
-        pid.compute(status.current_temperature, status.target_temperature,
-                    &(status.water_heater_on));
+        pid->compute(status.current_temperature, status.target_temperature,
+                     &(status.water_heater_on));
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
 
     BaseTemperatureSensor<Adapter> *water_sensor;
     BaseTemperatureSensor<Adapter> *steam_sensor;
-    RelayPIDController<Adapter> pid;
-    SerialInterface<Adapter> serial;
-    Display<Adapter> display;
-    ModeDetector<Adapter> mode_detector;
+    BasePIDController *pid;
+    BaseSerialInterface<Adapter> *serial;
+    BaseDisplay<Adapter> *display;
+    BaseModeDetector *mode_detector;
     Gaggia::ControlStatus<Adapter> machine_status;
-    Heater<Adapter> heater;
+    BaseHeater *heater;
 };

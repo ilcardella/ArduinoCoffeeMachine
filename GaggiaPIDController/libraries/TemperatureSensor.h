@@ -1,17 +1,6 @@
 #pragma once
 
-template <class Adapter> class BaseTemperatureSensor
-{
-  public:
-    /** Return the name identifier of the sensor.
-     */
-    virtual typename Adapter::String get_name() = 0;
-
-    /* Read the sensor and store the current temperature in
-     * celsius degrees into 'value'.
-     * Return 'true' if the operation succeeds, 'false' otherwise */
-    virtual bool get_temperature_celsius(float *value) = 0;
-};
+#include "BaseTypes.h"
 
 template <class Adapter, class SensorType>
 class TemperatureSensor : public BaseTemperatureSensor<Adapter>
@@ -26,12 +15,12 @@ class TemperatureSensor : public BaseTemperatureSensor<Adapter>
     {
     }
 
-    typename Adapter::String get_name()
+    typename Adapter::String get_name() override
     {
         return name;
     }
 
-    bool get_temperature_celsius(float *value)
+    bool get_temperature_celsius(float *value) override
     {
         unsigned long now = Adapter::millis();
         if (now - time_last_read > read_period)
