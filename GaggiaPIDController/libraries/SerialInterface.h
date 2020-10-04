@@ -20,7 +20,7 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface<Adap
         // to overwrite sensor readings
         if (Adapter::SerialAvailable())
         {
-            typename Adapter::String data = Adapter::SerialReadStringUntil('\n');
+            string data = Adapter::SerialReadStringUntil('\n');
             if (data.startsWith("help"))
             {
                 print_help();
