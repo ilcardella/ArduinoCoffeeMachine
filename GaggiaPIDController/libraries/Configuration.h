@@ -11,15 +11,15 @@ struct Configuration
     inline static constexpr SensorTypes WATER_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
     inline static constexpr SensorTypes STEAM_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
     // Input pin of the water temperature sensor
-    inline static constexpr uint8_t WATER_TEMP_PIN = 4;
+    inline static constexpr unsigned char WATER_TEMP_PIN = 4;
     // Input pin of the steam temperature sensor
-    inline static constexpr uint8_t STEAM_TEMP_PIN = 5;
+    inline static constexpr unsigned char STEAM_TEMP_PIN = 5;
 
     // Output PWM pin to control the boiler
-    inline static constexpr uint8_t HEATER_SSR_PIN = 6;
+    inline static constexpr unsigned char HEATER_SSR_PIN = 6;
 
     // Input pin to detect steam mode
-    inline static constexpr uint8_t STEAM_SWITCH_PIN = 7;
+    inline static constexpr unsigned char STEAM_SWITCH_PIN = 7;
 
     // Target water temperature in celsius
     inline static constexpr double TARGET_WATER_TEMP = 95.0;
@@ -32,8 +32,8 @@ struct Configuration
     inline static constexpr double D_GAIN = 0.75;
 
     // SPI interface common pins
-    inline static constexpr uint8_t SPI_CLK_PIN = 8;
-    inline static constexpr uint8_t SPI_DO_PIN = 9;
+    inline static constexpr unsigned char SPI_CLK_PIN = 8;
+    inline static constexpr unsigned char SPI_DO_PIN = 9;
 
     // Serial interface
     inline static constexpr unsigned long SERIAL_BAUDRATE = 9600;
