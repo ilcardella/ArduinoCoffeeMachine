@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
+macro(gaggia_add_gtest TEST_NAME)
+  add_executable(${TEST_NAME} ${TEST_NAME}.cpp)
+  target_link_libraries(${TEST_NAME} PUBLIC CoffeeMachineLib gtest)
+  gtest_discover_tests(${TEST_NAME})
+endmacro()
+
+
 # Set up GoogleTest
 add_subdirectory(third_party/googletest)
 target_compile_definitions(gtest
@@ -11,7 +18,5 @@ target_compile_definitions(gtest
 enable_testing()
 include(GoogleTest)
 
-set(TEST_NAME "test_temperature_sensors")
-add_executable(${TEST_NAME} ${TEST_NAME}.cpp)
-target_link_libraries(${TEST_NAME} PUBLIC CoffeeMachineLib gtest)
-gtest_discover_tests(${TEST_NAME})
+gaggia_add_gtest("test_temperature_sensors")
+gaggia_add_gtest("test_pid_controller")

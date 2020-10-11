@@ -1,62 +1,10 @@
-#include "gtest/gtest.h"
+#include "CommonTest.h"
 
-#include <coffee_machine/CoffeeMachine.h>
-#include <coffee_machine/Configuration.h>
-
-#include "mock/CppAdapter.h"
-#include "mock/MockDisplay.h"
-#include "mock/MockHeater.h"
-#include "mock/MockModeDetector.h"
-#include "mock/MockPID.h"
-#include "mock/MockSerial.h"
-#include "mock/MockTempSensor.h"
-
-using Adapter = CppAdapter;
-
-class TestGaggiaCoffeeMachine : public ::testing::Test
+class TestTemperatureSensors : public CommonTest
 {
-  protected:
-    TestGaggiaCoffeeMachine()
-        : pid(), serial(), mode_detector(), display(), heater(), water_sensor("water"),
-          steam_sensor("steam"), creation_time(Adapter::millis())
-    {
-    }
-
-    void SetUp() override
-    {
-        display.reset();
-        serial.reset();
-        pid.reset();
-        mode_detector.reset();
-        heater.reset();
-        water_sensor.reset();
-        steam_sensor.reset();
-        creation_time = Adapter::millis();
-    }
-
-    CoffeeMachine<Adapter> make_machine()
-    {
-        return CoffeeMachine<Adapter>(&pid, &serial, &mode_detector, &display, &heater,
-                                      &water_sensor, &steam_sensor);
-    }
-
-    unsigned long normalize_time(const double &time)
-    {
-        return time - creation_time;
-    }
-
-    MockDisplay<Adapter> display;
-    MockSerial<Adapter> serial;
-    MockPID pid;
-    MockModeDetector mode_detector;
-    MockHeater heater;
-    MockTempSensor<Adapter> water_sensor;
-    MockTempSensor<Adapter> steam_sensor;
-
-    unsigned long creation_time;
 };
 
-TEST_F(TestGaggiaCoffeeMachine, testWaterModeHealthySensorHeating)
+TEST_F(TestTemperatureSensors, testWaterModeHealthySensorHeating)
 {
     // Mock healthy temp sensor and pid controllerand a "low" temperature
     mode_detector.mode = Gaggia::Mode::WATER_MODE;
@@ -79,7 +27,7 @@ TEST_F(TestGaggiaCoffeeMachine, testWaterModeHealthySensorHeating)
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
 
-TEST_F(TestGaggiaCoffeeMachine, testWaterModeHealthySensorCooling)
+TEST_F(TestTemperatureSensors, testWaterModeHealthySensorCooling)
 {
     // Mock healthy temp sensor and pid controller and a "high" temperature
     mode_detector.mode = Gaggia::Mode::WATER_MODE;
@@ -102,7 +50,7 @@ TEST_F(TestGaggiaCoffeeMachine, testWaterModeHealthySensorCooling)
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
 
-TEST_F(TestGaggiaCoffeeMachine, testWaterModeHealthySensorStandby)
+TEST_F(TestTemperatureSensors, testWaterModeHealthySensorStandby)
 {
     // Mock healthy temp sensor and pid controller and a "target" temperature
     mode_detector.mode = Gaggia::Mode::WATER_MODE;
@@ -125,7 +73,7 @@ TEST_F(TestGaggiaCoffeeMachine, testWaterModeHealthySensorStandby)
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
 
-TEST_F(TestGaggiaCoffeeMachine, testWaterModeFaultySensor)
+TEST_F(TestTemperatureSensors, testWaterModeFaultySensor)
 {
     // Mock healthy temp sensor and pid controller and a "target" temperature
     mode_detector.mode = Gaggia::Mode::WATER_MODE;
@@ -149,7 +97,7 @@ TEST_F(TestGaggiaCoffeeMachine, testWaterModeFaultySensor)
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
 
-TEST_F(TestGaggiaCoffeeMachine, testSteamModeHealthySensorHeating)
+TEST_F(TestTemperatureSensors, testSteamModeHealthySensorHeating)
 {
     // Mock healthy temp sensor and pid controllerand a "low" temperature
     mode_detector.mode = Gaggia::Mode::STEAM_MODE;
@@ -172,7 +120,7 @@ TEST_F(TestGaggiaCoffeeMachine, testSteamModeHealthySensorHeating)
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
 
-TEST_F(TestGaggiaCoffeeMachine, testSteamModeHealthySensorCooling)
+TEST_F(TestTemperatureSensors, testSteamModeHealthySensorCooling)
 {
     // Mock healthy temp sensor and pid controller and a "high" temperature
     mode_detector.mode = Gaggia::Mode::STEAM_MODE;
@@ -195,7 +143,7 @@ TEST_F(TestGaggiaCoffeeMachine, testSteamModeHealthySensorCooling)
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
 
-TEST_F(TestGaggiaCoffeeMachine, testSteamModeHealthySensorStandby)
+TEST_F(TestTemperatureSensors, testSteamModeHealthySensorStandby)
 {
     // Mock healthy temp sensor and pid controller and a "target" temperature
     mode_detector.mode = Gaggia::Mode::STEAM_MODE;
@@ -218,7 +166,7 @@ TEST_F(TestGaggiaCoffeeMachine, testSteamModeHealthySensorStandby)
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
 
-TEST_F(TestGaggiaCoffeeMachine, testSteamModeFaultySensor)
+TEST_F(TestTemperatureSensors, testSteamModeFaultySensor)
 {
     // Mock healthy temp sensor and pid controller and a "target" temperature
     mode_detector.mode = Gaggia::Mode::STEAM_MODE;

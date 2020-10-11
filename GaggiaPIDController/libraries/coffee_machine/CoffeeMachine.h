@@ -134,8 +134,11 @@ template <class Adapter> class CoffeeMachine
             pid->set_kd(gain);
         }
 
-        pid->compute(status.current_temperature, status.target_temperature,
-                     &(status.water_heater_on));
+        if (not pid->compute(status.current_temperature, status.target_temperature,
+                             &(status.water_heater_on)))
+        {
+            status.water_heater_on = false;
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
