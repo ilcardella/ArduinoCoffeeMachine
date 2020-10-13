@@ -20,3 +20,4 @@ include(GoogleTest)
 
 gaggia_add_gtest("test_temperature_sensors")
 gaggia_add_gtest("test_pid_controller")
+gaggia_add_gtest("test_safety_timeouts")

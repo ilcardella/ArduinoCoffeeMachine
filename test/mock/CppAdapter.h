@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <string>
+#include <unistd.h>
 
 class CppAdapter
 {
@@ -26,14 +27,15 @@ class CppAdapter
 
     static void delay(unsigned long ms)
     {
-        ;
+        sleep(ms / 1000);
     }
 
     static unsigned long millis()
     {
-        using namespace std::chrono;
-        return duration_cast<milliseconds>(system_clock::now().time_since_epoch())
-            .count();
+        // using namespace std::chrono;
+        // return duration_cast<milliseconds>(system_clock::now().time_since_epoch())
+        //     .count();
+        return millis_ret;
     }
 
     static void SerialBegin(const unsigned long &baudrate)
@@ -65,4 +67,6 @@ class CppAdapter
     {
         return 0;
     }
+
+    inline static unsigned long millis_ret = 0;
 };
