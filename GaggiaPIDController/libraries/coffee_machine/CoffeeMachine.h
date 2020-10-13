@@ -138,6 +138,7 @@ template <class Adapter> class CoffeeMachine
                              &(status.water_heater_on)))
         {
             status.water_heater_on = false;
+            status.status_message = "PID fault";
         }
     }
 

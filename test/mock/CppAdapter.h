@@ -50,7 +50,7 @@ class CppAdapter
 
     static String SerialReadStringUntil(const char &terminator)
     {
-        return "";
+        return read_until_ret;
     }
 
     static size_t SerialPrintln(const char *value)
@@ -69,4 +69,5 @@ class CppAdapter
     }
 
     inline static unsigned long millis_ret = 0;
+    inline static String read_until_ret = "";
 };
