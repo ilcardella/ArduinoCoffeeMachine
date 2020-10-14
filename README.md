@@ -5,6 +5,14 @@ This Arduino based controller improves the stability of the water temperature of
 
 ## Software
 
+The codebase is mainly C++ and it's designed to isolate the Arduino specific parts in
+implementation details classes.
+Most of the components are template classes that accept an `Adapter` type as parameter.
+This `Adapter` class allows to abstract the Arduino specific features requiring Arduino
+specific headers and libraries.
+The goal and the benefit of this is to allow the creation of a C++ library of
+the non-Arduino dependant code adding automated unit testing in CI.
+
 ### Arduino libraries
 
 This project depends on the following Arduino libraries:
@@ -18,9 +26,17 @@ This project depends on the following Arduino libraries:
 The code configuration is contained in a "static" `struct` in the file `Configuration.h`.
 To change the default configuration just edit the default value of the desired parameter.
 
+### Makefile
+
+The `Makefile` at the project root is the entrypoint for development actions such as
+build, test and build the docs.
+
 ### Build
 
-You can build the code using the Arduino IDE or with VSCode with the [Arduino extension](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino) opening the `GaggiaPIDController.ino` sketch.
+You can build the code with different approaches:
+- with the Arduino IDE opening the `GaggiaPIDController.ino` sketch
+- with VSCode and the [Arduino extension](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino) opening the `GaggiaPIDController.ino` sketch
+- with `make build` using Docker
 
 #### Build with Docker
 

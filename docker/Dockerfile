@@ -2,8 +2,12 @@
 
 FROM ubuntu:latest AS arduino-builder
 
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update \
-    && apt-get install -y curl \
+    && apt-get install -y \
+    curl \
+    build-essential \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Install arduino build tools

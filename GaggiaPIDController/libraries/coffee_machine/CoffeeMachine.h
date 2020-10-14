@@ -17,9 +17,10 @@ template <class Adapter> class CoffeeMachine
     {
         // Mark machine start time
         machine_status.time_since_start = Adapter::millis();
+        machine_status.time_since_steam_mode = Adapter::millis();
     }
 
-    bool spin()
+    Gaggia::ControlStatus<Adapter> spin()
     {
         serial->read_input();
 
@@ -33,7 +34,8 @@ template <class Adapter> class CoffeeMachine
         display->update(machine_status);
 
         serial->print_status(machine_status);
-        return true;
+
+        return machine_status;
     }
 
   private:
@@ -132,8 +134,12 @@ template <class Adapter> class CoffeeMachine
             pid->set_kd(gain);
         }
 
-        pid->compute(status.current_temperature, status.target_temperature,
-                     &(status.water_heater_on));
+        if (not pid->compute(status.current_temperature, status.target_temperature,
+                             &(status.water_heater_on)))
+        {
+            status.water_heater_on = false;
+            status.status_message = "PID fault";
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
