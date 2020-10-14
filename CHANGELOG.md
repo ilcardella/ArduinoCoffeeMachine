@@ -7,7 +7,7 @@
 - CMake configuration for non-Arduino dependant code
 - Automated test suite for non-Arduino dependant codebase
 
-## Changed
+### Changed
 - Reformat of the `TemperatureSensor` class using template for sensor implementation
 
 ## [1.1.0] - 2020-08-22
