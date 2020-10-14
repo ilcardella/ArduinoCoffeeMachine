@@ -1,6 +1,6 @@
 #pragma once
 
-#include <chrono>
+// #include <chrono>
 #include <string>
 #include <unistd.h>
 
@@ -50,7 +50,7 @@ class CppAdapter
 
     static String SerialReadStringUntil(const char &terminator)
     {
-        return read_until_ret;
+        return "";
     }
 
     static size_t SerialPrintln(const char *value)
@@ -69,5 +69,4 @@ class CppAdapter
     }
 
     inline static unsigned long millis_ret = 0;
-    inline static String read_until_ret = "";
 };

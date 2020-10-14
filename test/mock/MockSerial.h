@@ -10,15 +10,17 @@ template <class Adapter> class MockSerial : public BaseSerialInterface<Adapter>
 
     void read_input() override
     {
+        read_input_called = true;
     }
 
     void print_status(const Gaggia::ControlStatus<Adapter> &status) override
     {
+        status_to_send = status;
     }
 
     bool is_debug_active() override
     {
-        return false;
+        return debug_on;
     }
 
     double get_mock_temperature() override
@@ -28,26 +30,36 @@ template <class Adapter> class MockSerial : public BaseSerialInterface<Adapter>
 
     bool get_new_kp(double *kp) override
     {
-        *kp = 1.0;
+        *kp = kp_in;
         return true;
     }
 
     bool get_new_ki(double *ki) override
     {
-        *ki = 1.0;
+        *ki = ki_in;
         return true;
     }
 
     bool get_new_kd(double *kd) override
     {
-        *kd = 1.0;
+        *kd = kd_in;
         return true;
     }
 
     void reset()
     {
-        // TODO
+        read_input_called = false;
+        status_to_send = Gaggia::ControlStatus<Adapter>();
+        debug_on = false;
+        kp_in = 1.0;
+        ki_in = 1.0;
+        kd_in = 1.0;
     }
 
-    // TODO
+    bool read_input_called = false;
+    Gaggia::ControlStatus<Adapter> status_to_send;
+    bool debug_on = false;
+    double kp_in = 1.0;
+    double ki_in = 1.0;
+    double kd_in = 1.0;
 };
