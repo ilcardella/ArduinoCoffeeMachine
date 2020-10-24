@@ -24,9 +24,9 @@ template <class Adapter> class CoffeeMachine
     {
         serial->read_input();
 
-        if (update_machine_status(machine_status))
+        if (update_machine_status())
         {
-            update_pid(machine_status);
+            update_pid();
         }
 
         heater->set(machine_status.water_heater_on);
@@ -39,85 +39,86 @@ template <class Adapter> class CoffeeMachine
     }
 
   private:
-    bool update_machine_status(Gaggia::ControlStatus<Adapter> &status)
+    bool update_machine_status()
     {
         unsigned long now = Adapter::millis();
 
         // Set SSR off by default and let the PID decide whether to turn it on
-        status.water_heater_on = false;
+        machine_status.water_heater_on = false;
         // Read operation mode
-        status.machine_mode = mode_detector->get_mode();
+        machine_status.machine_mode = mode_detector->get_mode();
 
         // Reset steam mode timeout counter when not in steam mode
-        if (status.machine_mode != Gaggia::Mode::STEAM_MODE)
+        if (machine_status.machine_mode != Gaggia::Mode::STEAM_MODE)
         {
-            status.time_since_steam_mode = now;
+            machine_status.time_since_steam_mode = now;
         }
 
         // Set target temperature based on machine mode
-        status.target_temperature = (status.machine_mode == Gaggia::Mode::WATER_MODE)
-                                        ? Configuration::TARGET_WATER_TEMP
-                                        : Configuration::TARGET_STEAM_TEMP;
+        machine_status.target_temperature =
+            (machine_status.machine_mode == Gaggia::Mode::WATER_MODE)
+                ? Configuration::TARGET_WATER_TEMP
+                : Configuration::TARGET_STEAM_TEMP;
 
         // When debug mode is enabled do not read sensors
         if (serial->is_debug_active())
         {
-            status.current_temperature = serial->get_mock_temperature();
-            status.status_message = "Debug mode";
+            machine_status.current_temperature = serial->get_mock_temperature();
+            machine_status.status_message = "Debug mode";
             return true;
         }
 
         // Select correct sensor for current operation mode
         BaseTemperatureSensor<Adapter> *sensor =
-            (status.machine_mode == Gaggia::Mode::WATER_MODE) ? water_sensor
-                                                              : steam_sensor;
-
+            (machine_status.machine_mode == Gaggia::Mode::WATER_MODE) ? water_sensor
+                                                                      : steam_sensor;
         // Get the current temp from the temperature sensor
         float sensor_value;
         if (not sensor || not sensor->get_temperature_celsius(&sensor_value))
         {
-            status.status_message =
+            machine_status.status_message =
                 "Unable to read temperature from sensor: " + sensor->get_name();
             return false;
         }
 
-        status.current_temperature = static_cast<double>(sensor_value);
+        machine_status.current_temperature = static_cast<double>(sensor_value);
 
         // Use a tolerance of +/- 1Deg for the message
-        double diff = status.target_temperature - status.current_temperature;
+        double diff =
+            machine_status.target_temperature - machine_status.current_temperature;
         if (diff < -1.0)
         {
-            status.status_message = "Cooling...";
+            machine_status.status_message = "Cooling...";
         }
         else if (diff > 1.0)
         {
-            status.status_message = "Heating...";
+            machine_status.status_message = "Heating...";
         }
         else
         {
-            status.status_message = "Ready";
+            machine_status.status_message = "Ready";
         }
 
         // If the machine has been on for more than the safety limit, then report a
         // problem so the heater will be turned off
         if (Configuration::SAFETY_TIMEOUT > 0 &&
-            (now - status.time_since_start) > Configuration::SAFETY_TIMEOUT)
+            (now - machine_status.time_since_start) > Configuration::SAFETY_TIMEOUT)
         {
-            status.status_message = "Safety timeout expired";
+            machine_status.status_message = "Safety timeout expired";
             return false;
         }
-        // Check steam mode timeout to avoid keeping the machine at high temps for long
+        // Check steam mode timeout to avoid keeping the machine at high temps for
+        // long
         if (Configuration::STEAM_TIMEOUT > 0 &&
-            (now - status.time_since_steam_mode) > Configuration::STEAM_TIMEOUT)
+            (now - machine_status.time_since_steam_mode) > Configuration::STEAM_TIMEOUT)
         {
-            status.status_message = "Steam mode timeout expired";
+            machine_status.status_message = "Steam mode timeout expired";
             return false;
         }
-
         return true;
     }
 
-    void update_pid(Gaggia::ControlStatus<Adapter> &status)
+    void update_pid()
     {
         // Check if new PID gains have been requested and update our controller
         double gain;
@@ -134,11 +135,12 @@ template <class Adapter> class CoffeeMachine
             pid->set_kd(gain);
         }
 
-        if (not pid->compute(status.current_temperature, status.target_temperature,
-                             &(status.water_heater_on)))
+        if (not pid->compute(machine_status.current_temperature,
+                             machine_status.target_temperature,
+                             &(machine_status.water_heater_on)))
         {
-            status.water_heater_on = false;
-            status.status_message = "PID fault";
+            machine_status.water_heater_on = false;
+            machine_status.status_message = "PID fault";
         }
     }
 

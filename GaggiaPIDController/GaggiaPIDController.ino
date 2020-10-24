@@ -45,5 +45,13 @@ void setup()
 
 void loop()
 {
-    machine->spin();
+    if (machine)
+    {
+        machine->spin();
+    }
+    else
+    {
+        Adapter::SerialPrintln("Error initialising coffee machine");
+        Adapter::delay(1000);
+    }
 }

@@ -39,6 +39,6 @@ struct Configuration
     inline static constexpr unsigned long SERIAL_BAUDRATE = 9600;
 
     // Safety timeouts in milliseconds to turn off the heater. (disabled if < 1)
-    inline static constexpr unsigned long SAFETY_TIMEOUT = 40 * 60 * 1000; // 40 minutes
-    inline static constexpr unsigned long STEAM_TIMEOUT = 5 * 60 * 1000;   // 5 minutes
+    inline static constexpr long SAFETY_TIMEOUT = 2400000; // 40 minutes
+    inline static constexpr long STEAM_TIMEOUT = 300000;   // 5 minutes
 };
