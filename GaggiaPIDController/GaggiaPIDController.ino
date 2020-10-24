@@ -2,14 +2,14 @@
 #include <PID_v1.h>
 
 #include "libraries/ArduinoAdapter.h"
-#include "libraries/Display.h"
 #include "libraries/Factories.h"
-#include "libraries/Heater.h"
-#include "libraries/ModeDetector.h"
-#include "libraries/RelayPIDController.h"
-#include "libraries/SerialInterface.h"
 #include "libraries/coffee_machine/BaseTypes.h"
 #include "libraries/coffee_machine/CoffeeMachine.h"
+#include "libraries/coffee_machine/Display.h"
+#include "libraries/coffee_machine/Heater.h"
+#include "libraries/coffee_machine/ModeDetector.h"
+#include "libraries/coffee_machine/RelayPIDController.h"
+#include "libraries/coffee_machine/SerialInterface.h"
 
 using Adapter = ArduinoAdapter;
 

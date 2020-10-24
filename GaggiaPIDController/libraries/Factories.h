@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Sensors.h"
-#include "TemperatureSensor.h"
 #include "coffee_machine/BaseTypes.h"
 #include "coffee_machine/Configuration.h"
+#include "coffee_machine/TemperatureSensor.h"
 
 class SensorFactory
 {

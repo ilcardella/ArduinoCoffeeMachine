@@ -1,7 +1,7 @@
 #pragma once
 
-#include "coffee_machine/BaseTypes.h"
-#include "coffee_machine/Common.h"
+#include "BaseTypes.h"
+#include "Common.h"
 
 template <class Adapter, class DisplayType> class Display : public BaseDisplay<Adapter>
 {

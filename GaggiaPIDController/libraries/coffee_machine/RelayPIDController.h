@@ -1,6 +1,6 @@
 #pragma once
 
-#include "coffee_machine/BaseTypes.h"
+#include "BaseTypes.h"
 
 template <class Adapter, class PIDType>
 class RelayPIDController : public BasePIDController
