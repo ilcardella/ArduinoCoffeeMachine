@@ -3,15 +3,13 @@
 #include "coffee_machine/BaseTypes.h"
 #include "coffee_machine/Common.h"
 
-#include "SSD1306AsciiWire.h"
-
-template <class Adapter> class Display : public BaseDisplay<Adapter>
+template <class Adapter, class DisplayType> class Display : public BaseDisplay<Adapter>
 {
   public:
     Display() : display(), time_last_update(0)
     {
-        Wire.begin();
-        Wire.setClock(400000L);
+        Adapter::WireBegin();
+        Adapter::WireSetClock(400000L);
         display.begin(&Adafruit128x64, 0x3C);
         display.setFont(Adafruit5x7);
         display.clear();
@@ -70,6 +68,6 @@ template <class Adapter> class Display : public BaseDisplay<Adapter>
 
     static constexpr unsigned short REFRESH_PERIOD = 200;
 
-    SSD1306AsciiWire display;
+    DisplayType display;
     unsigned long time_last_update;
 };

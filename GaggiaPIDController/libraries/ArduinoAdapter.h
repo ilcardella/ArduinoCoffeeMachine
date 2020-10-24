@@ -62,4 +62,14 @@ class ArduinoAdapter
     {
         return Serial.println(value);
     }
+
+    static void WireBegin()
+    {
+        Wire.begin();
+    }
+
+    static void WireSetClock(const uint32_t &clock)
+    {
+        Wire.setClock(clock);
+    }
 };

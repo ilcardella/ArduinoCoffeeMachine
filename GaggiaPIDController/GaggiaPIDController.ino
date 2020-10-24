@@ -1,3 +1,5 @@
+#include "SSD1306AsciiWire.h"
+
 #include "libraries/ArduinoAdapter.h"
 #include "libraries/Display.h"
 #include "libraries/Factories.h"
@@ -21,7 +23,7 @@ BaseTemperatureSensor<Adapter> *steam_sensor;
 
 void setup()
 {
-    display = new Display<Adapter>();
+    display = new Display<Adapter, SSD1306AsciiWire>();
     serial = new SerialInterface<Adapter>(Configuration::SERIAL_BAUDRATE);
     pid = new RelayPIDController<Adapter>(Configuration::P_GAIN, Configuration::I_GAIN,
                                           Configuration::D_GAIN);

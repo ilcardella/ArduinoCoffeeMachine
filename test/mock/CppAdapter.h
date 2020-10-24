@@ -68,5 +68,15 @@ class CppAdapter
         return 0;
     }
 
+    static void WireBegin()
+    {
+        ;
+    }
+
+    static void WireSetClock(const uint32_t &clock)
+    {
+        ;
+    }
+
     inline static unsigned long millis_ret = 0;
 };
