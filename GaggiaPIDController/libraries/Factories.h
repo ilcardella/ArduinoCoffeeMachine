@@ -1,9 +1,15 @@
 #pragma once
 
+#include <PID_v1.h>
+#include <SSD1306AsciiWire.h>
+
 #include "Sensors.h"
-#include "TemperatureSensor.h"
+
 #include "coffee_machine/BaseTypes.h"
 #include "coffee_machine/Configuration.h"
+#include "coffee_machine/Display.h"
+#include "coffee_machine/RelayPIDController.h"
+#include "coffee_machine/TemperatureSensor.h"
 
 class SensorFactory
 {
@@ -27,5 +33,24 @@ class SensorFactory
             return nullptr;
             break;
         }
+    }
+};
+
+class DisplayFactory
+{
+  public:
+    template <class Adapter> static BaseDisplay<Adapter> *make_display()
+    {
+        return new Display<Adapter, SSD1306AsciiWire>();
+    }
+};
+
+class PIDFactory
+{
+  public:
+    template <class Adapter> static BasePIDController *make_pid_controller()
+    {
+        return new RelayPIDController<Adapter, PID>(
+            Configuration::P_GAIN, Configuration::I_GAIN, Configuration::D_GAIN);
     }
 };

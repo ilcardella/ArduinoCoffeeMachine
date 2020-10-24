@@ -3,8 +3,8 @@
 #include "coffee_machine/BaseTypes.h"
 #include "coffee_machine/Configuration.h"
 
-#include "max6675.h"
 #include <TSIC.h>
+#include <max6675.h>
 
 namespace sensors
 {

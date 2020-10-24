@@ -1,21 +1,19 @@
 #pragma once
 
-#include "coffee_machine/BaseTypes.h"
+#include "BaseTypes.h"
 
-#include <PID_v1.h>
-
-template <class Adapter> class RelayPIDController : public BasePIDController
+template <class Adapter, class PIDType>
+class RelayPIDController : public BasePIDController
 {
   public:
     RelayPIDController(const double &kp, const double &ki, const double &kd)
         : pid_input(0.0), pid_output(0.0), pid_setpoint(0.0), pid_window_size(5000),
-          p_gain(kp), i_gain(ki), d_gain(kd)
+          p_gain(kp), i_gain(ki), d_gain(kd),
+          pid(&pid_input, &pid_output, &pid_setpoint, p_gain, i_gain, d_gain, DIRECT)
     {
-        pid = new PID(&pid_input, &pid_output, &pid_setpoint, p_gain, i_gain, d_gain,
-                      DIRECT);
         // the PID output will represents a time window capped at pid_window_size
-        pid->SetOutputLimits(0, pid_window_size);
-        pid->SetMode(AUTOMATIC);
+        pid.SetOutputLimits(0, pid_window_size);
+        pid.SetMode(AUTOMATIC);
     }
 
     bool compute(const double &input, const double &setpoint, bool *relay_on) override
@@ -28,7 +26,7 @@ template <class Adapter> class RelayPIDController : public BasePIDController
         pid_setpoint = setpoint;
 
         // Process the pid output
-        pid->Compute();
+        pid.Compute();
 
         // Set the relay status based on the pid output
         *relay_on = (pid_output >= window_progress);
@@ -39,23 +37,23 @@ template <class Adapter> class RelayPIDController : public BasePIDController
     void set_kp(const double &kp) override
     {
         p_gain = kp;
-        pid->SetTunings(p_gain, i_gain, d_gain);
+        pid.SetTunings(p_gain, i_gain, d_gain);
     }
 
     void set_ki(const double &ki) override
     {
         i_gain = ki;
-        pid->SetTunings(p_gain, i_gain, d_gain);
+        pid.SetTunings(p_gain, i_gain, d_gain);
     }
 
     void set_kd(const double &kd) override
     {
         d_gain = kd;
-        pid->SetTunings(p_gain, i_gain, d_gain);
+        pid.SetTunings(p_gain, i_gain, d_gain);
     }
 
   private:
-    PID *pid;
+    PIDType pid;
     double p_gain;
     double i_gain;
     double d_gain;

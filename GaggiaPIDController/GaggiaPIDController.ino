@@ -1,12 +1,13 @@
 #include "libraries/ArduinoAdapter.h"
-#include "libraries/Display.h"
 #include "libraries/Factories.h"
-#include "libraries/Heater.h"
-#include "libraries/ModeDetector.h"
-#include "libraries/RelayPIDController.h"
-#include "libraries/SerialInterface.h"
+
 #include "libraries/coffee_machine/BaseTypes.h"
 #include "libraries/coffee_machine/CoffeeMachine.h"
+#include "libraries/coffee_machine/Display.h"
+#include "libraries/coffee_machine/Heater.h"
+#include "libraries/coffee_machine/ModeDetector.h"
+#include "libraries/coffee_machine/RelayPIDController.h"
+#include "libraries/coffee_machine/SerialInterface.h"
 
 using Adapter = ArduinoAdapter;
 
@@ -21,10 +22,9 @@ BaseTemperatureSensor<Adapter> *steam_sensor;
 
 void setup()
 {
-    display = new Display<Adapter>();
+    display = DisplayFactory::make_display<Adapter>();
     serial = new SerialInterface<Adapter>(Configuration::SERIAL_BAUDRATE);
-    pid = new RelayPIDController<Adapter>(Configuration::P_GAIN, Configuration::I_GAIN,
-                                          Configuration::D_GAIN);
+    pid = PIDFactory::make_pid_controller<Adapter>();
     mode_detector = new ModeDetector<Adapter>(Configuration::STEAM_SWITCH_PIN);
     heater = new Heater<Adapter>(Configuration::HEATER_SSR_PIN);
     water_sensor =

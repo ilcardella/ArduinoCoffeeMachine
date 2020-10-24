@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <Wire.h>
 
 class ArduinoAdapter
 {
@@ -61,5 +62,15 @@ class ArduinoAdapter
     static size_t SerialPrintln(StringSumHelper &value)
     {
         return Serial.println(value);
+    }
+
+    static void WireBegin()
+    {
+        Wire.begin();
+    }
+
+    static void WireSetClock(const uint32_t &clock)
+    {
+        Wire.setClock(clock);
     }
 };
