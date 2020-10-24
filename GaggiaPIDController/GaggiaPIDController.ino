@@ -1,8 +1,6 @@
-#include "SSD1306AsciiWire.h"
-#include <PID_v1.h>
-
 #include "libraries/ArduinoAdapter.h"
 #include "libraries/Factories.h"
+
 #include "libraries/coffee_machine/BaseTypes.h"
 #include "libraries/coffee_machine/CoffeeMachine.h"
 #include "libraries/coffee_machine/Display.h"
@@ -24,10 +22,9 @@ BaseTemperatureSensor<Adapter> *steam_sensor;
 
 void setup()
 {
-    display = new Display<Adapter, SSD1306AsciiWire>();
+    display = DisplayFactory::make_display<Adapter>();
     serial = new SerialInterface<Adapter>(Configuration::SERIAL_BAUDRATE);
-    pid = new RelayPIDController<Adapter, PID>(
-        Configuration::P_GAIN, Configuration::I_GAIN, Configuration::D_GAIN);
+    pid = PIDFactory::make_pid_controller<Adapter>();
     mode_detector = new ModeDetector<Adapter>(Configuration::STEAM_SWITCH_PIN);
     heater = new Heater<Adapter>(Configuration::HEATER_SSR_PIN);
     water_sensor =
