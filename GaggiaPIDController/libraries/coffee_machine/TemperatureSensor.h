@@ -6,7 +6,7 @@ template <class Adapter, class SensorType>
 class TemperatureSensor : public BaseTemperatureSensor<Adapter>
 {
   public:
-    TemperatureSensor(const typename Adapter::String &name, const unsigned char &pin,
+    TemperatureSensor(const char *name, const unsigned char &pin,
                       const unsigned long read_period,
                       const unsigned int &moving_avg_size = 1,
                       const float &temp_offset = 0)
@@ -15,7 +15,7 @@ class TemperatureSensor : public BaseTemperatureSensor<Adapter>
     {
     }
 
-    typename Adapter::String get_name() override
+    char *get_name() override
     {
         return name;
     }
@@ -43,7 +43,7 @@ class TemperatureSensor : public BaseTemperatureSensor<Adapter>
 
   private:
     SensorType sensor;
-    typename Adapter::String name;
+    char *name;
     unsigned long time_last_read;
     unsigned long read_period;
     MovingAverage<float> m_avg;

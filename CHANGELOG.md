@@ -9,6 +9,10 @@
 
 ### Changed
 - Reformat of the `TemperatureSensor` class using template for sensor implementation
+- Replaced use of Arduino String with char array
+
+### Fixed
+- Resolved crash due to String assignments
 
 ## [1.1.0] - 2020-08-22
 ### Added

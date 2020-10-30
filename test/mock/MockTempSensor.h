@@ -5,13 +5,13 @@
 template <class Adapter> class MockTempSensor : public BaseTemperatureSensor<Adapter>
 {
   public:
-    MockTempSensor(const typename Adapter::String &name) : name(name)
+    MockTempSensor(std::string name) : name(name)
     {
     }
 
-    typename Adapter::String get_name() override
+    char *get_name() override
     {
-        return name;
+        return const_cast<char *>(name.c_str());
     }
 
     bool get_temperature_celsius(float *value) override
@@ -26,7 +26,7 @@ template <class Adapter> class MockTempSensor : public BaseTemperatureSensor<Ada
         healthy = true;
     }
 
-    typename Adapter::String name;
+    std::string name;
     float temp_c = 0.0f;
     bool healthy = true;
 };

@@ -13,76 +13,75 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface<Adap
 
     void read_input() override
     {
-        using string = typename Adapter::String;
-
         // Read input data and enable or disable the debug mode
         // If debug mode is enabled, accept temperature input
         // to overwrite sensor readings
         if (Adapter::SerialAvailable())
         {
-            string data = Adapter::SerialReadStringUntil('\n');
-            if (data.startsWith("help"))
+            char data[25];
+            Adapter::SerialReadStringUntil('\n', data);
+            if (string_utils::start_with(data, "help"))
             {
                 print_help();
             }
-            else if (data.startsWith("debug on"))
+            else if (string_utils::start_with(data, "debug on"))
             {
                 inputs.debug_mode = true;
                 Adapter::SerialPrintln("Setting debug mode ON");
             }
-            else if (data.startsWith("debug off"))
+            else if (string_utils::start_with(data, "debug off"))
             {
                 inputs.debug_mode = false;
                 Adapter::SerialPrintln("Setting debug mode OFF");
             }
-            else if (data.startsWith("output on"))
+            else if (string_utils::start_with(data, "output on"))
             {
                 inputs.enable_output = true;
                 Adapter::SerialPrintln("Setting output ON");
             }
-            else if (data.startsWith("output off"))
+            else if (string_utils::start_with(data, "output off"))
             {
                 inputs.enable_output = false;
                 Adapter::SerialPrintln("Setting output OFF");
             }
-            else if (data.startsWith("temp ") && is_debug_active())
+            else if (string_utils::start_with(data, "temp ") && is_debug_active())
             {
-                data.replace("temp ", "");
-                inputs.mock_temperature = data.toDouble();
-                Adapter::SerialPrintln("Setting mock temperature to; " + data);
+                inputs.mock_temperature = string_utils::to_number<double>(data, 5);
+                // Adapter::SerialPrintln("Setting mock temperature to; " + data);
+                Adapter::SerialPrintln("Setting mock temperature");
             }
-            else if (data.startsWith("kp "))
+            else if (string_utils::start_with(data, "kp "))
             {
-                data.replace("kp ", "");
-                inputs.kp = data.toDouble();
-                Adapter::SerialPrintln("Setting PID kp to: " + data);
+                inputs.kp = string_utils::to_number<double>(data, 3);
+                // Adapter::SerialPrintln("Setting PID kp to: " + data);
+                Adapter::SerialPrintln("Setting PID kp");
             }
-            else if (data.startsWith("ki "))
+            else if (string_utils::start_with(data, "ki "))
             {
-                data.replace("ki ", "");
-                inputs.ki = data.toDouble();
-                Adapter::SerialPrintln("Setting PID ki to: " + data);
+                inputs.ki = string_utils::to_number<double>(data, 3);
+                // Adapter::SerialPrintln("Setting PID ki to: " + data);
+                Adapter::SerialPrintln("Setting PID ki");
             }
-            else if (data.startsWith("kd "))
+            else if (string_utils::start_with(data, "kd "))
             {
-                data.replace("kd ", "");
-                inputs.kd = data.toDouble();
-                Adapter::SerialPrintln("Setting PID kd to: " + data);
+                inputs.kd = string_utils::to_number<double>(data, 3);
+                // Adapter::SerialPrintln("Setting PID kd to: " + data);
+                Adapter::SerialPrintln("Setting PID kd");
             }
         }
     }
 
     void print_status(const Gaggia::ControlStatus<Adapter> &status) override
     {
-        using string = typename Adapter::String;
         auto now = Adapter::millis();
         if (is_output_enabled() && now - time_last_print > PRINT_TIMEOUT)
         {
             time_last_print = now;
-            string output = string(static_cast<int>(status.machine_mode)) + "," +
-                            string(status.current_temperature) + "," +
-                            string(status.target_temperature) + "," +
-                            string(status.water_heater_on) + "," + status.status_message;
+            char output[100];
+            snprintf(output, 100, "%d,%.2f,%.2f,%d,%s",
+                     static_cast<int>(status.machine_mode), status.current_temperature,
+                     status.target_temperature, status.water_heater_on,
+                     status.status_message);
             Adapter::SerialPrintln(output);
         }
     }

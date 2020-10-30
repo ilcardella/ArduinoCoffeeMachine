@@ -44,24 +44,26 @@ template <class Adapter, class DisplayType> class Display : public BaseDisplay<A
     void write_current_temp(const double &temp)
     {
         display.setCursor(1, 3);
-        typename Adapter::String str = typename Adapter::String(temp, 1) + " C  ";
-        display.print(str.c_str());
+        char output[10];
+        snprintf(output, 10, "%5.1f C  ", temp);
+        display.print(output);
         display.println();
     }
 
     void write_target_temp(const double &temp)
     {
         display.setCursor(85, 3);
-        typename Adapter::String str = typename Adapter::String(temp, 1) + " C  ";
-        display.print(str.c_str());
+        char output[10];
+        snprintf(output, 10, "%5.1f C  ", temp);
+        display.print(output);
         display.println();
     }
 
-    void write_status_message(const typename Adapter::String &message)
+    void write_status_message(const char *message)
     {
         display.setCursor(1, 5);
         // TODO if the message is too long, make it scroll
-        display.print(message.c_str());
+        display.print(message);
         display.clearToEOL();
         display.println();
     }

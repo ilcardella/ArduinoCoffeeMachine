@@ -6,70 +6,57 @@
 class ArduinoAdapter
 {
   public:
-    using String = String;
-    using StringSumHelper = StringSumHelper;
-
-    static void pinMode(uint8_t pin, uint8_t mode)
+    inline static void pinMode(uint8_t pin, uint8_t mode)
     {
-        pinMode(pin, mode);
+        ::pinMode(pin, mode);
     }
 
-    static int digitalRead(uint8_t pin)
+    inline static int digitalRead(uint8_t pin)
     {
-        return digitalRead(pin);
+        return ::digitalRead(pin);
     }
 
-    static void digitalWrite(uint8_t pin, uint8_t val)
+    inline static void digitalWrite(uint8_t pin, uint8_t val)
     {
-        digitalWrite(pin, val);
+        ::digitalWrite(pin, val);
     }
 
-    static void delay(unsigned long ms)
+    inline static void delay(unsigned long ms)
     {
-        delay(ms);
+        ::delay(ms);
     }
 
-    static unsigned long millis()
+    inline static unsigned long millis()
     {
-        return millis();
+        return ::millis();
     }
 
-    static void SerialBegin(const unsigned long &baudrate)
+    inline static void SerialBegin(const unsigned long &baudrate)
     {
         Serial.begin(baudrate);
     }
 
-    static int SerialAvailable()
+    inline static int SerialAvailable()
     {
         return Serial.available();
     }
 
-    static String SerialReadStringUntil(const char &terminator)
+    inline static void SerialReadStringUntil(const char &terminator, char *data)
     {
-        return Serial.readStringUntil(terminator);
+        strcpy(data, Serial.readStringUntil(terminator).c_str());
     }
 
-    static size_t SerialPrintln(const char *value)
-    {
-        return Serial.println(value);
-    }
-
-    static size_t SerialPrintln(const String &value)
+    inline static size_t SerialPrintln(const char *value)
     {
         return Serial.println(value);
     }
 
-    static size_t SerialPrintln(StringSumHelper &value)
-    {
-        return Serial.println(value);
-    }
-
-    static void WireBegin()
+    inline static void WireBegin()
     {
         Wire.begin();
     }
 
-    static void WireSetClock(const uint32_t &clock)
+    inline static void WireSetClock(const uint32_t &clock)
     {
         Wire.setClock(clock);
     }

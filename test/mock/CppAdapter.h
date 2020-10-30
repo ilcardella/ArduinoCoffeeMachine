@@ -7,30 +7,27 @@
 class CppAdapter
 {
   public:
-    using String = std::string;
-    using StringSumHelper = std::string;
-
-    static void pinMode(uint8_t pin, uint8_t mode)
+    inline static void pinMode(uint8_t pin, uint8_t mode)
     {
         ;
     }
 
-    static int digitalRead(uint8_t pin)
+    inline static int digitalRead(uint8_t pin)
     {
         return 0;
     }
 
-    static void digitalWrite(uint8_t pin, uint8_t val)
+    inline static void digitalWrite(uint8_t pin, uint8_t val)
     {
         ;
     }
 
-    static void delay(unsigned long ms)
+    inline static void delay(unsigned long ms)
     {
         sleep(ms / 1000);
     }
 
-    static unsigned long millis()
+    inline static unsigned long millis()
     {
         // using namespace std::chrono;
         // return duration_cast<milliseconds>(system_clock::now().time_since_epoch())
@@ -38,45 +35,37 @@ class CppAdapter
         return millis_ret;
     }
 
-    static void SerialBegin(const unsigned long &baudrate)
+    inline static void SerialBegin(const unsigned long &baudrate)
     {
         ;
     }
 
-    static int SerialAvailable()
+    inline static int SerialAvailable()
     {
         return 1;
     }
 
-    static String SerialReadStringUntil(const char &terminator)
-    {
-        return "";
-    }
-
-    static size_t SerialPrintln(const char *value)
-    {
-        return 0;
-    }
-
-    static size_t SerialPrintln(const String &value)
-    {
-        return 0;
-    }
-
-    static size_t SerialPrintln(StringSumHelper &value)
-    {
-        return 0;
-    }
-
-    static void WireBegin()
+    inline static void SerialReadStringUntil(const char &terminator, char *data)
     {
         ;
     }
 
-    static void WireSetClock(const uint32_t &clock)
+    inline static size_t SerialPrintln(const char *value)
+    {
+        strncpy(message_sent, value, 100);
+        return 0;
+    }
+
+    inline static void WireBegin()
+    {
+        ;
+    }
+
+    inline static void WireSetClock(const uint32_t &clock)
     {
         ;
     }
 
     inline static unsigned long millis_ret = 0;
+    inline static char message_sent[100];
 };

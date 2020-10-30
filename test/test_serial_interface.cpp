@@ -23,7 +23,7 @@ TEST_F(TestSerialInterface, testSerialReadsInputsAndSendStatus)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 
@@ -40,16 +40,19 @@ TEST_F(TestSerialInterface, testSerialReadsInputsAndSendStatus)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
     ASSERT_EQ(serial.status_to_send.machine_mode, Gaggia::Mode::WATER_MODE);
     ASSERT_EQ(serial.status_to_send.current_temperature, 10.0);
     ASSERT_EQ(serial.status_to_send.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(serial.status_to_send.water_heater_on);
-    ASSERT_EQ(serial.status_to_send.status_message, "Heating...");
+    ASSERT_EQ(strcmp(serial.status_to_send.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(serial.status_to_send.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(serial.status_to_send.time_since_steam_mode), 0.0);
+
+    // TODO test output of serial interface
+    // ASSERT_EQ(strcmp(Adapter::message_sent, "1,0.0,95.0,1,Heating..."), 0);
 }
 
 TEST_F(TestSerialInterface, testSerialDebugMode)
@@ -71,7 +74,7 @@ TEST_F(TestSerialInterface, testSerialDebugMode)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 
@@ -86,7 +89,7 @@ TEST_F(TestSerialInterface, testSerialDebugMode)
     ASSERT_EQ(status.current_temperature, 42.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Debug mode");
+    ASSERT_EQ(strcmp(status.status_message, "Debug mode"), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 
@@ -97,7 +100,7 @@ TEST_F(TestSerialInterface, testSerialDebugMode)
     ASSERT_EQ(status.current_temperature, 42.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Debug mode");
+    ASSERT_EQ(strcmp(status.status_message, "Debug mode"), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
@@ -121,7 +124,7 @@ TEST_F(TestSerialInterface, testSerialPIDGainsInputs)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 
@@ -135,7 +138,7 @@ TEST_F(TestSerialInterface, testSerialPIDGainsInputs)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
     ASSERT_EQ(serial.kp_in, pid.kp);
