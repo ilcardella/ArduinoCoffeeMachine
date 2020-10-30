@@ -16,7 +16,7 @@ class SensorFactory
   public:
     template <class Adapter, SensorTypes type>
     static BaseTemperatureSensor<Adapter> *make_temperature_sensor(
-        const typename Adapter::String &name, const unsigned char &pin)
+        const char *name, const unsigned char &pin)
     {
         using namespace sensors;
         switch (type)

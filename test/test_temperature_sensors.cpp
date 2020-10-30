@@ -22,7 +22,7 @@ TEST_F(TestTemperatureSensors, testWaterModeHealthySensorHeating)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, std::string("Heating...").c_str()), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
@@ -45,7 +45,7 @@ TEST_F(TestTemperatureSensors, testWaterModeHealthySensorCooling)
     ASSERT_EQ(status.current_temperature, 100.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Cooling...");
+    ASSERT_EQ(strcmp(status.status_message, std::string("Cooling...").c_str()), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
@@ -68,7 +68,7 @@ TEST_F(TestTemperatureSensors, testWaterModeHealthySensorStandby)
     ASSERT_EQ(status.current_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Ready");
+    ASSERT_EQ(strcmp(status.status_message, std::string("Ready").c_str()), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
@@ -92,7 +92,9 @@ TEST_F(TestTemperatureSensors, testWaterModeFaultySensor)
     ASSERT_EQ(status.current_temperature, 0.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Unable to read temperature from sensor: water");
+    ASSERT_EQ(
+        strcmp(status.status_message, std::string("Temperature sensor fault").c_str()),
+        0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
@@ -115,7 +117,7 @@ TEST_F(TestTemperatureSensors, testSteamModeHealthySensorHeating)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, std::string("Heating...").c_str()), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
@@ -138,7 +140,7 @@ TEST_F(TestTemperatureSensors, testSteamModeHealthySensorCooling)
     ASSERT_EQ(status.current_temperature, 200.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Cooling...");
+    ASSERT_EQ(strcmp(status.status_message, std::string("Cooling...").c_str()), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
@@ -161,7 +163,7 @@ TEST_F(TestTemperatureSensors, testSteamModeHealthySensorStandby)
     ASSERT_EQ(status.current_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Ready");
+    ASSERT_EQ(strcmp(status.status_message, std::string("Ready").c_str()), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }
@@ -185,7 +187,9 @@ TEST_F(TestTemperatureSensors, testSteamModeFaultySensor)
     ASSERT_EQ(status.current_temperature, 0.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Unable to read temperature from sensor: steam");
+    ASSERT_EQ(
+        strcmp(status.status_message, std::string("Temperature sensor fault").c_str()),
+        0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }

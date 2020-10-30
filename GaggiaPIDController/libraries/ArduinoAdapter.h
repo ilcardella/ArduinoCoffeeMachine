@@ -6,9 +6,6 @@
 class ArduinoAdapter
 {
   public:
-    using String = String;
-    using StringSumHelper = StringSumHelper;
-
     inline static void pinMode(uint8_t pin, uint8_t mode)
     {
         ::pinMode(pin, mode);
@@ -44,22 +41,12 @@ class ArduinoAdapter
         return Serial.available();
     }
 
-    inline static String SerialReadStringUntil(const char &terminator)
+    inline static void SerialReadStringUntil(const char &terminator, char *data)
     {
-        return Serial.readStringUntil(terminator);
+        strcpy(data, Serial.readStringUntil(terminator).c_str());
     }
 
     inline static size_t SerialPrintln(const char *value)
-    {
-        return Serial.println(value);
-    }
-
-    inline static size_t SerialPrintln(const String &value)
-    {
-        return Serial.println(value);
-    }
-
-    inline static size_t SerialPrintln(StringSumHelper &value)
     {
         return Serial.println(value);
     }

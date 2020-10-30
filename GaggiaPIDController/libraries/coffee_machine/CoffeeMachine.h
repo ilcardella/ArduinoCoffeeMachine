@@ -64,7 +64,8 @@ template <class Adapter> class CoffeeMachine
         if (serial->is_debug_active())
         {
             machine_status.current_temperature = serial->get_mock_temperature();
-            machine_status.status_message = "Debug mode";
+            strncpy(machine_status.status_message, string_utils::strings::DEBUG_MODE,
+                    machine_status.MSG_LEN);
             return true;
         }
 
@@ -76,8 +77,8 @@ template <class Adapter> class CoffeeMachine
         float sensor_value;
         if (not sensor || not sensor->get_temperature_celsius(&sensor_value))
         {
-            machine_status.status_message =
-                "Unable to read temperature from sensor: " + sensor->get_name();
+            strncpy(machine_status.status_message,
+                    string_utils::strings::TEMP_SENSOR_ERROR, machine_status.MSG_LEN);
             return false;
         }
 
@@ -88,15 +89,18 @@ template <class Adapter> class CoffeeMachine
             machine_status.target_temperature - machine_status.current_temperature;
         if (diff < -1.0)
         {
-            machine_status.status_message = "Cooling...";
+            strncpy(machine_status.status_message, string_utils::strings::COOLING,
+                    machine_status.MSG_LEN);
         }
         else if (diff > 1.0)
         {
-            machine_status.status_message = "Heating...";
+            strncpy(machine_status.status_message, string_utils::strings::HEATING,
+                    machine_status.MSG_LEN);
         }
         else
         {
-            machine_status.status_message = "Ready";
+            strncpy(machine_status.status_message, string_utils::strings::READY,
+                    machine_status.MSG_LEN);
         }
 
         // If the machine has been on for more than the safety limit, then report a
@@ -104,7 +108,9 @@ template <class Adapter> class CoffeeMachine
         if (Configuration::SAFETY_TIMEOUT > 0 &&
             (now - machine_status.time_since_start) > Configuration::SAFETY_TIMEOUT)
         {
-            machine_status.status_message = "Safety timeout expired";
+            strncpy(machine_status.status_message,
+                    string_utils::strings::SAFETY_TIMEOUT_EXPIRED,
+                    machine_status.MSG_LEN);
             return false;
         }
         // Check steam mode timeout to avoid keeping the machine at high temps for
@@ -112,7 +118,8 @@ template <class Adapter> class CoffeeMachine
         if (Configuration::STEAM_TIMEOUT > 0 &&
             (now - machine_status.time_since_steam_mode) > Configuration::STEAM_TIMEOUT)
         {
-            machine_status.status_message = "Steam mode timeout expired";
+            strncpy(machine_status.status_message,
+                    string_utils::strings::STEAM_TIMEOUT_EXPIRED, machine_status.MSG_LEN);
             return false;
         }
         return true;
@@ -140,7 +147,8 @@ template <class Adapter> class CoffeeMachine
                              &(machine_status.water_heater_on)))
         {
             machine_status.water_heater_on = false;
-            machine_status.status_message = "PID fault";
+            strncpy(machine_status.status_message, string_utils::strings::PID_FAILT,
+                    machine_status.MSG_LEN);
         }
     }
 

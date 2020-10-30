@@ -24,7 +24,7 @@ TEST_F(TestPIDController, testFaultyPIDController)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "PID fault");
+    ASSERT_EQ(strcmp(status.status_message, "PID fault"), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 
@@ -35,7 +35,7 @@ TEST_F(TestPIDController, testFaultyPIDController)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 }

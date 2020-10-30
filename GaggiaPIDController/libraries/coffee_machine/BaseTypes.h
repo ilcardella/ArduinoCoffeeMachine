@@ -73,7 +73,7 @@ template <class Adapter> class BaseTemperatureSensor
 
     /** Return the name identifier of the sensor.
      */
-    virtual typename Adapter::String get_name() = 0;
+    virtual char *get_name() = 0;
 
     /* Read the sensor and store the current temperature in
      * celsius degrees into 'value'.

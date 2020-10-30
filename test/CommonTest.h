@@ -4,6 +4,7 @@
 
 #include <coffee_machine/CoffeeMachine.h>
 #include <coffee_machine/Configuration.h>
+#include <coffee_machine/SerialInterface.h>
 
 #include "mock/CppAdapter.h"
 #include "mock/MockDisplay.h"

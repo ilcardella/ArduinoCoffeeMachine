@@ -24,7 +24,7 @@ TEST_F(TestSafetyTimeouts, testWaterSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 
@@ -37,7 +37,7 @@ TEST_F(TestSafetyTimeouts, testWaterSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), exceeded_time);
 
@@ -50,7 +50,7 @@ TEST_F(TestSafetyTimeouts, testWaterSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Safety timeout expired");
+    ASSERT_EQ(strcmp(status.status_message, "Safety timeout expired"), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), exceeded_time);
 
@@ -69,7 +69,7 @@ TEST_F(TestSafetyTimeouts, testWaterSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Safety timeout expired");
+    ASSERT_EQ(strcmp(status.status_message, "Safety timeout expired"), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     // -1000 because the mode changed to steam 1 second ago
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), exceeded_time - 1000);
@@ -89,7 +89,7 @@ TEST_F(TestSafetyTimeouts, testWaterSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Safety timeout expired");
+    ASSERT_EQ(strcmp(status.status_message, "Safety timeout expired"), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), exceeded_time);
 }
@@ -114,7 +114,7 @@ TEST_F(TestSafetyTimeouts, testSteamSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
 
@@ -134,7 +134,7 @@ TEST_F(TestSafetyTimeouts, testSteamSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     // 0.0 because last time in water mode was at creation
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
@@ -149,7 +149,7 @@ TEST_F(TestSafetyTimeouts, testSteamSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_FALSE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Steam mode timeout expired");
+    ASSERT_EQ(strcmp(status.status_message, "Steam mode timeout expired"), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     // 0.0 because last time in water mode was at creation
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
@@ -169,7 +169,7 @@ TEST_F(TestSafetyTimeouts, testSteamSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), exceeded_time);
 
@@ -188,7 +188,7 @@ TEST_F(TestSafetyTimeouts, testSteamSafetyTimeout)
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(status.status_message, "Heating...");
+    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
     ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
     ASSERT_EQ(normalize_time(status.time_since_steam_mode), exceeded_time - 1000);
 }
