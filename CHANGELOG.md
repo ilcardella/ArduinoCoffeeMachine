@@ -13,6 +13,7 @@
 
 ### Fixed
 - Resolved crash due to String assignments
+- Fixed print formatting of float and double
 
 ## [1.1.0] - 2020-08-22
 ### Added
