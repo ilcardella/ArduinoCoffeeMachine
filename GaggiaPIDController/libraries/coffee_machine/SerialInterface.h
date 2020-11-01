@@ -76,11 +76,17 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface<Adap
         auto now = Adapter::millis();
         if (is_output_enabled() && now - time_last_print > PRINT_TIMEOUT)
         {
-            time_last_print = now;
             char output[100];
-            snprintf(output, 100, "%d,%.2f,%.2f,%d,%s",
-                     static_cast<int>(status.machine_mode), status.current_temperature,
-                     status.target_temperature, status.water_heater_on,
+            char curr_temp_buffer[6];
+            char target_temp_buffer[6];
+
+            time_last_print = now;
+
+            dtostrf(status.current_temperature, 4, 1, curr_temp_buffer);
+            dtostrf(status.target_temperature, 4, 1, target_temp_buffer);
+
+            snprintf(output, 100, "%d,%s,%s,%d,%s", static_cast<int>(status.machine_mode),
+                     curr_temp_buffer, target_temp_buffer, status.water_heater_on,
                      status.status_message);
             Adapter::SerialPrintln(output);
         }

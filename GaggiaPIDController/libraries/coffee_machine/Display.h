@@ -43,18 +43,21 @@ template <class Adapter, class DisplayType> class Display : public BaseDisplay<A
 
     void write_current_temp(const double &temp)
     {
-        display.setCursor(1, 3);
-        char output[10];
-        snprintf(output, 10, "%5.1f C  ", temp);
-        display.print(output);
-        display.println();
+        write_temp(1, 3, temp);
     }
 
     void write_target_temp(const double &temp)
     {
-        display.setCursor(85, 3);
+        write_temp(85, 3, temp);
+    }
+
+    void write_temp(const unsigned &col, const unsigned &row, const double &temp)
+    {
+        display.setCursor(col, row);
         char output[10];
-        snprintf(output, 10, "%5.1f C  ", temp);
+        char buffer[6];
+        dtostrf(temp, 4, 1, buffer);
+        snprintf(output, 10, "%s C  ", buffer);
         display.print(output);
         display.println();
     }
