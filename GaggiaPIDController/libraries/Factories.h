@@ -26,7 +26,7 @@ class SensorFactory
             break;
         case SensorTypes::KTYPE_SPI:
             return new TemperatureSensor<Adapter, KTypeThermocouple>(name, pin, 300, 10,
-                                                                     -10.0f);
+                                                                     -15.0f);
             break;
         default:
             // Ideally we would raise an exception here

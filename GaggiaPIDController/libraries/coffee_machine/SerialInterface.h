@@ -162,7 +162,7 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface<Adap
     struct SerialInput
     {
         bool debug_mode = false;
-        bool enable_output = true;
+        bool enable_output = false;
         double mock_temperature = 0.0;
         double kp = 0.0;
         double ki = 0.0;
