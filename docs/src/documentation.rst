@@ -32,6 +32,17 @@ an idea of what I used, you can change anything as you might prefer:
 * Thermal paste
 * M4 brass hexagonal standoff
 
+This is the diagram of all the components connected for testing on a breadboard.
+In the diagram the thermocouple sensors are missing and their pins are to be considered
+as connected to the two MAX6675 modules.
+The same exception is true for the SSR AC pins.
+
+.. figure:: images/GaggiaPIDController_bb.jpg
+    :align: center
+    :alt: Breadboard circuit diagram
+
+    Breadboard circuit diagram
+
 Arduino
 *******
 
@@ -138,9 +149,9 @@ wired to the Arduino board: one to ``GND`` and one to the selected digital pin.
     Arduino Nano and the Fotek SSR
 
 The AC terminals instead needs to be connected to replace the two thermostats. One
-themostat is connected to a ``red`` and a ``brown`` whire, while the second one is
+themostat is connected to a ``red`` and a ``brown`` wire, while the second one is
 connected to a ``white`` and again a ``red`` wire. I connected the SSR terminals using
-a piece of 18AWG wire and 2 male space connectors, one to the ``brown`` connector
+a piece of 18AWG wire and 2 male spade connectors, one to the ``brown`` connector
 of the first thermostat and the second one to the ``white`` connector of the other
 thermostat.
 
@@ -278,9 +289,6 @@ And the outside:
 
     Final external assembly of the Gaggia Paros
 
-The display is going to have a small 3D printed support leveraging the screw at the top
-of the black plastic cover, for now it's just hanging there :)
-
 PID Tuning
 **********
 
@@ -316,7 +324,6 @@ to apply such modification to any coffee machine!
 
 There are still a few things that I'd like to improve:
 
-- Create the display support frame
 - Improve the internal wiring, I did not do a good job on that front
 - Replace the Arduino Nano with a ESP8266 based board to have WiFi connectivity
 
