@@ -4,6 +4,7 @@
 
 #include <coffee_machine/CoffeeMachine.h>
 #include <coffee_machine/Configuration.h>
+#include <coffee_machine/Display.h>
 #include <coffee_machine/SerialInterface.h>
 
 #include "mock/CppAdapter.h"
@@ -20,14 +21,13 @@ class CommonTest : public ::testing::Test
 {
   protected:
     CommonTest()
-        : pid(), serial(), mode_detector(), display(), heater(), water_sensor("water"),
-          steam_sensor("steam"), creation_time(Adapter::millis())
+        : pid(), serial(), mode_detector(), display(new MockDisplay()), heater(),
+          water_sensor("water"), steam_sensor("steam"), creation_time(Adapter::millis())
     {
     }
 
     void SetUp() override
     {
-        display.reset();
         serial.reset();
         pid.reset();
         mode_detector.reset();
@@ -48,7 +48,7 @@ class CommonTest : public ::testing::Test
         return time - creation_time;
     }
 
-    MockDisplay<Adapter> display;
+    Display<Adapter> display;
     MockSerial<Adapter> serial;
     MockPID pid;
     MockModeDetector mode_detector;

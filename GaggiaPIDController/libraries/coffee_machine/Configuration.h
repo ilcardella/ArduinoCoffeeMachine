@@ -6,10 +6,17 @@ enum class SensorTypes
     KTYPE_SPI // K-type thermocouple with SPI interface
 };
 
+enum class DisplayTypes
+{
+    SSD1306_128x64
+};
+
 struct Configuration
 {
     inline static constexpr SensorTypes WATER_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
     inline static constexpr SensorTypes STEAM_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
+    inline static constexpr DisplayTypes DISPLAY_TYPE = DisplayTypes::SSD1306_128x64;
+
     // Input pin of the water temperature sensor
     inline static constexpr unsigned char WATER_TEMP_PIN = 4;
     // Input pin of the steam temperature sensor
@@ -24,7 +31,7 @@ struct Configuration
     // Target water temperature in celsius
     inline static constexpr double TARGET_WATER_TEMP = 95.0;
     // Target steam temperature in celsius
-    inline static constexpr double TARGET_STEAM_TEMP = 150.0;
+    inline static constexpr double TARGET_STEAM_TEMP = 145.0;
 
     // PID gain parameters
     inline static constexpr double P_GAIN = 125;

@@ -19,12 +19,17 @@ template <class Adapter> class BaseSerialInterface
     virtual bool get_new_kd(double *kd) = 0;
 };
 
-template <class Adapter> class BaseDisplay
+class BaseDisplay
 {
   public:
     virtual ~BaseDisplay() = default;
 
-    virtual bool update(const Gaggia::ControlStatus<Adapter> &status) = 0;
+    virtual bool initialise() = 0;
+    virtual bool clear() = 0;
+    virtual bool print(const unsigned &col, const unsigned &row, const char *data) = 0;
+    virtual bool print(const unsigned &col, const unsigned &row, const int &data) = 0;
+    virtual bool print(const unsigned &col, const unsigned &row, const float &data) = 0;
+    virtual bool print(const unsigned &col, const unsigned &row, const double &data) = 0;
 };
 
 class BaseHeater

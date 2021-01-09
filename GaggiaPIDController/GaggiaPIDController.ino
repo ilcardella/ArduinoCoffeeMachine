@@ -12,7 +12,7 @@
 using Adapter = ArduinoAdapter;
 
 CoffeeMachine<Adapter> *machine;
-BaseDisplay<Adapter> *display;
+Display<Adapter> *display;
 BaseSerialInterface<Adapter> *serial;
 BasePIDController *pid;
 BaseModeDetector *mode_detector;
@@ -22,7 +22,7 @@ BaseTemperatureSensor<Adapter> *steam_sensor;
 
 void setup()
 {
-    display = DisplayFactory::make_display<Adapter>();
+    display = DisplayFactory::make_display<Adapter, Configuration::DISPLAY_TYPE>();
     serial = new SerialInterface<Adapter>(Configuration::SERIAL_BAUDRATE);
     pid = PIDFactory::make_pid_controller<Adapter>();
     mode_detector = new ModeDetector<Adapter>(Configuration::STEAM_SWITCH_PIN);

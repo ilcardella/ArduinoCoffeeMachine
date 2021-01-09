@@ -1,8 +1,8 @@
 #pragma once
 
 #include <PID_v1.h>
-#include <SSD1306AsciiWire.h>
 
+#include "SSD1306AsciiDisplay.h"
 #include "Sensors.h"
 
 #include "coffee_machine/BaseTypes.h"
@@ -26,7 +26,7 @@ class SensorFactory
             break;
         case SensorTypes::KTYPE_SPI:
             return new TemperatureSensor<Adapter, KTypeThermocouple>(name, pin, 300, 10,
-                                                                     -15.0f);
+                                                                     -12.0f);
             break;
         default:
             // Ideally we would raise an exception here
@@ -39,9 +39,18 @@ class SensorFactory
 class DisplayFactory
 {
   public:
-    template <class Adapter> static BaseDisplay<Adapter> *make_display()
+    template <class Adapter, DisplayTypes type> static Display<Adapter> *make_display()
     {
-        return new Display<Adapter, SSD1306AsciiWire>();
+        switch (type)
+        {
+        case DisplayTypes::SSD1306_128x64:
+            return new Display<Adapter>(new SSD1306AsciiDisplay<Adapter>());
+            break;
+        default:
+            // Ideally we would raise an exception here
+            return nullptr;
+            break;
+        }
     }
 };
 
