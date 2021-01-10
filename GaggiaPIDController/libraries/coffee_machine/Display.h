@@ -3,24 +3,20 @@
 #include "BaseTypes.h"
 #include "Common.h"
 
-template <class Adapter, class DisplayType> class Display : public BaseDisplay<Adapter>
+template <class Adapter> class Display
 {
   public:
-    Display() : display(), time_last_update(0)
+    Display(BaseDisplay *display) : display(display), time_last_update(0)
     {
-        Adapter::WireBegin();
-        Adapter::WireSetClock(400000L);
-        display.begin(&Adafruit128x64, 0x3C);
-        display.setFont(Adafruit5x7);
-        display.clear();
     }
 
-    bool update(const Gaggia::ControlStatus<Adapter> &status) override
+    bool update(const Gaggia::ControlStatus<Adapter> &status)
     {
         // Refresh the display with a reasonable rate
         auto now = Adapter::millis();
         if (now - time_last_update > REFRESH_PERIOD)
         {
+            display->clear();
             write_machine_mode(status.machine_mode);
             write_current_temp(status.current_temperature);
             write_target_temp(status.target_temperature);
@@ -34,11 +30,8 @@ template <class Adapter, class DisplayType> class Display : public BaseDisplay<A
   private:
     void write_machine_mode(const Gaggia::Mode &mode)
     {
-        display.setCursor(30, 1);
-        display.print((mode == Gaggia::Mode::WATER_MODE) ? "Water" : "Steam");
-        display.print(" mode");
-        display.clearToEOL();
-        display.println();
+        display->print(30, 1,
+                       (mode == Gaggia::Mode::WATER_MODE) ? "Water mode" : "Steam mode");
     }
 
     void write_current_temp(const double &temp)
@@ -53,26 +46,21 @@ template <class Adapter, class DisplayType> class Display : public BaseDisplay<A
 
     void write_temp(const unsigned &col, const unsigned &row, const double &temp)
     {
-        display.setCursor(col, row);
         char output[10];
         char buffer[6];
-        dtostrf(temp, 4, 1, buffer);
+        string_utils::my_dtostrf(temp, 4, 1, buffer);
         snprintf(output, 10, "%s C  ", buffer);
-        display.print(output);
-        display.println();
+        display->print(col, row, output);
     }
 
     void write_status_message(const char *message)
     {
-        display.setCursor(1, 5);
         // TODO if the message is too long, make it scroll
-        display.print(message);
-        display.clearToEOL();
-        display.println();
+        display->print(1, 5, message);
     }
 
     static constexpr unsigned short REFRESH_PERIOD = 200;
 
-    DisplayType display;
+    BaseDisplay *display;
     unsigned long time_last_update;
 };

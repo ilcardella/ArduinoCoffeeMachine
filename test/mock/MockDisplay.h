@@ -1,21 +1,34 @@
 #pragma once
 
 #include <coffee_machine/BaseTypes.h>
-#include <coffee_machine/Common.h>
 
-template <class Adapter> class MockDisplay : public BaseDisplay<Adapter>
+class MockDisplay : public BaseDisplay
 {
   public:
     MockDisplay() = default;
-    bool update(const Gaggia::ControlStatus<Adapter> &status) override
-    {
-        return healthy;
-    }
 
-    void reset()
+    bool initialise()
     {
-        healthy = true;
+        return true;
     }
-
-    bool healthy = true;
+    bool clear()
+    {
+        return true;
+    }
+    bool print(const unsigned &col, const unsigned &row, const char *data)
+    {
+        return true;
+    }
+    bool print(const unsigned &col, const unsigned &row, const int &data)
+    {
+        return true;
+    }
+    bool print(const unsigned &col, const unsigned &row, const float &data)
+    {
+        return true;
+    }
+    bool print(const unsigned &col, const unsigned &row, const double &data)
+    {
+        return true;
+    }
 };

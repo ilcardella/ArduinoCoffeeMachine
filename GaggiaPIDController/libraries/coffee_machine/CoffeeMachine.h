@@ -3,12 +3,13 @@
 #include "BaseTypes.h"
 #include "Common.h"
 #include "Configuration.h"
+#include "Display.h"
 
 template <class Adapter> class CoffeeMachine
 {
   public:
     CoffeeMachine(BasePIDController *pid, BaseSerialInterface<Adapter> *serial,
-                  BaseModeDetector *mode_detector, BaseDisplay<Adapter> *display,
+                  BaseModeDetector *mode_detector, Display<Adapter> *display,
                   BaseHeater *heater, BaseTemperatureSensor<Adapter> *water_sensor,
                   BaseTemperatureSensor<Adapter> *steam_sensor)
         : pid(pid), serial(serial), mode_detector(mode_detector), display(display),
@@ -158,7 +159,7 @@ template <class Adapter> class CoffeeMachine
     BaseTemperatureSensor<Adapter> *steam_sensor;
     BasePIDController *pid;
     BaseSerialInterface<Adapter> *serial;
-    BaseDisplay<Adapter> *display;
+    Display<Adapter> *display;
     BaseModeDetector *mode_detector;
     Gaggia::ControlStatus<Adapter> machine_status;
     BaseHeater *heater;
