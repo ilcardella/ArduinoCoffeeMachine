@@ -66,6 +66,15 @@ class CppAdapter
         ;
     }
 
+    inline static char *dtostrf(double val, signed char width, unsigned char prec,
+                                char *sout)
+    {
+        char fmt[20];
+        sprintf(fmt, "%%%d.%df", width, prec);
+        sprintf(sout, fmt, val);
+        return sout;
+    }
+
     inline static unsigned long millis_ret = 0;
     inline static char message_sent[100];
 };

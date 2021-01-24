@@ -95,11 +95,4 @@ template <typename T> T to_number(const char *data, const unsigned &start_index 
     return static_cast<T>(atof(number));
 }
 
-char *my_dtostrf(double val, signed char width, unsigned char prec, char *sout)
-{
-    char fmt[20];
-    sprintf(fmt, "%%%d.%df", width, prec);
-    sprintf(sout, fmt, val);
-    return sout;
-}
 } // namespace string_utils

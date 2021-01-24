@@ -48,7 +48,7 @@ template <class Adapter> class Display
     {
         char output[10];
         char buffer[6];
-        string_utils::my_dtostrf(temp, 4, 1, buffer);
+        Adapter::dtostrf(temp, 4, 1, buffer);
         snprintf(output, 10, "%s C  ", buffer);
         display->print(col, row, output);
     }
