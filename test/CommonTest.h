@@ -53,8 +53,8 @@ class CommonTest : public ::testing::Test
     MockPID pid;
     MockModeDetector mode_detector;
     MockHeater heater;
-    MockTempSensor<Adapter> water_sensor;
-    MockTempSensor<Adapter> steam_sensor;
+    MockTempSensor water_sensor;
+    MockTempSensor steam_sensor;
 
     unsigned long creation_time;
 };

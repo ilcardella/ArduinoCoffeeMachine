@@ -2,7 +2,7 @@
 
 #include <coffee_machine/BaseTypes.h>
 
-template <class Adapter> class MockTempSensor : public BaseTemperatureSensor<Adapter>
+class MockTempSensor : public BaseTemperatureSensor
 {
   public:
     MockTempSensor(std::string name) : name(name)

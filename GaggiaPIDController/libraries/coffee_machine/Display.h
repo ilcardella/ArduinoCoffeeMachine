@@ -10,7 +10,7 @@ template <class Adapter> class Display
     {
     }
 
-    bool update(const Gaggia::ControlStatus<Adapter> &status)
+    bool update(const Gaggia::ControlStatus &status)
     {
         // Refresh the display with a reasonable rate
         auto now = Adapter::millis();

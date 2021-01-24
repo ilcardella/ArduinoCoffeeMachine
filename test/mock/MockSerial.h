@@ -3,7 +3,7 @@
 #include <coffee_machine/BaseTypes.h>
 #include <coffee_machine/Common.h>
 
-template <class Adapter> class MockSerial : public BaseSerialInterface<Adapter>
+template <class Adapter> class MockSerial : public BaseSerialInterface
 {
   public:
     MockSerial() = default;
@@ -13,7 +13,7 @@ template <class Adapter> class MockSerial : public BaseSerialInterface<Adapter>
         read_input_called = true;
     }
 
-    void print_status(const Gaggia::ControlStatus<Adapter> &status) override
+    void print_status(const Gaggia::ControlStatus &status) override
     {
         status_to_send = status;
     }
@@ -49,7 +49,7 @@ template <class Adapter> class MockSerial : public BaseSerialInterface<Adapter>
     void reset()
     {
         read_input_called = false;
-        status_to_send = Gaggia::ControlStatus<Adapter>();
+        status_to_send = Gaggia::ControlStatus();
         debug_on = false;
         kp_in = 1.0;
         ki_in = 1.0;
@@ -57,7 +57,7 @@ template <class Adapter> class MockSerial : public BaseSerialInterface<Adapter>
     }
 
     bool read_input_called = false;
-    Gaggia::ControlStatus<Adapter> status_to_send;
+    Gaggia::ControlStatus status_to_send;
     bool debug_on = false;
     double kp_in = 1.0;
     double ki_in = 1.0;

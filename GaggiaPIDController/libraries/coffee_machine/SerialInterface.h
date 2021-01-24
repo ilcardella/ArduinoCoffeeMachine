@@ -3,7 +3,7 @@
 #include "BaseTypes.h"
 #include "Common.h"
 
-template <class Adapter> class SerialInterface : public BaseSerialInterface<Adapter>
+template <class Adapter> class SerialInterface : public BaseSerialInterface
 {
   public:
     SerialInterface(const unsigned short &baudrate) : time_last_print(0), inputs()
@@ -71,7 +71,7 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface<Adap
         }
     }
 
-    void print_status(const Gaggia::ControlStatus<Adapter> &status) override
+    void print_status(const Gaggia::ControlStatus &status) override
     {
         auto now = Adapter::millis();
         if (is_output_enabled() && now - time_last_print > PRINT_TIMEOUT)
@@ -82,8 +82,8 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface<Adap
 
             time_last_print = now;
 
-            dtostrf(status.current_temperature, 4, 1, curr_temp_buffer);
-            dtostrf(status.target_temperature, 4, 1, target_temp_buffer);
+            Adapter::dtostrf(status.current_temperature, 4, 1, curr_temp_buffer);
+            Adapter::dtostrf(status.target_temperature, 4, 1, target_temp_buffer);
 
             snprintf(output, 100, "%d,%s,%s,%d,%s", static_cast<int>(status.machine_mode),
                      curr_temp_buffer, target_temp_buffer, status.water_heater_on,
