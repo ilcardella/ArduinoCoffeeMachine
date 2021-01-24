@@ -13,12 +13,12 @@ using Adapter = ArduinoAdapter;
 
 CoffeeMachine<Adapter> *machine;
 Display<Adapter> *display;
-BaseSerialInterface<Adapter> *serial;
+BaseSerialInterface *serial;
 BasePIDController *pid;
 BaseModeDetector *mode_detector;
 BaseHeater *heater;
-BaseTemperatureSensor<Adapter> *water_sensor;
-BaseTemperatureSensor<Adapter> *steam_sensor;
+BaseTemperatureSensor *water_sensor;
+BaseTemperatureSensor *steam_sensor;
 
 void setup()
 {

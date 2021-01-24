@@ -15,8 +15,8 @@ class SensorFactory
 {
   public:
     template <class Adapter, SensorTypes type>
-    static BaseTemperatureSensor<Adapter> *make_temperature_sensor(
-        const char *name, const unsigned char &pin)
+    static BaseTemperatureSensor *make_temperature_sensor(const char *name,
+                                                          const unsigned char &pin)
     {
         using namespace sensors;
         switch (type)

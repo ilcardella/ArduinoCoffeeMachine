@@ -60,4 +60,11 @@ class ArduinoAdapter
     {
         Wire.setClock(clock);
     }
+
+    inline static char *dtostrf(double val, signed char width, unsigned char prec,
+                                char *s)
+
+    {
+        return ::dtostrf(val, width, prec, s);
+    }
 };

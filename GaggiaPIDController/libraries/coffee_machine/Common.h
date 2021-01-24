@@ -8,7 +8,7 @@ enum class Mode
     STEAM_MODE = 1
 };
 
-template <class Adapter> struct ControlStatus
+struct ControlStatus
 {
     Mode machine_mode = Mode::WATER_MODE;
     double current_temperature = 0.0;

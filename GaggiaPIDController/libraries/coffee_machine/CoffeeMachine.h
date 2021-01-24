@@ -8,10 +8,10 @@
 template <class Adapter> class CoffeeMachine
 {
   public:
-    CoffeeMachine(BasePIDController *pid, BaseSerialInterface<Adapter> *serial,
+    CoffeeMachine(BasePIDController *pid, BaseSerialInterface *serial,
                   BaseModeDetector *mode_detector, Display<Adapter> *display,
-                  BaseHeater *heater, BaseTemperatureSensor<Adapter> *water_sensor,
-                  BaseTemperatureSensor<Adapter> *steam_sensor)
+                  BaseHeater *heater, BaseTemperatureSensor *water_sensor,
+                  BaseTemperatureSensor *steam_sensor)
         : pid(pid), serial(serial), mode_detector(mode_detector), display(display),
           heater(heater), water_sensor(water_sensor), steam_sensor(steam_sensor),
           machine_status()
@@ -21,7 +21,7 @@ template <class Adapter> class CoffeeMachine
         machine_status.time_since_steam_mode = Adapter::millis();
     }
 
-    Gaggia::ControlStatus<Adapter> spin()
+    Gaggia::ControlStatus spin()
     {
         serial->read_input();
 
@@ -71,7 +71,7 @@ template <class Adapter> class CoffeeMachine
         }
 
         // Select correct sensor for current operation mode
-        BaseTemperatureSensor<Adapter> *sensor =
+        BaseTemperatureSensor *sensor =
             (machine_status.machine_mode == Gaggia::Mode::WATER_MODE) ? water_sensor
                                                                       : steam_sensor;
         // Get the current temp from the temperature sensor
@@ -155,12 +155,12 @@ template <class Adapter> class CoffeeMachine
 
     /////////////////////////////////////////////////////////////////////////////////////
 
-    BaseTemperatureSensor<Adapter> *water_sensor;
-    BaseTemperatureSensor<Adapter> *steam_sensor;
+    BaseTemperatureSensor *water_sensor;
+    BaseTemperatureSensor *steam_sensor;
     BasePIDController *pid;
-    BaseSerialInterface<Adapter> *serial;
+    BaseSerialInterface *serial;
     Display<Adapter> *display;
     BaseModeDetector *mode_detector;
-    Gaggia::ControlStatus<Adapter> machine_status;
+    Gaggia::ControlStatus machine_status;
     BaseHeater *heater;
 };

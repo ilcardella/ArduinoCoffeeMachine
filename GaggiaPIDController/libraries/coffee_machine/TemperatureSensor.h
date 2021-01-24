@@ -3,7 +3,7 @@
 #include "BaseTypes.h"
 
 template <class Adapter, class SensorType>
-class TemperatureSensor : public BaseTemperatureSensor<Adapter>
+class TemperatureSensor : public BaseTemperatureSensor
 {
   public:
     TemperatureSensor(const char *name, const unsigned char &pin,

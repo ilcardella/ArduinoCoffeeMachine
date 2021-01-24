@@ -2,14 +2,14 @@
 
 #include "Common.h"
 
-template <class Adapter> class BaseSerialInterface
+class BaseSerialInterface
 {
   public:
     virtual ~BaseSerialInterface() = default;
 
     virtual void read_input() = 0;
 
-    virtual void print_status(const Gaggia::ControlStatus<Adapter> &status) = 0;
+    virtual void print_status(const Gaggia::ControlStatus &status) = 0;
 
     virtual bool is_debug_active() = 0;
     virtual double get_mock_temperature() = 0;
@@ -71,7 +71,7 @@ class BaseSensor
     virtual bool read_sensor(float *value) = 0;
 };
 
-template <class Adapter> class BaseTemperatureSensor
+class BaseTemperatureSensor
 {
   public:
     virtual ~BaseTemperatureSensor() = default;
