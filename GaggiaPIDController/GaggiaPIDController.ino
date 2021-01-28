@@ -12,26 +12,19 @@
 using Adapter = ArduinoAdapter;
 
 CoffeeMachine<Adapter> *machine;
-Display<Adapter> *display;
-BaseSerialInterface *serial;
-BasePIDController *pid;
-BaseModeDetector *mode_detector;
-BaseHeater *heater;
-BaseTemperatureSensor *water_sensor;
-BaseTemperatureSensor *steam_sensor;
 
 void setup()
 {
-    display = DisplayFactory::make_display<Adapter, Configuration::DISPLAY_TYPE>();
-    serial = new SerialInterface<Adapter>(Configuration::SERIAL_BAUDRATE);
-    pid = PIDFactory::make_pid_controller<Adapter>();
-    mode_detector = new ModeDetector<Adapter>(Configuration::STEAM_SWITCH_PIN);
-    heater = new Heater<Adapter>(Configuration::HEATER_SSR_PIN);
-    water_sensor =
+    auto display = DisplayFactory::make_display<Adapter, Configuration::DISPLAY_TYPE>();
+    auto serial = new SerialInterface<Adapter>(Configuration::SERIAL_BAUDRATE);
+    auto pid = PIDFactory::make_pid_controller<Adapter>();
+    auto mode_detector = new ModeDetector<Adapter>(Configuration::STEAM_SWITCH_PIN);
+    auto heater = new Heater<Adapter>(Configuration::HEATER_SSR_PIN);
+    auto water_sensor =
         SensorFactory::make_temperature_sensor<Adapter,
                                                Configuration::WATER_TEMP_SENSOR_TYPE>(
             "water_sensor", Configuration::WATER_TEMP_PIN);
-    steam_sensor =
+    auto steam_sensor =
         SensorFactory::make_temperature_sensor<Adapter,
                                                Configuration::STEAM_TEMP_SENSOR_TYPE>(
             "steam_sensor", Configuration::STEAM_TEMP_PIN);

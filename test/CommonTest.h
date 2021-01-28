@@ -39,7 +39,7 @@ class CommonTest : public ::testing::Test
 
     CoffeeMachine<Adapter> make_machine()
     {
-        return CoffeeMachine<Adapter>(&pid, &serial, &mode_detector, &display, &heater,
+        return CoffeeMachine<Adapter>(&pid, &serial, &mode_detector, display, &heater,
                                       &water_sensor, &steam_sensor);
     }
 
@@ -48,7 +48,7 @@ class CommonTest : public ::testing::Test
         return time - creation_time;
     }
 
-    Display<Adapter> display;
+    BaseDisplay *display;
     MockSerial<Adapter> serial;
     MockPID pid;
     MockModeDetector mode_detector;

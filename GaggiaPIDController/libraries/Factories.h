@@ -39,12 +39,12 @@ class SensorFactory
 class DisplayFactory
 {
   public:
-    template <class Adapter, DisplayTypes type> static Display<Adapter> *make_display()
+    template <class Adapter, DisplayTypes type> static BaseDisplay *make_display()
     {
         switch (type)
         {
         case DisplayTypes::SSD1306_128x64:
-            return new Display<Adapter>(new SSD1306AsciiDisplay<Adapter>());
+            return new SSD1306AsciiDisplay<Adapter>();
             break;
         default:
             // Ideally we would raise an exception here

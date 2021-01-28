@@ -9,10 +9,10 @@ template <class Adapter> class CoffeeMachine
 {
   public:
     CoffeeMachine(BasePIDController *pid, BaseSerialInterface *serial,
-                  BaseModeDetector *mode_detector, Display<Adapter> *display,
+                  BaseModeDetector *mode_detector, BaseDisplay *display_type,
                   BaseHeater *heater, BaseTemperatureSensor *water_sensor,
                   BaseTemperatureSensor *steam_sensor)
-        : pid(pid), serial(serial), mode_detector(mode_detector), display(display),
+        : pid(pid), serial(serial), mode_detector(mode_detector), display(display_type),
           heater(heater), water_sensor(water_sensor), steam_sensor(steam_sensor),
           machine_status()
     {
@@ -32,7 +32,7 @@ template <class Adapter> class CoffeeMachine
 
         heater->set(machine_status.water_heater_on);
 
-        display->update(machine_status);
+        display.update(machine_status);
 
         serial->print_status(machine_status);
 
@@ -159,7 +159,7 @@ template <class Adapter> class CoffeeMachine
     BaseTemperatureSensor *steam_sensor;
     BasePIDController *pid;
     BaseSerialInterface *serial;
-    Display<Adapter> *display;
+    Display<Adapter> display;
     BaseModeDetector *mode_detector;
     Gaggia::ControlStatus machine_status;
     BaseHeater *heater;
