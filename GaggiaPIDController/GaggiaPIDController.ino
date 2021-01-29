@@ -3,11 +3,6 @@
 
 #include "libraries/coffee_machine/BaseTypes.h"
 #include "libraries/coffee_machine/CoffeeMachine.h"
-#include "libraries/coffee_machine/Display.h"
-#include "libraries/coffee_machine/Heater.h"
-#include "libraries/coffee_machine/ModeDetector.h"
-#include "libraries/coffee_machine/RelayPIDController.h"
-#include "libraries/coffee_machine/SerialInterface.h"
 
 using Adapter = ArduinoAdapter;
 
@@ -16,7 +11,9 @@ CoffeeMachine<Adapter> *machine;
 void setup()
 {
     auto display = DisplayFactory::make_display<Adapter, Configuration::DISPLAY_TYPE>();
-    auto serial = new SerialInterface<Adapter>(Configuration::SERIAL_BAUDRATE);
+    auto serial =
+        SerialFactory::make_serial_interface<Adapter,
+                                             Configuration::SERIAL_INTERFACE_TYPE>();
     auto pid = PIDFactory::make_pid_controller<Adapter>();
     auto mode_detector = new ModeDetector<Adapter>(Configuration::STEAM_SWITCH_PIN);
     auto heater = new Heater<Adapter>(Configuration::HEATER_SSR_PIN);

@@ -11,11 +11,18 @@ enum class DisplayTypes
     SSD1306_128x64
 };
 
+enum class SerialTypes
+{
+    ARDUINO_SERIAL
+};
+
 struct Configuration
 {
     inline static constexpr SensorTypes WATER_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
     inline static constexpr SensorTypes STEAM_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
     inline static constexpr DisplayTypes DISPLAY_TYPE = DisplayTypes::SSD1306_128x64;
+    inline static constexpr SerialTypes SERIAL_INTERFACE_TYPE =
+        SerialTypes::ARDUINO_SERIAL;
 
     // Input pin of the water temperature sensor
     inline static constexpr unsigned char WATER_TEMP_PIN = 4;

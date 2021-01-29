@@ -3,23 +3,22 @@
 #include "BaseTypes.h"
 #include "Common.h"
 
-template <class Adapter> class SerialInterface : public BaseSerialInterface
+template <class Adapter> class SerialInterface
 {
   public:
-    SerialInterface(const unsigned short &baudrate) : time_last_print(0), inputs()
+    SerialInterface(BaseSerialInterface *serial) : serial(serial)
     {
-        Adapter::SerialBegin(baudrate);
     }
 
-    void read_input() override
+    void read_input()
     {
         // Read input data and enable or disable the debug mode
         // If debug mode is enabled, accept temperature input
         // to overwrite sensor readings
-        if (Adapter::SerialAvailable())
+        if (serial->available())
         {
             char data[25];
-            Adapter::SerialReadStringUntil('\n', data);
+            serial->read_string_until('\n', data);
             if (string_utils::start_with(data, "help"))
             {
                 print_help();
@@ -27,51 +26,51 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface
             else if (string_utils::start_with(data, "debug on"))
             {
                 inputs.debug_mode = true;
-                Adapter::SerialPrintln("Setting debug mode ON");
+                serial->println("Setting debug mode ON");
             }
             else if (string_utils::start_with(data, "debug off"))
             {
                 inputs.debug_mode = false;
-                Adapter::SerialPrintln("Setting debug mode OFF");
+                serial->println("Setting debug mode OFF");
             }
             else if (string_utils::start_with(data, "output on"))
             {
                 inputs.enable_output = true;
-                Adapter::SerialPrintln("Setting output ON");
+                serial->println("Setting output ON");
             }
             else if (string_utils::start_with(data, "output off"))
             {
                 inputs.enable_output = false;
-                Adapter::SerialPrintln("Setting output OFF");
+                serial->println("Setting output OFF");
             }
             else if (string_utils::start_with(data, "temp ") && is_debug_active())
             {
                 inputs.mock_temperature = string_utils::to_number<double>(data, 5);
-                // Adapter::SerialPrintln("Setting mock temperature to; " + data);
-                Adapter::SerialPrintln("Setting mock temperature");
+                // serial->println("Setting mock temperature to; " + data);
+                serial->println("Setting mock temperature");
             }
             else if (string_utils::start_with(data, "kp "))
             {
                 inputs.kp = string_utils::to_number<double>(data, 3);
-                // Adapter::SerialPrintln("Setting PID kp to: " + data);
-                Adapter::SerialPrintln("Setting PID kp");
+                // serial->println("Setting PID kp to: " + data);
+                serial->println("Setting PID kp");
             }
             else if (string_utils::start_with(data, "ki "))
             {
                 inputs.ki = string_utils::to_number<double>(data, 3);
-                // Adapter::SerialPrintln("Setting PID ki to: " + data);
-                Adapter::SerialPrintln("Setting PID ki");
+                // serial->println("Setting PID ki to: " + data);
+                serial->println("Setting PID ki");
             }
             else if (string_utils::start_with(data, "kd "))
             {
                 inputs.kd = string_utils::to_number<double>(data, 3);
-                // Adapter::SerialPrintln("Setting PID kd to: " + data);
-                Adapter::SerialPrintln("Setting PID kd");
+                // serial->println("Setting PID kd to: " + data);
+                serial->println("Setting PID kd");
             }
         }
     }
 
-    void print_status(const Gaggia::ControlStatus &status) override
+    void print_status(const Gaggia::ControlStatus &status)
     {
         auto now = Adapter::millis();
         if (is_output_enabled() && now - time_last_print > PRINT_TIMEOUT)
@@ -88,21 +87,21 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface
             snprintf(output, 100, "%d,%s,%s,%d,%s", static_cast<int>(status.machine_mode),
                      curr_temp_buffer, target_temp_buffer, status.water_heater_on,
                      status.status_message);
-            Adapter::SerialPrintln(output);
+            serial->println(output);
         }
     }
 
-    bool is_debug_active() override
+    bool is_debug_active()
     {
         return inputs.debug_mode;
     }
 
-    double get_mock_temperature() override
+    double get_mock_temperature()
     {
         return inputs.mock_temperature;
     }
 
-    bool get_new_kp(double *kp) override
+    bool get_new_kp(double *kp)
     {
         if (inputs.kp > 0.0)
         {
@@ -113,7 +112,7 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface
         return false;
     }
 
-    bool get_new_ki(double *ki) override
+    bool get_new_ki(double *ki)
     {
         if (inputs.ki > 0.0)
         {
@@ -124,7 +123,7 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface
         return false;
     }
 
-    bool get_new_kd(double *kd) override
+    bool get_new_kd(double *kd)
     {
         if (inputs.kd > 0.0)
         {
@@ -138,17 +137,17 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface
   private:
     void print_help()
     {
-        Adapter::SerialPrintln("**** GaggiaPIDController serial interface ****");
-        Adapter::SerialPrintln("Commands:");
-        Adapter::SerialPrintln("- help: show this message");
-        Adapter::SerialPrintln("- debug [on/off]: enable/disable debug mode");
-        Adapter::SerialPrintln("- output [on/off]: enable/disable serial output");
-        Adapter::SerialPrintln(
+        serial->println("**** GaggiaPIDController serial interface ****");
+        serial->println("Commands:");
+        serial->println("- help: show this message");
+        serial->println("- debug [on/off]: enable/disable debug mode");
+        serial->println("- output [on/off]: enable/disable serial output");
+        serial->println(
             "- temp [value]: Set the mock temperature. Used only in debug mode");
-        Adapter::SerialPrintln("- kp [value]: Set the P gain of the PID controller");
-        Adapter::SerialPrintln("- ki [value]: Set the I gain of the PID controller");
-        Adapter::SerialPrintln("- kd [value]: Set the D gain of the PID controller");
-        Adapter::SerialPrintln("**** END ****");
+        serial->println("- kp [value]: Set the P gain of the PID controller");
+        serial->println("- ki [value]: Set the I gain of the PID controller");
+        serial->println("- kd [value]: Set the D gain of the PID controller");
+        serial->println("**** END ****");
     }
 
     bool is_output_enabled()
@@ -168,6 +167,7 @@ template <class Adapter> class SerialInterface : public BaseSerialInterface
         double ki = 0.0;
         double kd = 0.0;
     };
-
     SerialInput inputs;
-};
+
+    BaseSerialInterface *serial;
+}

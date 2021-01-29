@@ -7,16 +7,10 @@ class BaseSerialInterface
   public:
     virtual ~BaseSerialInterface() = default;
 
-    virtual void read_input() = 0;
-
-    virtual void print_status(const Gaggia::ControlStatus &status) = 0;
-
-    virtual bool is_debug_active() = 0;
-    virtual double get_mock_temperature() = 0;
-
-    virtual bool get_new_kp(double *kp) = 0;
-    virtual bool get_new_ki(double *ki) = 0;
-    virtual bool get_new_kd(double *kd) = 0;
+    virtual void begin(const unsigned long &baudrate) = 0;
+    virtual int available() = 0;
+    virtual void read_string_until(const char &terminator, char *data) = 0;
+    virtual size_t println(const char *value) = 0;
 };
 
 class BaseDisplay

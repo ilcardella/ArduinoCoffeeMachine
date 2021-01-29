@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "Configuration.h"
 #include "Display.h"
+#include "SerialInterface.h"
 
 template <class Adapter> class CoffeeMachine
 {
@@ -23,7 +24,7 @@ template <class Adapter> class CoffeeMachine
 
     Gaggia::ControlStatus spin()
     {
-        serial->read_input();
+        serial.read_input();
 
         if (update_machine_status())
         {
@@ -34,7 +35,7 @@ template <class Adapter> class CoffeeMachine
 
         display.update(machine_status);
 
-        serial->print_status(machine_status);
+        serial.print_status(machine_status);
 
         return machine_status;
     }
@@ -62,9 +63,9 @@ template <class Adapter> class CoffeeMachine
                 : Configuration::TARGET_STEAM_TEMP;
 
         // When debug mode is enabled do not read sensors
-        if (serial->is_debug_active())
+        if (serial.is_debug_active())
         {
-            machine_status.current_temperature = serial->get_mock_temperature();
+            machine_status.current_temperature = serial.get_mock_temperature();
             strncpy(machine_status.status_message, string_utils::strings::DEBUG_MODE,
                     machine_status.MSG_LEN);
             return true;
@@ -130,15 +131,15 @@ template <class Adapter> class CoffeeMachine
     {
         // Check if new PID gains have been requested and update our controller
         double gain;
-        if (serial->get_new_kp(&gain))
+        if (serial.get_new_kp(&gain))
         {
             pid->set_kp(gain);
         }
-        if (serial->get_new_ki(&gain))
+        if (serial.get_new_ki(&gain))
         {
             pid->set_ki(gain);
         }
-        if (serial->get_new_kd(&gain))
+        if (serial.get_new_kd(&gain))
         {
             pid->set_kd(gain);
         }
@@ -158,7 +159,7 @@ template <class Adapter> class CoffeeMachine
     BaseTemperatureSensor *water_sensor;
     BaseTemperatureSensor *steam_sensor;
     BasePIDController *pid;
-    BaseSerialInterface *serial;
+    SerialInterface<Adapter> serial;
     Display<Adapter> display;
     BaseModeDetector *mode_detector;
     Gaggia::ControlStatus machine_status;

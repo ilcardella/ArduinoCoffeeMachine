@@ -2,14 +2,12 @@
 
 #include <PID_v1.h>
 
+#include "ArduinoSerial.h"
 #include "SSD1306AsciiDisplay.h"
 #include "Sensors.h"
 
 #include "coffee_machine/BaseTypes.h"
 #include "coffee_machine/Configuration.h"
-#include "coffee_machine/Display.h"
-#include "coffee_machine/RelayPIDController.h"
-#include "coffee_machine/TemperatureSensor.h"
 
 class SensorFactory
 {
@@ -61,5 +59,24 @@ class PIDFactory
     {
         return new RelayPIDController<Adapter, PID>(
             Configuration::P_GAIN, Configuration::I_GAIN, Configuration::D_GAIN);
+    }
+};
+
+class SerialFactory
+{
+  public:
+    template <class Adapter, SerialTypes type>
+    static BaseSerialInterface *make_serial_interface()
+    {
+        switch (type)
+        {
+        case SerialTypes::ARDUINO_SERIAL:
+            return new ArduinoSerial<Adapter>(Configuration::SERIAL_BAUDRATE);
+            break;
+        default:
+            // Ideally we would raise an exception here
+            return nullptr;
+            break;
+        }
     }
 };
