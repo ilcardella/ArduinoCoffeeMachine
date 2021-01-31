@@ -16,13 +16,23 @@ enum class SerialTypes
     ARDUINO_SERIAL
 };
 
+enum class TempControllerTypes
+{
+    ARDUINO_PID
+};
+
 struct Configuration
 {
     inline static constexpr SensorTypes WATER_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
     inline static constexpr SensorTypes STEAM_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
+
     inline static constexpr DisplayTypes DISPLAY_TYPE = DisplayTypes::SSD1306_128x64;
+
     inline static constexpr SerialTypes SERIAL_INTERFACE_TYPE =
         SerialTypes::ARDUINO_SERIAL;
+
+    inline static constexpr TempControllerTypes TEMP_CONTROLLER_TYPE =
+        TempControllerTypes::ARDUINO_PID;
 
     // Input pin of the water temperature sensor
     inline static constexpr unsigned char WATER_TEMP_PIN = 4;
@@ -55,4 +65,10 @@ struct Configuration
     // Safety timeouts in milliseconds to turn off the heater. (disabled if < 1)
     inline static constexpr long SAFETY_TIMEOUT = 2400000; // 40 minutes
     inline static constexpr long STEAM_TIMEOUT = 300000;   // 5 minutes
+
+    // Configurations for the temperature sensors
+    inline static constexpr unsigned long WATER_TEMP_REFRESH_PERIOD = 300; // milliseconds
+    inline static constexpr unsigned long STEAM_TEMP_REFRESH_PERIOD = 300; // milliseconds
+    inline static constexpr float TSIC_TEMP_OFFSET = 0;
+    inline static constexpr float KTYPE_TEMP_OFFSET = -12.0f;
 };

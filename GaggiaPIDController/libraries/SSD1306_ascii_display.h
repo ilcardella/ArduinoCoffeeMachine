@@ -1,6 +1,6 @@
 #pragma once
 
-#include "coffee_machine/BaseTypes.h"
+#include "coffee_machine/interfaces.h"
 
 #include <SSD1306AsciiWire.h>
 

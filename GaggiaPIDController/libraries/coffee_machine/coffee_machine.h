@@ -1,21 +1,24 @@
 #pragma once
 
-#include "BaseTypes.h"
-#include "Common.h"
-#include "Configuration.h"
-#include "Display.h"
-#include "SerialInterface.h"
+#include "common.h"
+#include "configuration.h"
+#include "display.h"
+#include "heater.h"
+#include "interfaces.h"
+#include "mode_detector.h"
+#include "relay_controller.h"
+#include "serial_interface.h"
 
 template <class Adapter> class CoffeeMachine
 {
   public:
-    CoffeeMachine(BasePIDController *pid, BaseSerialInterface *serial,
-                  BaseModeDetector *mode_detector, BaseDisplay *display_type,
-                  BaseHeater *heater, BaseTemperatureSensor *water_sensor,
+    CoffeeMachine(Controller *controller, BaseSerialInterface *serial,
+                  IOPin *mode_switch_pin, BaseDisplay *display_type, IOPin *heater_pin,
+                  BaseTemperatureSensor *water_sensor,
                   BaseTemperatureSensor *steam_sensor)
-        : pid(pid), serial(serial), mode_detector(mode_detector), display(display_type),
-          heater(heater), water_sensor(water_sensor), steam_sensor(steam_sensor),
-          machine_status()
+        : temp_controller(controller), serial(serial), mode_detector(mode_switch_pin),
+          display(display_type), heater(heater_pin), water_sensor(water_sensor),
+          steam_sensor(steam_sensor), machine_status()
     {
         // Mark machine start time
         machine_status.time_since_start = Adapter::millis();
@@ -31,7 +34,7 @@ template <class Adapter> class CoffeeMachine
             update_pid();
         }
 
-        heater->set(machine_status.water_heater_on);
+        heater.set(machine_status.water_heater_on);
 
         display.update(machine_status);
 
@@ -48,7 +51,7 @@ template <class Adapter> class CoffeeMachine
         // Set SSR off by default and let the PID decide whether to turn it on
         machine_status.water_heater_on = false;
         // Read operation mode
-        machine_status.machine_mode = mode_detector->get_mode();
+        machine_status.machine_mode = mode_detector.get_mode();
 
         // Reset steam mode timeout counter when not in steam mode
         if (machine_status.machine_mode != Gaggia::Mode::STEAM_MODE)
@@ -129,27 +132,12 @@ template <class Adapter> class CoffeeMachine
 
     void update_pid()
     {
-        // Check if new PID gains have been requested and update our controller
-        double gain;
-        if (serial.get_new_kp(&gain))
-        {
-            pid->set_kp(gain);
-        }
-        if (serial.get_new_ki(&gain))
-        {
-            pid->set_ki(gain);
-        }
-        if (serial.get_new_kd(&gain))
-        {
-            pid->set_kd(gain);
-        }
-
-        if (not pid->compute(machine_status.current_temperature,
-                             machine_status.target_temperature,
-                             &(machine_status.water_heater_on)))
+        if (not temp_controller.compute(machine_status.current_temperature,
+                                        machine_status.target_temperature,
+                                        &(machine_status.water_heater_on)))
         {
             machine_status.water_heater_on = false;
-            strncpy(machine_status.status_message, string_utils::strings::PID_FAILT,
+            strncpy(machine_status.status_message, string_utils::strings::PID_FAULT,
                     machine_status.MSG_LEN);
         }
     }
@@ -158,10 +146,10 @@ template <class Adapter> class CoffeeMachine
 
     BaseTemperatureSensor *water_sensor;
     BaseTemperatureSensor *steam_sensor;
-    BasePIDController *pid;
+    RelayController<Adapter> temp_controller;
     SerialInterface<Adapter> serial;
     Display<Adapter> display;
-    BaseModeDetector *mode_detector;
+    ModeDetector mode_detector;
     Gaggia::ControlStatus machine_status;
-    BaseHeater *heater;
+    Heater heater;
 };

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "BaseTypes.h"
-#include "Common.h"
+#include "common.h"
+#include "interfaces.h"
 
 template <class Adapter> class SerialInterface
 {
@@ -49,24 +49,6 @@ template <class Adapter> class SerialInterface
                 // serial->println("Setting mock temperature to; " + data);
                 serial->println("Setting mock temperature");
             }
-            else if (string_utils::start_with(data, "kp "))
-            {
-                inputs.kp = string_utils::to_number<double>(data, 3);
-                // serial->println("Setting PID kp to: " + data);
-                serial->println("Setting PID kp");
-            }
-            else if (string_utils::start_with(data, "ki "))
-            {
-                inputs.ki = string_utils::to_number<double>(data, 3);
-                // serial->println("Setting PID ki to: " + data);
-                serial->println("Setting PID ki");
-            }
-            else if (string_utils::start_with(data, "kd "))
-            {
-                inputs.kd = string_utils::to_number<double>(data, 3);
-                // serial->println("Setting PID kd to: " + data);
-                serial->println("Setting PID kd");
-            }
         }
     }
 
@@ -101,39 +83,6 @@ template <class Adapter> class SerialInterface
         return inputs.mock_temperature;
     }
 
-    bool get_new_kp(double *kp)
-    {
-        if (inputs.kp > 0.0)
-        {
-            *kp = inputs.kp;
-            inputs.kp = 0.0; // reset input
-            return true;
-        }
-        return false;
-    }
-
-    bool get_new_ki(double *ki)
-    {
-        if (inputs.ki > 0.0)
-        {
-            *ki = inputs.ki;
-            inputs.ki = 0.0; // reset input
-            return true;
-        }
-        return false;
-    }
-
-    bool get_new_kd(double *kd)
-    {
-        if (inputs.kd > 0.0)
-        {
-            *kd = inputs.kd;
-            inputs.kd = 0.0; // reset input
-            return true;
-        }
-        return false;
-    }
-
   private:
     void print_help()
     {
@@ -144,9 +93,6 @@ template <class Adapter> class SerialInterface
         serial->println("- output [on/off]: enable/disable serial output");
         serial->println(
             "- temp [value]: Set the mock temperature. Used only in debug mode");
-        serial->println("- kp [value]: Set the P gain of the PID controller");
-        serial->println("- ki [value]: Set the I gain of the PID controller");
-        serial->println("- kd [value]: Set the D gain of the PID controller");
         serial->println("**** END ****");
     }
 
@@ -163,11 +109,8 @@ template <class Adapter> class SerialInterface
         bool debug_mode = false;
         bool enable_output = false;
         double mock_temperature = 0.0;
-        double kp = 0.0;
-        double ki = 0.0;
-        double kd = 0.0;
     };
     SerialInput inputs;
 
     BaseSerialInterface *serial;
-}
+};

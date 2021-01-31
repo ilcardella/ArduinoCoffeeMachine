@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Common.h"
-
 class BaseSerialInterface
 {
   public:
@@ -26,32 +24,33 @@ class BaseDisplay
     virtual bool print(const unsigned &col, const unsigned &row, const double &data) = 0;
 };
 
-class BaseHeater
+class IOPin
 {
   public:
-    virtual ~BaseHeater() = default;
+    enum class Modes
+    {
+        IN,
+        IN_PU,
+        OUT
+    };
 
-    virtual bool set(const bool &on) = 0;
+    virtual ~IOPin() = default;
+
+    virtual void set_mode(const Modes &mode) = 0;
+    virtual bool is_high() = 0;
+    virtual bool is_low() = 0;
+    virtual void digital_write_high() = 0;
+    virtual void digital_write_low() = 0;
 };
 
-class BaseModeDetector
+class Controller
 {
   public:
-    virtual ~BaseModeDetector() = default;
+    virtual ~Controller() = default;
 
-    virtual Gaggia::Mode get_mode() = 0;
-};
-
-class BasePIDController
-{
-  public:
-    virtual ~BasePIDController() = default;
-
-    virtual bool compute(const double &input, const double &setpoint, bool *relay_on) = 0;
-
-    virtual void set_kp(const double &kp) = 0;
-    virtual void set_ki(const double &ki) = 0;
-    virtual void set_kd(const double &kd) = 0;
+    virtual void set_output_limits(const double &min, const double &max) = 0;
+    virtual bool compute(const double &input, const double &setpoint, double &output) = 0;
+    virtual bool update_settings(char *raw) = 0;
 };
 
 class BaseSensor

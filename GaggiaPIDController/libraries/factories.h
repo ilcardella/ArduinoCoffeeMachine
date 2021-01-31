@@ -1,13 +1,13 @@
 #pragma once
 
-#include <PID_v1.h>
+#include "SSD1306_ascii_display.h"
+#include "arduino_pid.h"
+#include "arduino_serial.h"
+#include "ktype_thermocouple.h"
+#include "tsic_sensor.h"
 
-#include "ArduinoSerial.h"
-#include "SSD1306AsciiDisplay.h"
-#include "Sensors.h"
-
-#include "coffee_machine/BaseTypes.h"
-#include "coffee_machine/Configuration.h"
+#include "coffee_machine/configuration.h"
+#include "coffee_machine/interfaces.h"
 
 class SensorFactory
 {
@@ -16,7 +16,6 @@ class SensorFactory
     static BaseTemperatureSensor *make_temperature_sensor(const char *name,
                                                           const unsigned char &pin)
     {
-        using namespace sensors;
         switch (type)
         {
         case SensorTypes::TSIC:
@@ -52,13 +51,23 @@ class DisplayFactory
     }
 };
 
-class PIDFactory
+class ControllerFactory
 {
   public:
-    template <class Adapter> static BasePIDController *make_pid_controller()
+    template <class Adapter, TempControllerTypes type>
+    static Controller *make_controller()
     {
-        return new RelayPIDController<Adapter, PID>(
-            Configuration::P_GAIN, Configuration::I_GAIN, Configuration::D_GAIN);
+        switch (type)
+        {
+        case TempControllerTypes::ARDUINO_PID:
+            return new ArduinoPID(Configuration::P_GAIN, Configuration::I_GAIN,
+                                  Configuration::D_GAIN);
+            break;
+        default:
+            // Ideally we would raise an exception here
+            return nullptr;
+            break;
+        }
     }
 };
 
