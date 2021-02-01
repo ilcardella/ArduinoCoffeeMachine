@@ -8,17 +8,21 @@
 #include "mode_detector.h"
 #include "relay_controller.h"
 #include "serial_interface.h"
+#include "temperature_sensor.h"
 
 template <class Adapter> class CoffeeMachine
 {
   public:
     CoffeeMachine(Controller *controller, BaseSerialInterface *serial,
                   IOPin *mode_switch_pin, BaseDisplay *display_type, IOPin *heater_pin,
-                  BaseTemperatureSensor *water_sensor,
-                  BaseTemperatureSensor *steam_sensor)
+                  BaseSensor *water_sensor, BaseSensor *steam_sensor)
         : temp_controller(controller), serial(serial), mode_detector(mode_switch_pin),
-          display(display_type), heater(heater_pin), water_sensor(water_sensor),
-          steam_sensor(steam_sensor), machine_status()
+          display(display_type), heater(heater_pin),
+          water_t_sensor("water_sensor", water_sensor,
+                         Configuration::WATER_TEMP_REFRESH_PERIOD, 10),
+          steam_t_sensor("steam_sensor", steam_sensor,
+                         Configuration::STEAM_TEMP_REFRESH_PERIOD, 10),
+          machine_status()
     {
         // Mark machine start time
         machine_status.time_since_start = Adapter::millis();
@@ -75,9 +79,10 @@ template <class Adapter> class CoffeeMachine
         }
 
         // Select correct sensor for current operation mode
-        BaseTemperatureSensor *sensor =
-            (machine_status.machine_mode == Gaggia::Mode::WATER_MODE) ? water_sensor
-                                                                      : steam_sensor;
+        TemperatureSensor<Adapter> *sensor =
+            (machine_status.machine_mode == Gaggia::Mode::WATER_MODE) ? &water_t_sensor
+                                                                      : &steam_t_sensor;
+
         // Get the current temp from the temperature sensor
         float sensor_value;
         if (not sensor || not sensor->get_temperature_celsius(&sensor_value))
@@ -87,6 +92,10 @@ template <class Adapter> class CoffeeMachine
             return false;
         }
 
+        // Add a static offset due possible reading error
+        sensor_value += (machine_status.machine_mode == Gaggia::Mode::WATER_MODE)
+                            ? Configuration::WATER_TEMP_OFFSET
+                            : Configuration::STEAM_TEMP_OFFSET;
         machine_status.current_temperature = static_cast<double>(sensor_value);
 
         // Use a tolerance of +/- 1Deg for the message
@@ -144,8 +153,8 @@ template <class Adapter> class CoffeeMachine
 
     /////////////////////////////////////////////////////////////////////////////////////
 
-    BaseTemperatureSensor *water_sensor;
-    BaseTemperatureSensor *steam_sensor;
+    TemperatureSensor<Adapter> water_t_sensor;
+    TemperatureSensor<Adapter> steam_t_sensor;
     RelayController<Adapter> temp_controller;
     SerialInterface<Adapter> serial;
     Display<Adapter> display;

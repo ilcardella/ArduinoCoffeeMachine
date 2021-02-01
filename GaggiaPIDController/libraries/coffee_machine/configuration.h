@@ -69,6 +69,6 @@ struct Configuration
     // Configurations for the temperature sensors
     inline static constexpr unsigned long WATER_TEMP_REFRESH_PERIOD = 300; // milliseconds
     inline static constexpr unsigned long STEAM_TEMP_REFRESH_PERIOD = 300; // milliseconds
-    inline static constexpr float TSIC_TEMP_OFFSET = 0;
-    inline static constexpr float KTYPE_TEMP_OFFSET = -12.0f;
+    inline static constexpr float WATER_TEMP_OFFSET = -12.0f; // degree celsius
+    inline static constexpr float STEAM_TEMP_OFFSET = -12.0f; // degree celsius
 };

@@ -63,19 +63,3 @@ class BaseSensor
      */
     virtual bool read_sensor(float *value) = 0;
 };
-
-class BaseTemperatureSensor
-{
-  public:
-    virtual ~BaseTemperatureSensor() = default;
-
-    /** Return the name identifier of the sensor.
-     */
-    virtual char *get_name() = 0;
-
-    /* Read the sensor and store the current temperature in
-     * celsius degrees into 'value'.
-     * Return 'true' if the operation succeeds, 'false' otherwise
-     */
-    virtual bool get_temperature_celsius(float *value) = 0;
-};

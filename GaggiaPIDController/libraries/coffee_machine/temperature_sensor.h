@@ -2,37 +2,34 @@
 
 #include "interfaces.h"
 
-template <class Adapter, class SensorType>
-class TemperatureSensor : public BaseTemperatureSensor
+template <class Adapter> class TemperatureSensor
 {
   public:
-    TemperatureSensor(const char *name, const unsigned char &pin,
+    TemperatureSensor(const char *name, BaseSensor *sensor,
                       const unsigned long read_period,
-                      const unsigned int &moving_avg_size = 1,
-                      const float &temp_offset = 0)
-        : name(name), m_avg(moving_avg_size), time_last_read(Adapter::millis()),
-          healthy(true), read_period(read_period), temp_offset(temp_offset), sensor(pin)
+                      const unsigned int &moving_avg_size = 1)
+        : name(name), sensor(sensor), m_avg(moving_avg_size),
+          time_last_read(Adapter::millis()), healthy(true), read_period(read_period)
     {
     }
 
-    char *get_name() override
+    char *get_name()
     {
         return name;
     }
 
-    bool get_temperature_celsius(float *value) override
+    bool get_temperature_celsius(float *value)
     {
         unsigned long now = Adapter::millis();
         if (now - time_last_read > read_period)
         {
             time_last_read = now;
             float reading;
-            if (not sensor.read_sensor(&reading))
+            if (not sensor->read_sensor(&reading))
             {
                 healthy = false;
                 return false;
             }
-            reading += temp_offset;
 
             healthy = true;
             m_avg.add(reading);
@@ -42,11 +39,10 @@ class TemperatureSensor : public BaseTemperatureSensor
     }
 
   private:
-    SensorType sensor;
+    BaseSensor *sensor;
     char *name;
     unsigned long time_last_read;
     unsigned long read_period;
     MovingAverage<float> m_avg;
     bool healthy;
-    float temp_offset;
 };

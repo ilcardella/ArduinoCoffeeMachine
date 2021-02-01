@@ -16,18 +16,15 @@ void setup()
         SerialFactory::make_serial_interface<Adapter,
                                              Configuration::SERIAL_INTERFACE_TYPE>();
     auto controller =
-        ControllerFactory::make_controller<Adapter,
-                                           Configuration::TEMP_CONTROLLER_TYPE>();
+        ControllerFactory::make_controller<Configuration::TEMP_CONTROLLER_TYPE>();
     auto mode_swith_pin = new ArduinoPin(Configuration::STEAM_SWITCH_PIN);
     auto heater_pin = new ArduinoPin(Configuration::HEATER_SSR_PIN);
     auto water_sensor =
-        SensorFactory::make_temperature_sensor<Adapter,
-                                               Configuration::WATER_TEMP_SENSOR_TYPE>(
-            "water_sensor", Configuration::WATER_TEMP_PIN);
+        SensorFactory::make_temperature_sensor<Configuration::WATER_TEMP_SENSOR_TYPE>(
+            Configuration::WATER_TEMP_PIN);
     auto steam_sensor =
-        SensorFactory::make_temperature_sensor<Adapter,
-                                               Configuration::STEAM_TEMP_SENSOR_TYPE>(
-            "steam_sensor", Configuration::STEAM_TEMP_PIN);
+        SensorFactory::make_temperature_sensor<Configuration::STEAM_TEMP_SENSOR_TYPE>(
+            Configuration::STEAM_TEMP_PIN);
 
     machine = new CoffeeMachine<Adapter>(controller, serial, mode_swith_pin, display,
                                          heater_pin, water_sensor, steam_sensor);

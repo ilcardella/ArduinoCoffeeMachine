@@ -12,18 +12,16 @@
 class SensorFactory
 {
   public:
-    template <class Adapter, SensorTypes type>
-    static BaseTemperatureSensor *make_temperature_sensor(const char *name,
-                                                          const unsigned char &pin)
+    template <SensorTypes type>
+    static BaseSensor *make_temperature_sensor(const unsigned char &pin)
     {
         switch (type)
         {
         case SensorTypes::TSIC:
-            return new TemperatureSensor<Adapter, TSICTempSensor>(name, pin, 300, 10);
+            return new TSICTempSensor(pin);
             break;
         case SensorTypes::KTYPE_SPI:
-            return new TemperatureSensor<Adapter, KTypeThermocouple>(name, pin, 300, 10,
-                                                                     -12.0f);
+            return new KTypeThermocouple(pin);
             break;
         default:
             // Ideally we would raise an exception here
@@ -54,8 +52,7 @@ class DisplayFactory
 class ControllerFactory
 {
   public:
-    template <class Adapter, TempControllerTypes type>
-    static Controller *make_controller()
+    template <TempControllerTypes type> static Controller *make_controller()
     {
         switch (type)
         {
