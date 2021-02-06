@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include "configuration.h"
 #include "display.h"
 #include "heater.h"
 #include "interfaces.h"
@@ -10,7 +9,7 @@
 #include "serial_interface.h"
 #include "temperature_sensor.h"
 
-template <class Adapter> class CoffeeMachine
+template <class Adapter, class Configuration> class CoffeeMachine
 {
   public:
     CoffeeMachine(Controller *controller, BaseSerialInterface *serial,

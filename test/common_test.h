@@ -3,6 +3,7 @@
 #include "gtest/gtest.h"
 
 #include <coffee_machine/coffee_machine.h>
+#include <coffee_machine/default_configuration.h>
 
 #include "mock/mock_controller.h"
 #include "mock/mock_display.h"
@@ -12,6 +13,7 @@
 #include "mock/test_adapter.h"
 
 using Adapter = TestAdapter;
+using Configuration = DefaultConfiguration;
 
 class CommonTest : public ::testing::Test
 {
@@ -24,9 +26,9 @@ class CommonTest : public ::testing::Test
 
     void SetUp() override
     {
-        machine =
-            new CoffeeMachine<Adapter>(&controller, &serial, &mode_switch_pin, &display,
-                                       &heater_pin, &water_sensor, &steam_sensor);
+        machine = new CoffeeMachine<Adapter, Configuration>(
+            &controller, &serial, &mode_switch_pin, &display, &heater_pin, &water_sensor,
+            &steam_sensor);
         creation_time = Adapter::millis();
 
         set_default_mock_environment();
@@ -77,7 +79,7 @@ class CommonTest : public ::testing::Test
     MockIOPin heater_pin;
     MockSensor water_sensor;
     MockSensor steam_sensor;
-    CoffeeMachine<Adapter> *machine = nullptr;
+    CoffeeMachine<Adapter, Configuration> *machine = nullptr;
 
     unsigned long creation_time;
 };
