@@ -6,98 +6,64 @@ class TestTemperatureSensors : public CommonTest
 
 TEST_F(TestTemperatureSensors, testWaterModeHealthySensorHeating)
 {
-    auto machine = make_machine();
-
-    // Mock healthy temp sensor and pid controllerand a "low" temperature
-    mode_switch_pin.pin_status = true;
-    water_sensor.temp_c = 10.0f;
-    water_sensor.healthy = true;
-    // Steam sensor should not be used in this mode
-    steam_sensor.temp_c = 0.0f;
-    steam_sensor.healthy = false;
-    // Controller setting the output on
-    controller.mock_output = controller.max_output;
-    controller.healthy = true;
-
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, std::string("Heating...").c_str()), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, Adapter::millis_ret);
 }
 
 TEST_F(TestTemperatureSensors, testWaterModeHealthySensorCooling)
 {
-    auto machine = make_machine();
+    // Mock an high water temperature
+    water_sensor.temp_c = 100.0f - Configuration::WATER_TEMP_OFFSET;
+    // Mock the controller requesting the relay off
+    controller.set_min_output();
 
-    // Mock healthy temp sensor and pid controller and a "high" temperature
-    mode_switch_pin.pin_status = true;
-    water_sensor.temp_c = 100.0f;
-    water_sensor.healthy = true;
-    // Steam sensor should not be used in this mode
-    steam_sensor.temp_c = 0.0f;
-    steam_sensor.healthy = false;
-    // controller setting off the output
-    controller.mock_output = controller.min_output;
-    controller.healthy = true;
-
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
     ASSERT_EQ(status.current_temperature, 100.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_FALSE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, std::string("Cooling...").c_str()), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, Adapter::millis_ret);
 }
 
 TEST_F(TestTemperatureSensors, testWaterModeHealthySensorStandby)
 {
-    auto machine = make_machine();
+    // Mock the current water temp just on target
+    water_sensor.temp_c =
+        Configuration::TARGET_WATER_TEMP - Configuration::WATER_TEMP_OFFSET;
+    // Mock the controller requesting the relay off
+    controller.set_min_output();
 
-    // Mock healthy temp sensor and pid controller and a "target" temperature
-    mode_switch_pin.pin_status = true;
-    water_sensor.temp_c = Configuration::TARGET_WATER_TEMP;
-    water_sensor.healthy = true;
-    // Steam sensor should not be used in this mode
-    steam_sensor.temp_c = 0.0f;
-    steam_sensor.healthy = false;
-    // controller setting off the output
-    controller.mock_output = controller.min_output;
-    controller.healthy = true;
-
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
     ASSERT_EQ(status.current_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_FALSE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, std::string("Ready").c_str()), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, Adapter::millis_ret);
 }
 
 TEST_F(TestTemperatureSensors, testWaterModeFaultySensor)
 {
-    auto machine = make_machine();
-
-    // Mock healthy temp sensor and pid controller and a "target" temperature
-    mode_switch_pin.pin_status = true;
-    water_sensor.temp_c = Configuration::TARGET_WATER_TEMP;
+    // Mock the current water temp just on target
+    water_sensor.temp_c =
+        Configuration::TARGET_WATER_TEMP - Configuration::WATER_TEMP_OFFSET;
     water_sensor.healthy = false;
-    // Steam sensor should not be used in this mode
-    steam_sensor.temp_c = 0.0f;
-    steam_sensor.healthy = false;
     // Set this to output ON to verify that it does not influence the heater status
-    controller.mock_output = controller.max_output;
-    controller.healthy = true;
+    controller.set_max_output();
 
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
     ASSERT_EQ(status.current_temperature, 0.0);
@@ -106,105 +72,79 @@ TEST_F(TestTemperatureSensors, testWaterModeFaultySensor)
     ASSERT_EQ(
         strcmp(status.status_message, std::string("Temperature sensor fault").c_str()),
         0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, Adapter::millis_ret);
 }
 
 TEST_F(TestTemperatureSensors, testSteamModeHealthySensorHeating)
 {
-    auto machine = make_machine();
+    // Mock the mode button as pressed
+    mode_switch_pin.set_steam_mode();
 
-    // Mock healthy temp sensor and pid controllerand a "low" temperature
-    mode_switch_pin.pin_status = false;
-    steam_sensor.temp_c = 10.0f;
-    steam_sensor.healthy = true;
-    // Water sensor should not be used in this mode
-    water_sensor.temp_c = 0.0f;
-    water_sensor.healthy = false;
-    // controller setting off the output
-    controller.mock_output = controller.max_output;
-    controller.healthy = true;
-
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::STEAM_MODE);
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_TRUE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, std::string("Heating...").c_str()), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, 0.0);
 }
 
 TEST_F(TestTemperatureSensors, testSteamModeHealthySensorCooling)
 {
-    auto machine = make_machine();
+    // Mock the mode button as pressed
+    mode_switch_pin.set_steam_mode();
+    // Mock a high steam temperature
+    steam_sensor.temp_c = 200.0f - Configuration::STEAM_TEMP_OFFSET;
+    // controller requesting the relay as off
+    controller.set_min_output();
 
-    // Mock healthy temp sensor and pid controller and a "high" temperature
-    mode_switch_pin.pin_status = false;
-    steam_sensor.temp_c = 200.0f;
-    steam_sensor.healthy = true;
-    // Water sensor should not be used in this mode
-    water_sensor.temp_c = 0.0f;
-    water_sensor.healthy = false;
-    // controller setting off the output
-    controller.mock_output = controller.min_output;
-    controller.healthy = true;
-
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::STEAM_MODE);
     ASSERT_EQ(status.current_temperature, 200.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_FALSE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, std::string("Cooling...").c_str()), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, 0.0);
 }
 
 TEST_F(TestTemperatureSensors, testSteamModeHealthySensorStandby)
 {
-    auto machine = make_machine();
+    // Mock the mode button as pressed
+    mode_switch_pin.set_steam_mode();
+    // Mock a high steam temperature
+    steam_sensor.temp_c =
+        Configuration::TARGET_STEAM_TEMP - Configuration::STEAM_TEMP_OFFSET;
+    // controller requesting the relay as off
+    controller.set_min_output();
 
-    // Mock healthy temp sensor and pid controller and a "target" temperature
-    mode_switch_pin.pin_status = false;
-    steam_sensor.temp_c = Configuration::TARGET_STEAM_TEMP;
-    steam_sensor.healthy = true;
-    // Water sensor should not be used in this mode
-    water_sensor.temp_c = 0.0f;
-    water_sensor.healthy = false;
-    // controller setting off the output
-    controller.mock_output = controller.min_output;
-    controller.healthy = true;
-
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::STEAM_MODE);
     ASSERT_EQ(status.current_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_FALSE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, std::string("Ready").c_str()), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, 0.0);
 }
 
 TEST_F(TestTemperatureSensors, testSteamModeFaultySensor)
 {
-    auto machine = make_machine();
-
-    // Mock healthy temp sensor and pid controller and a "target" temperature
-    mode_switch_pin.pin_status = false;
-    steam_sensor.temp_c = Configuration::TARGET_STEAM_TEMP;
+    // Mock the mode button as pressed
+    mode_switch_pin.set_steam_mode();
+    // Mock a high steam temperature
+    steam_sensor.temp_c =
+        Configuration::TARGET_STEAM_TEMP - Configuration::STEAM_TEMP_OFFSET;
     steam_sensor.healthy = false;
-    // Water sensor should not be used in this mode
-    water_sensor.temp_c = 0.0f;
-    water_sensor.healthy = false;
-    // Set this to true to verify that it does not influence the heater status
-    // controller setting off the output
-    controller.mock_output = controller.max_output;
-    controller.healthy = true;
+    // Set this to verify that it does not influence the heater status
+    controller.set_max_output();
 
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::STEAM_MODE);
     ASSERT_EQ(status.current_temperature, 0.0);
@@ -213,8 +153,8 @@ TEST_F(TestTemperatureSensors, testSteamModeFaultySensor)
     ASSERT_EQ(
         strcmp(status.status_message, std::string("Temperature sensor fault").c_str()),
         0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, 0.0);
 }
 
 int main(int argc, char *argv[])

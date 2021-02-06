@@ -16,56 +16,10 @@ struct ControlStatus
     bool water_heater_on = false;
     static constexpr unsigned MSG_LEN = 100;
     char status_message[MSG_LEN];
-    unsigned long time_since_start = 0;
-    unsigned long time_since_steam_mode = 0;
+    unsigned long start_timestamp = 0;
+    unsigned long steam_mode_timestamp = 0;
 };
 } // namespace Gaggia
-
-template <typename T> class MovingAverage
-{
-  public:
-    MovingAverage(const unsigned int &window_size)
-        : window_size(window_size), index(0), sum(0)
-    {
-        readings = new T[window_size];
-        reset();
-    }
-
-    ~MovingAverage()
-    {
-        delete readings;
-        readings = nullptr;
-    }
-
-    void add(const T &value)
-    {
-        sum -= readings[index];
-        readings[index] = value;
-        sum += value;
-        index = (++index) % window_size;
-    }
-
-    T get()
-    {
-        return sum / window_size;
-    }
-
-    void reset()
-    {
-        index = 0;
-        sum = 0;
-        for (unsigned i = 0; i < window_size; ++i)
-        {
-            readings[i] = 0;
-        }
-    }
-
-  private:
-    unsigned int window_size;
-    T *readings;
-    unsigned int index;
-    T sum;
-};
 
 namespace string_utils
 {

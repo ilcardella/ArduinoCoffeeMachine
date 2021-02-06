@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interfaces.h"
+#include "moving_average.h"
 
 template <class Adapter> class TemperatureSensor
 {

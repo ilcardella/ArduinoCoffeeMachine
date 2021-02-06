@@ -19,12 +19,13 @@ template <class Adapter> class RelayController
         unsigned short window_progress = Adapter::millis() % WINDOW_SIZE;
 
         // Process the pid output
-        controller->compute(input, setpoint, output);
-
-        // Set the relay status based on the pid output
-        *relay_on = (output >= window_progress);
-
-        return true;
+        if (controller->compute(input, setpoint, output))
+        {
+            // Set the relay status based on the pid output
+            *relay_on = (output >= window_progress);
+            return true;
+        }
+        return false;
     }
 
     // void set_kp(const double &kp)

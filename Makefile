@@ -26,4 +26,7 @@ docs:
 
 ci: build test docs
 
-.PHONY: default build docs ci test build-docker
+clean:
+> rm -rf build
+
+.PHONY: default build docs ci test build-docker clean

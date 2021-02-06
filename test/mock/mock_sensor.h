@@ -13,12 +13,6 @@ class MockSensor : public BaseSensor
         return healthy;
     }
 
-    void reset()
-    {
-        temp_c = 0.0f;
-        healthy = true;
-    }
-
     float temp_c = 0.0f;
     bool healthy = true;
 };

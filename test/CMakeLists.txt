@@ -18,7 +18,8 @@ target_compile_definitions(gtest
 enable_testing()
 include(GoogleTest)
 
+gaggia_add_gtest("test_moving_average")
 gaggia_add_gtest("test_temperature_sensors")
-gaggia_add_gtest("test_pid_controller")
+gaggia_add_gtest("test_temperature_controller")
 gaggia_add_gtest("test_safety_timeouts")
 gaggia_add_gtest("test_serial_interface")

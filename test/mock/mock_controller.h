@@ -24,10 +24,14 @@ class MockController : public Controller
         return healthy;
     }
 
-    void reset()
+    void set_max_output()
     {
-        healthy = true;
-        mock_output = 0.0;
+        mock_output = max_output;
+    }
+
+    void set_min_output()
+    {
+        mock_output = min_output;
     }
 
     bool healthy = true;

@@ -29,7 +29,12 @@ class MockIOPin : public IOPin
     {
     }
 
-    void reset()
+    void set_water_mode()
+    {
+        pin_status = true;
+    }
+
+    void set_steam_mode()
     {
         pin_status = false;
     }

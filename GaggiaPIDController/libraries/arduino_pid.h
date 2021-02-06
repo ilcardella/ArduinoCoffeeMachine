@@ -23,9 +23,12 @@ class ArduinoPID : public Controller
     {
         pid_input = input;
         pid_setpoint = setpoint;
-        bool result = pid.Compute();
-        output = pid_output;
-        return result;
+        if (pid.Compute())
+        {
+            output = pid_output;
+            return true;
+        }
+        return false;
     }
 
     bool update_settings(char *raw) override

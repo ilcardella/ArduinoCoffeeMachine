@@ -25,8 +25,8 @@ template <class Adapter> class CoffeeMachine
           machine_status()
     {
         // Mark machine start time
-        machine_status.time_since_start = Adapter::millis();
-        machine_status.time_since_steam_mode = Adapter::millis();
+        machine_status.start_timestamp = Adapter::millis();
+        machine_status.steam_mode_timestamp = Adapter::millis();
     }
 
     Gaggia::ControlStatus spin()
@@ -60,7 +60,7 @@ template <class Adapter> class CoffeeMachine
         // Reset steam mode timeout counter when not in steam mode
         if (machine_status.machine_mode != Gaggia::Mode::STEAM_MODE)
         {
-            machine_status.time_since_steam_mode = now;
+            machine_status.steam_mode_timestamp = now;
         }
 
         // Set target temperature based on machine mode
@@ -84,7 +84,7 @@ template <class Adapter> class CoffeeMachine
                                                                       : &steam_t_sensor;
 
         // Get the current temp from the temperature sensor
-        float sensor_value;
+        float sensor_value(0.0f);
         if (not sensor || not sensor->get_temperature_celsius(&sensor_value))
         {
             strncpy(machine_status.status_message,
@@ -120,7 +120,7 @@ template <class Adapter> class CoffeeMachine
         // If the machine has been on for more than the safety limit, then report a
         // problem so the heater will be turned off
         if (Configuration::SAFETY_TIMEOUT > 0 &&
-            (now - machine_status.time_since_start) > Configuration::SAFETY_TIMEOUT)
+            (now - machine_status.start_timestamp) > Configuration::SAFETY_TIMEOUT)
         {
             strncpy(machine_status.status_message,
                     string_utils::strings::SAFETY_TIMEOUT_EXPIRED,
@@ -130,7 +130,7 @@ template <class Adapter> class CoffeeMachine
         // Check steam mode timeout to avoid keeping the machine at high temps for
         // long
         if (Configuration::STEAM_TIMEOUT > 0 &&
-            (now - machine_status.time_since_steam_mode) > Configuration::STEAM_TIMEOUT)
+            (now - machine_status.steam_mode_timestamp) > Configuration::STEAM_TIMEOUT)
         {
             strncpy(machine_status.status_message,
                     string_utils::strings::STEAM_TIMEOUT_EXPIRED, machine_status.MSG_LEN);

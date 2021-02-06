@@ -24,24 +24,50 @@ class CommonTest : public ::testing::Test
 
     void SetUp() override
     {
-        serial.reset();
-        controller.reset();
-        mode_switch_pin.reset();
-        heater_pin.reset();
-        water_sensor.reset();
-        steam_sensor.reset();
+        machine =
+            new CoffeeMachine<Adapter>(&controller, &serial, &mode_switch_pin, &display,
+                                       &heater_pin, &water_sensor, &steam_sensor);
         creation_time = Adapter::millis();
+
+        set_default_mock_environment();
+
+        time_step();
     }
 
-    CoffeeMachine<Adapter> make_machine()
+    void TearDown() override
     {
-        return CoffeeMachine<Adapter>(&controller, &serial, &mode_switch_pin, &display,
-                                      &heater_pin, &water_sensor, &steam_sensor);
+        delete machine;
+        machine = nullptr;
     }
 
-    unsigned long normalize_time(const double &time)
+    /**
+     * @brief Set the default mock environment
+     *
+     */
+    void set_default_mock_environment()
     {
-        return time - creation_time;
+        // pin_status true means the button is not pressed
+        mode_switch_pin.pin_status = true;
+        // Healthy water sensor and low temperature
+        water_sensor.temp_c = 10.0f - Configuration::WATER_TEMP_OFFSET;
+        water_sensor.healthy = true;
+        // Healthy steam sensor and low temperature
+        steam_sensor.temp_c = 10.0f - Configuration::STEAM_TEMP_OFFSET;
+        steam_sensor.healthy = true;
+        // Healthy controller returning the max pwm value (= relay on)
+        controller.mock_output = controller.max_output;
+        controller.healthy = true;
+        // Serial without inputs available
+        serial.input_available = false;
+    }
+
+    /**
+     * @brief Simulate the time passing by adding 500 ms to the return value of
+     * Adapter::millis()
+     */
+    void time_step()
+    {
+        Adapter::millis_ret += 500;
     }
 
     MockDisplay display;
@@ -51,6 +77,7 @@ class CommonTest : public ::testing::Test
     MockIOPin heater_pin;
     MockSensor water_sensor;
     MockSensor steam_sensor;
+    CoffeeMachine<Adapter> *machine = nullptr;
 
     unsigned long creation_time;
 };

@@ -13,27 +13,27 @@ class MockSerial : public BaseSerialInterface
 
     int available() override
     {
-        return 1;
+        return input_available ? 1 : 0;
     }
 
     void read_string_until(const char &terminator, char *data) override
     {
-        read_input_called = true;
-        strncpy(data, input_string, 100);
+        strcpy(data, input_string);
     }
 
     size_t println(const char *value) override
     {
-        strncpy(output_string, value, 100);
+        strcpy(output_string, value);
         return strlen(value);
     }
 
-    void reset()
+    void set_mock_input(const char *data)
     {
-        read_input_called = false;
+        input_available = true;
+        strcpy(input_string, data);
     }
 
+    bool input_available = false;
     char input_string[100];
     char output_string[100];
-    bool read_input_called = false;
 };
