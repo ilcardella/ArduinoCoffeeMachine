@@ -1,10 +1,9 @@
 #pragma once
 
-// #include <chrono>
 #include <string>
 #include <unistd.h>
 
-class CppAdapter
+class TestAdapter
 {
   public:
     inline static void pinMode(uint8_t pin, uint8_t mode)

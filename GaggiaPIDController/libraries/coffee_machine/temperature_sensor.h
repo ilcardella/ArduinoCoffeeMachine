@@ -40,7 +40,7 @@ template <class Adapter> class TemperatureSensor
 
   private:
     BaseSensor *sensor;
-    char *name;
+    const char *name;
     unsigned long time_last_read;
     unsigned long read_period;
     MovingAverage<float> m_avg;

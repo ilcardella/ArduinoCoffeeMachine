@@ -20,6 +20,7 @@ class Heater
         {
             pin->digital_write_low();
         }
+        return true;
     }
 
   private:

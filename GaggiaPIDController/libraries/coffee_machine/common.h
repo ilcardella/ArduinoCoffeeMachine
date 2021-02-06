@@ -37,7 +37,7 @@ template <typename T> class MovingAverage
         readings = nullptr;
     }
 
-    T add(const T &value)
+    void add(const T &value)
     {
         sum -= readings[index];
         readings[index] = value;

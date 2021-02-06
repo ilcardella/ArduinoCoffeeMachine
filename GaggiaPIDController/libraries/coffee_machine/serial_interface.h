@@ -57,7 +57,8 @@ template <class Adapter> class SerialInterface
         auto now = Adapter::millis();
         if (is_output_enabled() && now - time_last_print > PRINT_TIMEOUT)
         {
-            char output[100];
+            unsigned limit(100);
+            char output[limit];
             char curr_temp_buffer[6];
             char target_temp_buffer[6];
 
@@ -66,9 +67,9 @@ template <class Adapter> class SerialInterface
             Adapter::dtostrf(status.current_temperature, 4, 1, curr_temp_buffer);
             Adapter::dtostrf(status.target_temperature, 4, 1, target_temp_buffer);
 
-            snprintf(output, 100, "%d,%s,%s,%d,%s", static_cast<int>(status.machine_mode),
-                     curr_temp_buffer, target_temp_buffer, status.water_heater_on,
-                     status.status_message);
+            snprintf(output, limit - 1, "%d,%s,%s,%d,%s",
+                     static_cast<int>(status.machine_mode), curr_temp_buffer,
+                     target_temp_buffer, status.water_heater_on, status.status_message);
             serial->println(output);
         }
     }
