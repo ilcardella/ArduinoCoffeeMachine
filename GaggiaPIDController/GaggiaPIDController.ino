@@ -3,31 +3,26 @@
 #include "libraries/factories.h"
 
 #include "libraries/coffee_machine/coffee_machine.h"
-#include "libraries/coffee_machine/interfaces.h"
+#include "libraries/coffee_machine/default_configuration.h"
 
 using Adapter = ArduinoAdapter;
+using Configuration = DefaultConfiguration;
 
-CoffeeMachine<Adapter> *machine;
+CoffeeMachine<Adapter, Configuration> *machine;
 
 void setup()
 {
-    auto display = DisplayFactory::make_display<Adapter, Configuration::DISPLAY_TYPE>();
-    auto serial =
-        SerialFactory::make_serial_interface<Adapter,
-                                             Configuration::SERIAL_INTERFACE_TYPE>();
-    auto controller =
-        ControllerFactory::make_controller<Configuration::TEMP_CONTROLLER_TYPE>();
+    auto display = DisplayFactory::make_display<Adapter, Configuration>();
+    auto serial = SerialFactory::make_serial_interface<Adapter, Configuration>();
+    auto controller = ControllerFactory::make_controller<Configuration>();
     auto mode_swith_pin = new ArduinoPin(Configuration::STEAM_SWITCH_PIN);
     auto heater_pin = new ArduinoPin(Configuration::HEATER_SSR_PIN);
-    auto water_sensor =
-        SensorFactory::make_temperature_sensor<Configuration::WATER_TEMP_SENSOR_TYPE>(
-            Configuration::WATER_TEMP_PIN);
-    auto steam_sensor =
-        SensorFactory::make_temperature_sensor<Configuration::STEAM_TEMP_SENSOR_TYPE>(
-            Configuration::STEAM_TEMP_PIN);
+    auto water_sensor = SensorFactory::make_water_temperature_sensor<Configuration>();
+    auto steam_sensor = SensorFactory::make_steam_temperature_sensor<Configuration>();
 
-    machine = new CoffeeMachine<Adapter>(controller, serial, mode_swith_pin, display,
-                                         heater_pin, water_sensor, steam_sensor);
+    machine = new CoffeeMachine<Adapter, Configuration>(
+        controller, serial, mode_swith_pin, display, heater_pin, water_sensor,
+        steam_sensor);
 
     // Allow sensors to initialise
     Adapter::delay(500);

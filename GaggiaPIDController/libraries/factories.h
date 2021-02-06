@@ -6,22 +6,36 @@
 #include "ktype_thermocouple.h"
 #include "tsic_sensor.h"
 
-#include "coffee_machine/configuration.h"
 #include "coffee_machine/interfaces.h"
 
 class SensorFactory
 {
   public:
-    template <SensorTypes type>
-    static BaseSensor *make_temperature_sensor(const unsigned char &pin)
+    template <class Configuration> static BaseSensor *make_water_temperature_sensor()
+    {
+        return make_temperature_sensor<Configuration>(
+            Configuration::WATER_TEMP_SENSOR_TYPE, Configuration::WATER_TEMP_PIN);
+    }
+
+    template <class Configuration> static BaseSensor *make_steam_temperature_sensor()
+    {
+        return make_temperature_sensor<Configuration>(
+            Configuration::STEAM_TEMP_SENSOR_TYPE, Configuration::STEAM_TEMP_PIN);
+    }
+
+  private:
+    template <class Configuration>
+    static BaseSensor *make_temperature_sensor(typename Configuration::SensorTypes type,
+                                               const unsigned char &pin)
     {
         switch (type)
         {
-        case SensorTypes::TSIC:
+        case Configuration::SensorTypes::TSIC:
             return new TSICTempSensor(pin);
             break;
-        case SensorTypes::KTYPE_SPI:
-            return new KTypeThermocouple(pin);
+        case Configuration::SensorTypes::KTYPE_SPI:
+            return new KTypeThermocouple(pin, Configuration::SPI_CLK_PIN,
+                                         Configuration::SPI_DO_PIN);
             break;
         default:
             // Ideally we would raise an exception here
@@ -34,11 +48,11 @@ class SensorFactory
 class DisplayFactory
 {
   public:
-    template <class Adapter, DisplayTypes type> static BaseDisplay *make_display()
+    template <class Adapter, class Configuration> static BaseDisplay *make_display()
     {
-        switch (type)
+        switch (Configuration::DISPLAY_TYPE)
         {
-        case DisplayTypes::SSD1306_128x64:
+        case Configuration::DisplayTypes::SSD1306_128x64:
             return new SSD1306AsciiDisplay<Adapter>();
             break;
         default:
@@ -52,11 +66,11 @@ class DisplayFactory
 class ControllerFactory
 {
   public:
-    template <TempControllerTypes type> static Controller *make_controller()
+    template <class Configuration> static Controller *make_controller()
     {
-        switch (type)
+        switch (Configuration::TEMP_CONTROLLER_TYPE)
         {
-        case TempControllerTypes::ARDUINO_PID:
+        case Configuration::TempControllerTypes::ARDUINO_PID:
             return new ArduinoPID(Configuration::P_GAIN, Configuration::I_GAIN,
                                   Configuration::D_GAIN);
             break;
@@ -71,12 +85,12 @@ class ControllerFactory
 class SerialFactory
 {
   public:
-    template <class Adapter, SerialTypes type>
+    template <class Adapter, class Configuration>
     static BaseSerialInterface *make_serial_interface()
     {
-        switch (type)
+        switch (Configuration::SERIAL_INTERFACE_TYPE)
         {
-        case SerialTypes::ARDUINO_SERIAL:
+        case Configuration::SerialTypes::ARDUINO_SERIAL:
             return new ArduinoSerial<Adapter>(Configuration::SERIAL_BAUDRATE);
             break;
         default:

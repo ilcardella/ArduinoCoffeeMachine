@@ -11,6 +11,7 @@
 ### Changed
 - Reformat of the `TemperatureSensor` class using template for sensor implementation
 - Replaced use of Arduino String with char array
+- Configuration for coffee_machine library is provided through a template argument
 
 ### Fixed
 - Resolved crash due to String assignments

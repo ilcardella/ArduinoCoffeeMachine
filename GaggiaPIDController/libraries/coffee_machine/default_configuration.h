@@ -1,28 +1,28 @@
 #pragma once
 
-enum class SensorTypes
+struct DefaultConfiguration
 {
-    TSIC,     // TSic sensor family
-    KTYPE_SPI // K-type thermocouple with SPI interface
-};
+    enum class SensorTypes
+    {
+        TSIC,     // TSic sensor family
+        KTYPE_SPI // K-type thermocouple with SPI interface
+    };
 
-enum class DisplayTypes
-{
-    SSD1306_128x64
-};
+    enum class DisplayTypes
+    {
+        SSD1306_128x64
+    };
 
-enum class SerialTypes
-{
-    ARDUINO_SERIAL
-};
+    enum class SerialTypes
+    {
+        ARDUINO_SERIAL
+    };
 
-enum class TempControllerTypes
-{
-    ARDUINO_PID
-};
+    enum class TempControllerTypes
+    {
+        ARDUINO_PID
+    };
 
-struct Configuration
-{
     inline static constexpr SensorTypes WATER_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
     inline static constexpr SensorTypes STEAM_TEMP_SENSOR_TYPE = SensorTypes::KTYPE_SPI;
 
