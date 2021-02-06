@@ -1,149 +1,90 @@
-#include "CommonTest.h"
+#include "common_test.h"
 
 class TestSerialInterface : public CommonTest
 {
 };
 
-TEST_F(TestSerialInterface, testSerialReadsInputsAndSendStatus)
+TEST_F(TestSerialInterface, testSerialEnableAndDisableOutputStatus)
 {
-    // Mock healthy temp sensor, pid controller and a "low" temperature
-    mode_detector.mode = Gaggia::Mode::WATER_MODE;
-    water_sensor.temp_c = 10.0f;
-    water_sensor.healthy = true;
-    // Steam sensor should not be used in this mode
-    steam_sensor.temp_c = 0.0f;
-    steam_sensor.healthy = false;
-    pid.relay = true;
-    pid.healthy = true;
-
-    auto machine = make_machine();
-    auto status = machine.spin();
+    auto status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, Adapter::millis_ret);
+    // Verify that nothing was sent out on the serial output
+    ASSERT_EQ(strlen(serial.output_string), 0);
 
-    // Verify the read_input() is called
-    ASSERT_TRUE(serial.read_input_called);
-    serial.read_input_called = false; // reset
+    // Mock the input to enable the serial output
+    serial.set_mock_input("output on");
 
-    status = machine.spin();
-    // Verify the read_input() is called
-    ASSERT_TRUE(serial.read_input_called);
+    status = machine->spin();
 
-    // Verify the status request to send is correct and the same as returned by the spin()
+    // Verify the status request to send
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
     ASSERT_EQ(status.current_temperature, 10.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
-    ASSERT_EQ(serial.status_to_send.machine_mode, Gaggia::Mode::WATER_MODE);
-    ASSERT_EQ(serial.status_to_send.current_temperature, 10.0);
-    ASSERT_EQ(serial.status_to_send.target_temperature, Configuration::TARGET_WATER_TEMP);
-    ASSERT_TRUE(serial.status_to_send.water_heater_on);
-    ASSERT_EQ(strcmp(serial.status_to_send.status_message, "Heating..."), 0);
-    ASSERT_EQ(normalize_time(serial.status_to_send.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(serial.status_to_send.time_since_steam_mode), 0.0);
-
-    // TODO test output of serial interface
-    // ASSERT_EQ(strcmp(Adapter::message_sent, "1,0.0,95.0,1,Heating..."), 0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, Adapter::millis_ret);
+    // Verify message requested as output
+    ASSERT_EQ(strcmp(serial.output_string, "0,10.0,95.0,1,Heating..."), 0);
 }
 
 TEST_F(TestSerialInterface, testSerialDebugMode)
 {
-    // Mock healthy temp sensor, pid controller and a "low" temperature
-    mode_detector.mode = Gaggia::Mode::WATER_MODE;
-    water_sensor.temp_c = 10.0f;
-    water_sensor.healthy = true;
-    // Steam sensor should not be used in this mode
-    steam_sensor.temp_c = 0.0f;
-    steam_sensor.healthy = false;
-    pid.relay = true;
-    pid.healthy = true;
+    // Mock the input to enable the serial output
+    serial.set_mock_input("output on");
 
-    auto machine = make_machine();
-    auto status = machine.spin();
+    auto status = machine->spin();
 
-    ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
-    ASSERT_EQ(status.current_temperature, 10.0);
-    ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
-    ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    // Enable debug mode to verify the returned temperature is the mock one
+    serial.set_mock_input("debug on");
 
-    // Enable debug mode and verify the returned temperature is the mock one
-    serial.debug_on = true;
-    // Sensor should not be used anyway in debug mode
-    water_sensor.healthy = false;
+    status = machine->spin();
 
-    status = machine.spin();
+    // Set the mock temperature
+    serial.set_mock_input("temp 37");
+
+    status = machine->spin();
+
+    // The serial output is paced so we need to mock time passing
+    time_step();
+
+    status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
-    ASSERT_EQ(status.current_temperature, 42.0);
+    ASSERT_EQ(status.current_temperature, 37.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
     ASSERT_TRUE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, "Debug mode"), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, Adapter::millis_ret);
+    // Verify message requested as output
+    ASSERT_EQ(strcmp(serial.output_string, "0,37.0,95.0,1,Debug mode"), 0);
 
-    mode_detector.mode = Gaggia::Mode::STEAM_MODE;
-    status = machine.spin();
+    // Change to STEAM mode to verify the status is updated
+    mode_switch_pin.set_steam_mode();
+    auto steam_mode_ts = Adapter::millis_ret;
+
+    // The serial output is paced so we need to mock time passing
+    time_step();
+
+    status = machine->spin();
 
     ASSERT_EQ(status.machine_mode, Gaggia::Mode::STEAM_MODE);
-    ASSERT_EQ(status.current_temperature, 42.0);
+    ASSERT_EQ(status.current_temperature, 37.0);
     ASSERT_EQ(status.target_temperature, Configuration::TARGET_STEAM_TEMP);
     ASSERT_TRUE(status.water_heater_on);
     ASSERT_EQ(strcmp(status.status_message, "Debug mode"), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
-}
-
-TEST_F(TestSerialInterface, testSerialPIDGainsInputs)
-{
-    // Mock healthy temp sensor, pid controller and a "low" temperature
-    mode_detector.mode = Gaggia::Mode::WATER_MODE;
-    water_sensor.temp_c = 10.0f;
-    water_sensor.healthy = true;
-    // Steam sensor should not be used in this mode
-    steam_sensor.temp_c = 0.0f;
-    steam_sensor.healthy = false;
-    pid.relay = true;
-    pid.healthy = true;
-
-    auto machine = make_machine();
-    auto status = machine.spin();
-
-    ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
-    ASSERT_EQ(status.current_temperature, 10.0);
-    ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
-    ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
-
-    // Simulate PID gains coming from serial interface
-    serial.kp_in = 31.0;
-    serial.ki_in = 32.0;
-    serial.kd_in = 32.0;
-    status = machine.spin();
-
-    ASSERT_EQ(status.machine_mode, Gaggia::Mode::WATER_MODE);
-    ASSERT_EQ(status.current_temperature, 10.0);
-    ASSERT_EQ(status.target_temperature, Configuration::TARGET_WATER_TEMP);
-    ASSERT_TRUE(status.water_heater_on);
-    ASSERT_EQ(strcmp(status.status_message, "Heating..."), 0);
-    ASSERT_EQ(normalize_time(status.time_since_start), 0.0);
-    ASSERT_EQ(normalize_time(status.time_since_steam_mode), 0.0);
-    ASSERT_EQ(serial.kp_in, pid.kp);
-    ASSERT_EQ(serial.ki_in, pid.ki);
-    ASSERT_EQ(serial.kd_in, pid.kd);
+    ASSERT_EQ(status.start_timestamp, 0.0);
+    ASSERT_EQ(status.steam_mode_timestamp, steam_mode_ts);
+    // Verify message requested as output
+    ASSERT_EQ(strcmp(serial.output_string, "1,37.0,145.0,1,Debug mode"), 0);
 }
 
 int main(int argc, char *argv[])

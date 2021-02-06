@@ -1,35 +1,9 @@
 #pragma once
 
-#include "coffee_machine/BaseTypes.h"
-#include "coffee_machine/Configuration.h"
+#include "coffee_machine/interfaces.h"
 
+// #include <Arduino.h>
 #include <TSIC.h>
-#include <max6675.h>
-
-namespace sensors
-{
-class KTypeThermocouple : public BaseSensor
-{
-  public:
-    KTypeThermocouple(const unsigned char &pin)
-        : sensor(Configuration::SPI_CLK_PIN, pin, Configuration::SPI_DO_PIN)
-    {
-    }
-
-    bool read_sensor(float *value) override
-    {
-        float reading = sensor.readCelsius();
-        if (reading == NAN)
-        {
-            return false;
-        }
-        *value = reading;
-        return true;
-    }
-
-  private:
-    MAX6675 sensor;
-};
 
 class TSICTempSensor : public BaseSensor
 {
@@ -69,4 +43,3 @@ class TSICTempSensor : public BaseSensor
   private:
     TSIC sensor;
 };
-} // namespace sensors
