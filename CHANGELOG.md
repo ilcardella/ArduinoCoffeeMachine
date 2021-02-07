@@ -16,6 +16,7 @@
 ### Fixed
 - Resolved crash due to String assignments
 - Fixed print formatting of float and double
+- Fixed bug in MovingAverage affected by the creation of an instance with 0 history length
 
 ## [1.1.0] - 2020-08-22
 ### Added

@@ -8,7 +8,7 @@ template <typename T> class MovingAverage
     }
 
     MovingAverage(const unsigned int &window_size)
-        : window((window_size < 1) ? 1 : window_size), readings(new T[window_size]),
+        : window((window_size < 1) ? 1 : window_size), readings(new T[window]),
           invalid_cells(window)
     {
         reset();
