@@ -2,8 +2,8 @@
 #include "libraries/arduino_pin.h"
 #include "libraries/factories.h"
 
-#include "libraries/coffee_machine/coffee_machine.h"
-#include "libraries/coffee_machine/default_configuration.h"
+#include "libraries/lib_coffee_machine/src/lib_coffee_machine/coffee_machine.h"
+#include "libraries/lib_coffee_machine/src/lib_coffee_machine/default_configuration.h"
 
 using Adapter = ArduinoAdapter;
 using Configuration = DefaultConfiguration;

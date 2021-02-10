@@ -6,7 +6,7 @@
 #include "ktype_thermocouple.h"
 #include "tsic_sensor.h"
 
-#include "coffee_machine/interfaces.h"
+#include "lib_coffee_machine/src/lib_coffee_machine/interfaces.h"
 
 class SensorFactory
 {

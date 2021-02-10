@@ -1,6 +1,6 @@
 #pragma once
 
-#include "coffee_machine/interfaces.h"
+#include "lib_coffee_machine/src/lib_coffee_machine/interfaces.h"
 
 #include <max6675.h>
 
