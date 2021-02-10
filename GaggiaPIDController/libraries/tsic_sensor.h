@@ -2,7 +2,6 @@
 
 #include "coffee_machine/interfaces.h"
 
-// #include <Arduino.h>
 #include <TSIC.h>
 
 class TSICTempSensor : public BaseSensor

@@ -3,8 +3,9 @@
 #include "coffee_machine/interfaces.h"
 
 #include <SSD1306AsciiWire.h>
+#include <Wire.h>
 
-template <class Adapter> class SSD1306AsciiDisplay : public BaseDisplay
+class SSD1306AsciiDisplay : public BaseDisplay
 {
   public:
     SSD1306AsciiDisplay()
@@ -13,8 +14,8 @@ template <class Adapter> class SSD1306AsciiDisplay : public BaseDisplay
 
     bool initialise() override
     {
-        Adapter::WireBegin();
-        Adapter::WireSetClock(400000L);
+        Wire.begin();
+        Wire.setClock(400000L);
         display.begin(&Adafruit128x64, 0x3C);
         display.setFont(Adafruit5x7);
         clear();
