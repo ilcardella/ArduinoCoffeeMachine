@@ -1,9 +1,9 @@
 #pragma once
 
-#include "coffee_machine/interfaces.h"
+#include "lib_coffee_machine/src/lib_coffee_machine/interfaces.h"
 #include <Arduino.h>
 
-template <class Adapter> class ArduinoSerial : public BaseSerialInterface
+class ArduinoSerial : public BaseSerialInterface
 {
   public:
     ArduinoSerial(const unsigned short &baudrate)

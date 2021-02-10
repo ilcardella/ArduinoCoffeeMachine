@@ -18,15 +18,12 @@ build-docker:
 build: build-docker
 > $(DOCKER_RUN) arduino-builder scripts/build-project.sh  $(CORE) $(BOARD)
 
-test: build-docker
-> $(DOCKER_RUN) arduino-builder scripts/test-project.sh
-
 docs:
 > $(DOCKER_COMPOSE) --exit-code-from docs-builder docs-builder
 
-ci: build test docs
+ci: build docs
 
 clean:
 > rm -rf build
 
-.PHONY: default build docs ci test build-docker clean
+.PHONY: default build docs ci build-docker clean

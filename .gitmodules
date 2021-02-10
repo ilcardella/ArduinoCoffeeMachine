@@ -1,3 +1,3 @@
-[submodule "test/third_party/googletest"]
-	path = test/third_party/googletest
-	url = https://github.com/google/googletest.git
+[submodule "GaggiaPIDController/libraries/lib_coffee_machine"]
+	path = GaggiaPIDController/libraries/lib_coffee_machine
+	url = https://github.com/ilcardella/lib_coffee_machine

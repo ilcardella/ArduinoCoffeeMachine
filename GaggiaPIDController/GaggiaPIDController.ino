@@ -2,8 +2,8 @@
 #include "libraries/arduino_pin.h"
 #include "libraries/factories.h"
 
-#include "libraries/coffee_machine/coffee_machine.h"
-#include "libraries/coffee_machine/default_configuration.h"
+#include "libraries/lib_coffee_machine/src/lib_coffee_machine/coffee_machine.h"
+#include "libraries/lib_coffee_machine/src/lib_coffee_machine/default_configuration.h"
 
 using Adapter = ArduinoAdapter;
 using Configuration = DefaultConfiguration;
@@ -12,8 +12,8 @@ CoffeeMachine<Adapter, Configuration> *machine;
 
 void setup()
 {
-    auto display = DisplayFactory::make_display<Adapter, Configuration>();
-    auto serial = SerialFactory::make_serial_interface<Adapter, Configuration>();
+    auto display = DisplayFactory::make_display<Configuration>();
+    auto serial = SerialFactory::make_serial_interface<Configuration>();
     auto controller = ControllerFactory::make_controller<Configuration>();
     auto mode_swith_pin = new ArduinoPin(Configuration::STEAM_SWITCH_PIN);
     auto heater_pin = new ArduinoPin(Configuration::HEATER_SSR_PIN);
@@ -25,7 +25,7 @@ void setup()
         steam_sensor);
 
     // Allow sensors to initialise
-    Adapter::delay(500);
+    delay(500);
 }
 
 void loop()
@@ -36,7 +36,7 @@ void loop()
     }
     else
     {
-        Adapter::SerialPrintln("Error initialising coffee machine");
-        Adapter::delay(1000);
+        Serial.println("Error initialising coffee machine");
+        delay(1000);
     }
 }

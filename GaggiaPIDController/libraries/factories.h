@@ -6,7 +6,7 @@
 #include "ktype_thermocouple.h"
 #include "tsic_sensor.h"
 
-#include "coffee_machine/interfaces.h"
+#include "lib_coffee_machine/src/lib_coffee_machine/interfaces.h"
 
 class SensorFactory
 {
@@ -48,12 +48,12 @@ class SensorFactory
 class DisplayFactory
 {
   public:
-    template <class Adapter, class Configuration> static BaseDisplay *make_display()
+    template <class Configuration> static BaseDisplay *make_display()
     {
         switch (Configuration::DISPLAY_TYPE)
         {
         case Configuration::DisplayTypes::SSD1306_128x64:
-            return new SSD1306AsciiDisplay<Adapter>();
+            return new SSD1306AsciiDisplay();
             break;
         default:
             // Ideally we would raise an exception here
@@ -85,13 +85,12 @@ class ControllerFactory
 class SerialFactory
 {
   public:
-    template <class Adapter, class Configuration>
-    static BaseSerialInterface *make_serial_interface()
+    template <class Configuration> static BaseSerialInterface *make_serial_interface()
     {
         switch (Configuration::SERIAL_INTERFACE_TYPE)
         {
         case Configuration::SerialTypes::ARDUINO_SERIAL:
-            return new ArduinoSerial<Adapter>(Configuration::SERIAL_BAUDRATE);
+            return new ArduinoSerial(Configuration::SERIAL_BAUDRATE);
             break;
         default:
             // Ideally we would raise an exception here
