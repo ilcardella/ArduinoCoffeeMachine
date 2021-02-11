@@ -1,0 +1,3 @@
+[submodule "CoffeeMachine/libraries/lib_coffee_machine"]
+	path = CoffeeMachine/libraries/lib_coffee_machine
+	url = https://github.com/ilcardella/lib_coffee_machine
