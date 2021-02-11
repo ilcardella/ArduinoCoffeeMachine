@@ -1,17 +1,13 @@
-# Gaggia PID Controller [![Documentation Status](https://readthedocs.org/projects/gaggiapidcontroller/badge/?version=latest)](https://gaggiapidcontroller.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://travis-ci.com/ilcardella/GaggiaPIDController.svg?branch=master)](https://travis-ci.com/ilcardella/GaggiaPIDController)
+# Arduino Coffee Machine [![Documentation Status](https://readthedocs.org/projects/gaggiapidcontroller/badge/?version=latest)](https://gaggiapidcontroller.readthedocs.io/en/latest/?badge=latest)
 
 This project is a PID controller for a `Gaggia Paros` (or Gaggia Classic) coffee machine using Arduino and a few other components.
 This Arduino based controller improves the stability of the water temperature of the coffee machine by controlling the boiler with a PID control loop feedback.
 
 ## Software
 
-The codebase is mainly C++ and it's designed to isolate the Arduino specific parts in
-implementation details classes.
-Most of the components are template classes that accept an `Adapter` type as parameter.
-This `Adapter` class allows to abstract the Arduino specific features requiring Arduino
-specific headers and libraries.
-The goal and the benefit of this is to allow the creation of a C++ library of
-the non-Arduino dependant code adding automated unit testing in CI.
+This project is based on [lib_coffee_machine](https://github.com/ilcardella/lib_coffee_machine) which is a C++ library providing an abstraction of a generic coffee machine.
+
+This project implements the library interfaces targeting an Arduino Nano platform and several sensors and displays.
 
 ### Arduino libraries
 
@@ -21,21 +17,15 @@ This project depends on the following Arduino libraries:
 - [SDD1306Ascii](https://github.com/greiman/SSD1306Ascii)
 - [MAX6675](https://github.com/adafruit/MAX6675-library)
 
-### Configuration
-
-The code configuration is contained in a "static" `struct` in the file `Configuration.h`.
-To change the default configuration just edit the default value of the desired parameter.
-
 ### Makefile
 
-The `Makefile` at the project root is the entrypoint for development actions such as
-build, test and build the docs.
+The `Makefile` at the project root directory provides targets to build the code and the documentation.
 
 ### Build
 
 You can build the code with different approaches:
-- with the Arduino IDE opening the `GaggiaPIDController.ino` sketch
-- with VSCode and the [Arduino extension](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino) opening the `GaggiaPIDController.ino` sketch
+- with the Arduino IDE opening the `CoffeeMachine.ino` sketch
+- with VSCode and the [Arduino extension](https://marketplace.visualstudio.com/items?itemName=vsciot-vscode.vscode-arduino) opening the `CoffeeMachine.ino` sketch
 - with `make build` using Docker
 
 #### Build with Docker
@@ -52,7 +42,7 @@ $ cd /path/to/repo
 $ CORE=avr BOARD=nano make build
 ```
 
-The generated build files will be in the `GaggiaPIDController/build` directory.
+The generated build files will be in the `CoffeeMachine/build` directory.
 
 After building the Docker image the first time, you can then use the `arduino-cli` installed in the Docker image directly with:
 

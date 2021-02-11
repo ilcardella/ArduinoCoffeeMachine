@@ -4,7 +4,7 @@ services:
     build:
       context: .
       target: arduino-builder
-    image: gaggiapidcontroller/arduino-builder
+    image: arduino_coffee_machine/arduino-builder
     command: scripts/build-project.sh $CORE $BOARD
     user: $UID:$GID
     volumes:
@@ -13,7 +13,7 @@ services:
     build:
       context: .
       target: docs-builder
-    image: gaggiapidcontroller/docs-builder
+    image: arduino_coffee_machine/docs-builder
     command: make -C docs html
     user: $UID:$GID
     volumes:

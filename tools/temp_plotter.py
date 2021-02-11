@@ -49,7 +49,7 @@ class SerialPlotter:
     def setup_plot(self):
         fig = plt.figure(figsize=(10, 8))
         ax = plt.axes(xlim=(0.0, self.plot_size), ylim=(0.0, 200.0))
-        ax.set_title("Gaggia PID Controller Plotter")
+        ax.set_title("Temperature Plotter")
         ax.set_xlabel("Time")
         ax.set_ylabel("Temperature C")
 

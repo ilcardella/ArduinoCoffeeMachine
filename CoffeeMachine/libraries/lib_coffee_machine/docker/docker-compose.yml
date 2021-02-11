@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  lib_coffee_machine_builder:
+    build:
+      context: .
+      target: builder
+    image: lib_coffee_machine_builder
+    command: scripts/test-project.sh
+    user: $UID:$GID
+    volumes:
+        - "../:/build"

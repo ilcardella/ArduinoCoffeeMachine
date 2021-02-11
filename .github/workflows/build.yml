@@ -1,4 +1,4 @@
-name: GaggiaPIDController CI
+name: CI pipeline
 
 on:
   push:
