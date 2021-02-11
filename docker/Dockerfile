@@ -25,6 +25,6 @@ CMD [ "arduino-cli" "version" ]
 
 FROM sphinxdoc/sphinx:latest AS docs-builder
 
+RUN python3 -m pip install sphinx-rtd-theme
+
 WORKDIR /build
-COPY requirements.txt /build
-RUN pip3 install -r requirements.txt
