@@ -1,4 +1,4 @@
-GaggiaPIDController's documentation
+Arduino Coffee Machine's documentation
 ###################################
 
 .. important:: This project is a work in progress, I will update the documentation while
@@ -7,7 +7,7 @@ GaggiaPIDController's documentation
 Introduction
 ************
 
-``GaggiaPIDController`` is a modification for Gaggia coffee machines replacing the
+This project is a modification for Gaggia coffee machines replacing the
 existing thermostats with a PID controller powered by Arduino.
 This modification could be applied to other machines too, but
 in this document I will describe how I modified a ``Gaggia Paros``.
