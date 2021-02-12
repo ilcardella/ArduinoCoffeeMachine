@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'GaggiaPIDController'
+project = 'ArduinoCoffee Machine'
 copyright = '2020, Alberto Cardellini'
 author = 'Alberto Cardellini'
 

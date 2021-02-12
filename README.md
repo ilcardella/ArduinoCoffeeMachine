@@ -65,7 +65,7 @@ This is the list of components I used for the project:
 
 ## Documentation
 
-Read the project documentation at: https://gaggiapidcontroller.readthedocs.io
+Read the project documentation at: https://arduinocoffeemachine.readthedocs.io
 
 Or build it locally with:
 
