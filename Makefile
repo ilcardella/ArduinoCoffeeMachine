@@ -6,24 +6,24 @@ endif
 CORE ?= avr
 BOARD ?= nano
 ENV_VARS = CORE=$(CORE) BOARD=$(BOARD) UID=$(shell id -u) GID=$(shell id -g)
-DOCKER_COMPOSE = $(ENV_VARS) docker-compose -f docker/docker-compose.yml up --build
-DOCKER_BUILD = $(ENV_VARS) docker-compose -f docker/docker-compose.yml build --force-rm
-DOCKER_RUN = $(ENV_VARS) docker-compose -f docker/docker-compose.yml run --rm
+DOCKER_COMPOSE = $(ENV_VARS) docker-compose -f docker/docker-compose.yml up
+DOCKER_BUILD = $(ENV_VARS) docker-compose -f docker/docker-compose.yml build --force-rm --no-cache
 
 default: ci
 
-build-docker:
+docker:
 > $(DOCKER_BUILD) arduino-builder
+> $(DOCKER_BUILD) docs-builder
 
-build: build-docker
-> $(DOCKER_RUN) arduino-builder scripts/build-project.sh  $(CORE) $(BOARD)
+build:
+> $(DOCKER_COMPOSE) --exit-code-from arduino-builder arduino-builder
 
 docs:
 > $(DOCKER_COMPOSE) --exit-code-from docs-builder docs-builder
 
-ci: build docs
+ci: docker build docs
 
 clean:
 > rm -rf build
 
-.PHONY: default build docs ci build-docker clean
+.PHONY: default build docs ci docker clean

@@ -1,5 +1,5 @@
 Arduino Coffee Machine's documentation
-###################################
+######################################
 
 .. important:: This project is a work in progress, I will update the documentation while
    I progress with the work and things might change along the road
