@@ -2,7 +2,7 @@
 
 #include <PID_v1.h>
 
-#include "lib_coffee_machine/src/lib_coffee_machine/interfaces.h"
+#include "lib_coffee_machine/include/lib_coffee_machine/interfaces.h"
 
 class ArduinoPID : public Controller
 {

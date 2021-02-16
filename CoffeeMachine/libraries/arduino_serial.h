@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lib_coffee_machine/src/lib_coffee_machine/interfaces.h"
+#include "lib_coffee_machine/include/lib_coffee_machine/interfaces.h"
 #include <Arduino.h>
 
 class ArduinoSerial : public BaseSerialInterface
