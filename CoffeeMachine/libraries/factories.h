@@ -90,7 +90,7 @@ class SerialFactory
         switch (Configuration::SERIAL_INTERFACE_TYPE)
         {
         case Configuration::SerialTypes::ARDUINO_SERIAL:
-            return new ArduinoSerial(Configuration::SERIAL_BAUDRATE);
+            return new ArduinoSerial();
             break;
         default:
             // Ideally we would raise an exception here

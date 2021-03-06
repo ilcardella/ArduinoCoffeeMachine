@@ -6,10 +6,7 @@
 class ArduinoSerial : public BaseSerialInterface
 {
   public:
-    ArduinoSerial(const unsigned short &baudrate)
-    {
-        begin(baudrate);
-    }
+    ArduinoSerial() = default;
 
     void begin(const unsigned long &baudrate) override
     {
