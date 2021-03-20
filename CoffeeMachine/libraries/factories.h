@@ -35,7 +35,7 @@ class SensorFactory
             break;
         case Configuration::SensorTypes::KTYPE_SPI:
             return new KTypeThermocouple(pin, Configuration::SPI_CLK_PIN,
-                                         Configuration::SPI_DO_PIN);
+                                         Configuration::SPI_CS_PIN);
             break;
         default:
             // Ideally we would raise an exception here
