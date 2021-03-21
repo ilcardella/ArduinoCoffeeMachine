@@ -16,22 +16,22 @@ class SSD1306AsciiDisplay : public BaseDisplay
     {
         Wire.begin();
         Wire.setClock(400000L);
-        display.begin(&Adafruit128x64, 0x3C);
-        display.setFont(Adafruit5x7);
+        oled.begin(&Adafruit128x64, 0x3C);
+        oled.setFont(Adafruit5x7);
         clear();
         return true;
     }
 
     bool clear() override
     {
-        display.clear();
+        oled.clear();
         return true;
     }
 
     bool print(const unsigned &col, const unsigned &row, const char *data) override
     {
-        display.setCursor(col, row);
-        display.print(data);
+        oled.setCursor(col, row);
+        oled.print(data);
         return true;
     }
 
@@ -53,6 +53,12 @@ class SSD1306AsciiDisplay : public BaseDisplay
         return true;
     }
 
+    bool display()
+    {
+        // Nothing to do
+        return true;
+    }
+
   private:
-    SSD1306AsciiWire display;
+    SSD1306AsciiWire oled;
 };
