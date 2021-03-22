@@ -6,10 +6,11 @@ import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import copy
+import argparse
 
 
 class SerialPlotter:
-    def __init__(self, port="/dev/ttyUSB0", baudrate=9600, plot_size=1000):
+    def __init__(self, port, baudrate, plot_size=1000):
         print("Starting serial connection...")
         self.plot_size = plot_size
         # Serial connection
@@ -112,8 +113,26 @@ class SerialPlotter:
 
 
 def main():
+    parser = argparse.ArgumentParser(prog="Temperature Serial Plotter")
+    parser.add_argument(
+        "-d",
+        "--device",
+        help="The full path of the serial device to use",
+        default="/dev/ttyUSB0",
+        metavar="DEVICE",
+        type=str,
+    )
+    parser.add_argument(
+        "-b",
+        "--baudrate",
+        help="The baudrate used to communicate with the serial device",
+        default=9600,
+        metavar="BAUDRATE",
+        type=int,
+    )
+    args = parser.parse_args()
     try:
-        plotter = SerialPlotter(port="/dev/ttyUSB0", baudrate=9600)
+        plotter = SerialPlotter(port=args.device, baudrate=args.baudrate)
         plotter.start()
     except serial.serialutil.SerialException as e:
         print(e)
