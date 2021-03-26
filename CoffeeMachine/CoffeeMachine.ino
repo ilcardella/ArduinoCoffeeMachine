@@ -1,12 +1,11 @@
 #include "libraries/arduino_adapter.h"
 #include "libraries/arduino_pin.h"
+#include "libraries/configuration.h"
 #include "libraries/factories.h"
 
 #include "libraries/lib_coffee_machine/include/lib_coffee_machine/coffee_machine.h"
-#include "libraries/lib_coffee_machine/include/lib_coffee_machine/default_configuration.h"
 
 using Adapter = ArduinoAdapter;
-using Configuration = DefaultConfiguration;
 
 CoffeeMachine<Adapter, Configuration> *machine;
 
@@ -33,6 +32,7 @@ void loop()
     if (machine)
     {
         machine->spin();
+        delay(1);
     }
     else
     {
