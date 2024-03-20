@@ -11,7 +11,7 @@ matplotlib = "^3.2.1"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.3"
-black = {version = "^19.10b0", allow-prereleases = true}
+black = {version = "^24.3", allow-prereleases = true}
 
 [tool.black]
 line-length = 88
